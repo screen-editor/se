@@ -1,3 +1,24 @@
+#ifndef lint
+static char RCSid[] = "$Header: main.c,v 1.4 86/10/07 14:50:17 arnold Exp $";
+#endif
+
+/*
+ * $Log:	main.c,v $
+ * Revision 1.4  86/10/07  14:50:17  arnold
+ * Changed setterm to set_term, to avoid Unix/PC shared library conflict.
+ * 
+ * Revision 1.3  86/07/17  17:20:58  arnold
+ * Terminal initialization code cleaned up considerably.
+ * 
+ * Revision 1.2  86/07/11  15:12:26  osadr
+ * Removed code that was Georgia Tech specific
+ * 
+ * Revision 1.1  86/05/06  13:37:38  osadr
+ * Initial revision
+ * 
+ * 
+ */
+
 /*
 ** main.c
 **
@@ -31,11 +52,11 @@ char Savfil[MAXLINE] = "";	/* remembered file name */
 
 /* Concerning line descriptors: */
 LINEDESC Buf[MAXBUF];
+LINEDESC *Line0;	/* head of list of line descriptors */
 #ifdef OLD_SCRATCH
 LINEDESC *Lastbf;	/* last pointer used in Buf */
 LINEDESC *Free;		/* head of free list */
 #endif
-LINEDESC *Line0;	/* head of list of line descriptors */
 
 
 /* Concerning the 'undo' command: */
@@ -57,10 +78,10 @@ int Saverrcode = ENOERR;/* cause of previous error */
 int Probation = NO;	/* YES if unsaved buffer can be destroyed */
 int Argno;		/* command line argument pointer */
 char Last_char_scanned = 0;	/* last char scanned w/ctl-[sl], init illegal  */
+char Peekc = EOS;	/* push a SKIP_RIGHT if adding delimiters */
 #ifdef HARD_TERMS
 int Tspeed;		/* terminal speed in characters/second */
 #endif
-char Peekc = EOS;	/* push a SKIP_RIGHT if adding delimiters */
 #ifdef BSD4_2
 int Reading = NO;	/* are we doing terminal input? */
 #endif
@@ -117,20 +138,11 @@ int Hup_caught = 0;	/* caught a SIGHUP when phone line dropped */
 int Catching_stops;	/* catching or ignoring SIGTSTP's? */
 #endif
 
-/* Concerning Unix and SWT compatiblity: */
-int Unix_mode = YES;	/* behaving like Unix editors? */
-char BACKSCAN = '?';	/* back scan character */
-char NOTINCCL = '^';	/* class negation character */
-char XMARK = '~';	/* global exclude on mark name */
-char ESCAPE = '\\';	/* escape character */
-
-/* Concering Georgia Tech specific code: */
-int At_gtics = NO;	/* are we running at Georgia Tech ICS? */
-
 /* Concerning file encryption: */
 int Crypting = NO;	/* doing file encryption? */
 char Key[KEYSIZE] = "";	/* saved encryption key */
 
+extern char *getenv ();
 
 /* main --- main program for screen editor */
 
@@ -209,64 +221,10 @@ char *argv[];
 	ttynormal ();
 }
 
-
-#ifdef HARD_TERMS
-/* decode_mnemonic --- decode a terminal type mnemonic */
-
-int decode_mnemonic (str)
-char str[];
-{
-	int i;
-	int strbsr ();
-
-	static struct {
-		char *s;
-		int t;
-	} stab[] = {
-		"950",          TVI950,
-		"adm31",        ADM31,  
-		"adm3a",        ADM3A,  
-		"anp",          ANP,    
-		"b150",         BEE150,   
-		"b200",         BEE200,   
-		"cg",           CG,     
-		"consul",       ADDS980,
-		"esprit",       ESPRIT,
-		"fox",          FOX,    
-		"gt40",         GT40,   
-		"h19",          H19,    
-		"haz",          HAZ1510,
-		"hp21",         HP21,   
-		"hz1510",       HAZ1510,
-		"ibm",          IBM,    
-		"isc",          ISC8001,
-		"netron",       NETRON, 
-		"regent",       ADDS100,
-		"regent40",     ADDS100,	/* kludge */
-		"sbee",         SBEE,   
-		"sol",          SOL,    
-		"trs80",        TRS80,  
-		"ts1",          TS1,
-		"tvt",          TVT,    
-		"vc4404",       VC4404,
-		"vi200",        VI200,
-		"vi300",	VI300,
-		"vi50",         VI50,
-	};
-
-	i = strbsr ((char *)stab, sizeof (stab), sizeof (stab[0]), str);
-	if (i == EOF)
-		return (ERR);
-	else
-		return (stab[i].t);
-}
-#endif
-
-
-
 /* error --- print error message and die semi-gracefully */
 
-error (msg)
+error (coredump, msg)
+int coredump;
 char *msg;
 {
 	/*
@@ -278,45 +236,11 @@ char *msg;
 	ttynormal ();
 	fprintf (stderr, "%s\n", msg);
 	signal (SIGQUIT, SIG_DFL);	/* restore normal quit handling */
-	kill (getpid(), SIGQUIT);	/* dump memory */
-}
-
-
-/* get_term_type --- force user to divulge terminal type */
-
-#ifndef HARD_TERMS
-get_term_type ()
-{
-	int setcaps ();
-#else
-get_term_type (term_type)
-int *term_type;
-{
-	int decode_mnemonic ();
-#endif
-
-	char *p;
-	char *getenv ();
-
-	if ((p = getenv ("TERM")) == NULL)
-	{
-		ttynormal ();
-		fprintf (stderr, "You must set your terminal type with 'TERM=<type>'\n");
+	if (coredump)
+		kill (getpid (), SIGQUIT);	/* dump memory */
+	else
 		exit (1);
-	}
-
-#ifdef HARD_TERMS
-	if ((*term_type =  decode_mnemonic()) == ERR)
-#else
-	if (setcaps (p) == ERR)
-#endif
-	{
-		ttynormal ();
-		fprintf (stderr, "I'm sorry, but I can't support %s terminals.\n", p);
-		exit (1);
-	}
 }
-
 
 /* initialize --- set up global data areas, get terminal type */
 
@@ -326,24 +250,17 @@ char *argv[];
 {
 	int i, dosopt ();
 
-#ifdef HARD_TERMS
-	int strcmp ();
-	int decode_mnemonic ();
-	char lin[MAXLINE];
-
-	/* Determine what type of terminal we're on */
 	Argno = 1;
-	strcpy (lin, &argv[Argno][0]);
-	if (Argno < argc && lin[0] == '-' && lin[2] == EOS
-	    && (lin[1] == 't' || lin[1] == 'T'))
+#ifdef HARD_TERMS
+	/* Determine what type of terminal we're on */
+	if (Argno < argc && argv[Argno][0] == '-' && argv[Argno][2] == EOS
+	    && (argv[Argno][1] == 't' || argv[Argno][1] == 'T'))
 	{
 		Argno = 2;
 		if (Argno < argc)
 		{
-			strcpy (lin, argv[Argno]);
-			strmap (lin, 'l');
-			Term_type = decode_mnemonic (lin);
-			if (Term_type == ERR)
+			strmap (argv[Argno], 'l');
+			if (set_term (argv[Argno]) == ERR)
 				usage ();
 			else
 				Argno++;
@@ -352,11 +269,10 @@ char *argv[];
 			usage ();
 	}
 	else
-		get_term_type (&Term_type);
-#else
-	Argno = 1;
-	get_term_type ();
+		/* fall through to the if, below */
 #endif
+		if (set_term (getenv ("TERM")) == ERR)
+			usage ();
 
 	/* Initialize the scratch file: */
 	mkbuf ();
@@ -371,12 +287,7 @@ char *argv[];
 
 	if (dosopt ("") == ERR)
 		error ("in initialize: can't happen");
-
-	return;
 }
-
-
-
 
 /* intrpt --- see if there has been an interrupt or hangup */
 
@@ -392,11 +303,10 @@ int intrpt ()
 	{
 		Errcode = EHANGUP;
 		Hup_caught = 0;
-		return 1;
+		return (1);
 	}
 	return (0);
 }
-
 
 /* int_hdlr --- handle an interrupt signal */
 
@@ -449,7 +359,6 @@ int stop_hdlr ()
 }
 #endif
 
-
 /* hangup --- dump contents of edit buffer if SIGHUP occurs */
 
 hangup ()
@@ -469,7 +378,6 @@ hangup ()
 	exit (1);
 }
 
-
 /* mswait --- message waiting subroutine */
 
 /* if the user wants to be notified, and the mail file is readable, */
@@ -482,7 +390,6 @@ hangup ()
 mswait ()
 {
 	int access ();
-	char *getenv ();
 	struct stat buf;
 	static char *mbox = NULL;
 	static int first = YES;
@@ -511,7 +418,6 @@ mswait ()
 		twrite (1, "\007", 1);	/* Bell */
 	}
 }
-
 
 /* printverboseerrormessage --- print verbose error message */
 
@@ -645,16 +551,17 @@ printverboseerrormessage ()
 	Errcode = ENOERR;
 }
 
-
 /* usage --- print usage diagnostic and die */
 
 usage ()
 {
 	ttynormal ();
+	fprintf (stderr, "Usage: se%s%s\n",
 #ifdef HARD_TERMS
-	fprintf (stderr, "Usage: se [-t <terminal>] { <pathname | -<opt> }\n");
+	" [ -t <terminal> ] ",
 #else
-	fprintf (stderr, "Usage: se { <pathname> | -<option> }\n");
+	" ",
 #endif
+	"[ --acdfghiklmstuvwxyz ] [ file ... ]");
 	exit (1);
 }

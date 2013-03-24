@@ -1,11 +1,26 @@
+.\" 
+.\" $Header: scriptse.1,v 1.2 86/07/11 15:17:32 osadr Exp $
+.\" 
+.\" $Log:	scriptse.1,v $
+.\" Revision 1.2  86/07/11  15:17:32  osadr
+.\" Removal of Georgia Tech specific items, and some cleaning up.
+.\" 
+.\" Revision 1.1  86/05/06  13:41:03  osadr
+.\" Initial revision
+.\" 
+.\" 
+.\" 
 .TH SCRIPTSE 1 local
 .SH NAME
 scriptse \- make scripts for se
 .SH SYNOPSIS
-.B scriptse [-d]
+.B scriptse
+[
+.B \-d
+]
 < script_file |
 .B se
-[&]
+[ & ]
 .SH DESCRIPTION
 .I Scriptse
 reads standard input, and writes standard output.
@@ -37,11 +52,12 @@ will
 .I not
 add the ASCII DEL after each carriage return.
 This is useful for program which want to turn newlines into carraige
-returns, for instance when sending files across the VAX link to the
-Primes.
+returns.
 .PP
 If you do use a script, either sit back and watch it run, or redirect
-the output into a file (or /dev/null, if you are confident).
+the output into a file (or
+.BR /dev/null ,
+if you are confident).
 .SH SEE ALSO
 .IR se (1).
 .SH CAVEATS

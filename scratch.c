@@ -1,3 +1,18 @@
+#ifndef lint
+static char RCSid[] = "$Header: scratch.c,v 1.2 86/07/17 17:21:38 arnold Exp $";
+#endif
+
+/*
+ * $Log:	scratch.c,v $
+ * Revision 1.2  86/07/17  17:21:38  arnold
+ * Calls to error() changed to reflect whether or not to coredump.
+ * 
+ * Revision 1.1  86/05/06  13:38:04  osadr
+ * Initial revision
+ * 
+ * 
+ */
+
 /*
 ** scratch.c
 **
@@ -342,7 +357,7 @@ register char str[];
 			close (*fd);
 
 	}
-	error ("can't create scratch file");
+	error (YES, "can't create scratch file");
 }
 
 
@@ -389,7 +404,7 @@ int  count, fd;
 
 	ret = read (fd, buf, count);
 	if (ret != count)
-		error ("Fatal scratch file read error");
+		error (YES, "Fatal scratch file read error");
 
 	return (ret);
 }
@@ -419,7 +434,7 @@ filedes fd;
 
 	ret = lseek (fd, pos, 0);               /* abs seek */
 	if (ret != pos)
-		error ("Fatal scratch file seek error");
+		error (YES, "Fatal scratch file seek error");
 	return (OK);
 }
 
@@ -522,7 +537,7 @@ filedes fd;
 
 	ret = write (fd, buf, count);
 	if (ret != count)
-		error ("Fatal scratch file write error");
+		error (YES, "Fatal scratch file write error");
 	return (ret);
 }
 

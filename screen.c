@@ -1,3 +1,21 @@
+#ifndef lint
+static char RCSid[] = "$Header: screen.c,v 1.3 86/07/17 17:22:19 arnold Exp $";
+#endif
+
+/*
+ * $Log:	screen.c,v $
+ * Revision 1.3  86/07/17  17:22:19  arnold
+ * Senddelay() moved to term.c, where it belongs.
+ * 
+ * Revision 1.2  86/05/27  17:46:46  osadr
+ * Fix for early 4.2 BSD systems to use <sys/time.h> instead of <time.h>.
+ * 
+ * Revision 1.1  86/05/06  13:38:18  osadr
+ * Initial revision
+ * 
+ * 
+ */
+
 /*
 ** screen.c
 **
@@ -7,7 +25,11 @@
 
 #include "se.h"
 #include "extern.h"
+#ifdef BSD4_2
+#include <sys/time.h>
+#else
 #include <time.h>
+#endif
 
 /* clrrow --- clear out all of a row except the bar */
 
@@ -1080,21 +1102,3 @@ fixscreen ()
 	}
 
 }
-
-
-#ifdef HARD_TERMS
-/* senddelay --- send NULs to delay n milliseconds */
-
-senddelay (n)
-int n;
-{
-	register int q;
-
-	q = (long) n * Tspeed / 1000l;
-	while (q > 0)
-	{
-		twrite (1, "\0\0\0\0\0\0\0\0\0\0", q > 10 ? 10 : q);
-		q -= 10;
-	}
-}
-#endif

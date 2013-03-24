@@ -1,4 +1,16 @@
 #! /bin/sh
+# 
+# $Header: Install,v 1.2 86/10/07 15:09:08 arnold Exp $
+# 
+# $Log:	Install,v $
+# Revision 1.2  86/10/07  15:09:08  arnold
+# Fixed to make the help directory and use relative paths.
+# 
+# Revision 1.1  86/05/06  14:04:04  osadr
+# Initial revision
+# 
+# 
+# 
 : Install -- put se help files into their proper directory.
 :	     This program is called from the makefile.
 
@@ -6,10 +18,22 @@ INSTALL=$1
 shift
 umask 022
 
+if [ ! -d $INSTALL ]
+then
+	echo making directory $INSTLL
+	if mkdir $INSTALL
+	then
+		:
+	else
+		echo could not mkdir $INSTALL
+		exit 1
+	fi
+fi
+
 for i in $*
 do
 	echo installing $i
-	detab < $i > $INSTALL/$i
+	./detab < $i > $INSTALL/$i
 done
 
 : we really should do some error checking, but what the heck.

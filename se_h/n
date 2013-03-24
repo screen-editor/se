@@ -1,0 +1,11 @@
+          n    -- Name command
+
+               default range           syntax
+                         .,.           n<single-character-name>
+
+        "n" is used to uniquely mark a line.  if the same mark name is
+        already on other lines, it will be removed from them.
+
+
+        To  return to the command directory, type "hcomdir."  See also
+        "hk" and "hln"

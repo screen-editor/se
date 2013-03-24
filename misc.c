@@ -1,3 +1,15 @@
+#ifndef lint
+static char RCSid[] = "$Header: misc.c,v 1.1 86/05/06 13:37:51 osadr Exp $";
+#endif
+
+/*
+ * $Log:	misc.c,v $
+ * Revision 1.1  86/05/06  13:37:51  osadr
+ * Initial revision
+ * 
+ * 
+ */
+
 /*
 ** misc.c
 **

@@ -1,3 +1,21 @@
+#ifndef lint
+static char RCSid[] = "$Header: docmd1.c,v 1.3 86/07/17 17:19:37 arnold Exp $";
+#endif
+
+/*
+ * $Log:	docmd1.c,v $
+ * Revision 1.3  86/07/17  17:19:37  arnold
+ * Some general code cleaning up.
+ * 
+ * Revision 1.2  86/07/11  15:10:20  osadr
+ * Removed Georgia Tech specific items.
+ * 
+ * Revision 1.1  86/05/06  13:36:44  osadr
+ * Initial revision
+ * 
+ * 
+ */
+
 /*
 ** docmd1.c
 **
@@ -138,11 +156,6 @@ int i, glob, *status;
 
 	case COPYCOM:
 	case UCCOPYCOM:
-		if (! Unix_mode)
-			goto translit;	/* SWT uses 't' for translit */
-		/* else
-			fall through and act normally */
-	docopy:
 		i++;
 		if (getone (lin, &i, &line3, status) == EOF)
 			*status = ERR;
@@ -161,7 +174,7 @@ int i, glob, *status;
 			/* turn "s\n" into "s//%/\n" */
 			lin[i+0] = '/';
 			lin[i+1] = '/';
-			lin[i+2] = Unix_mode ? '%' : '&';
+			lin[i+2] = '%';
 			lin[i+3] = '/';
 			lin[i+4] = '\n';
 			lin[i+5] = EOS;
@@ -207,18 +220,13 @@ int i, glob, *status;
 
 	case TLITCOM:
 	case UCTLITCOM:
-		if (! Unix_mode)
-			goto docopy;	/* SWT uses 'y' for copying */
-		/* else
-			fall through and act normally */
-	translit:
 		i++;
 		if (lin[i] == '\n')
 		{
 			/* turn "y\n" into "y//%/\n" */
 			lin[i+0] = '/';
 			lin[i+1] = '/';
-			lin[i+2] = Unix_mode ? '%' : '&';
+			lin[i+2] = '%';
 			lin[i+3] = '/';
 			lin[i+4] = '\n';
 			lin[i+5] = EOS;
@@ -449,20 +457,10 @@ int i, glob, *status;
 		break;
 
 	case SHELLCOM:
-		if (! Unix_mode)
-			error ("in docmd: can't happen.");
-	shellcom:
 		i++;
 		defalt (Curln, Curln);
 		*status = doshell (lin, &i);
 		break;
-
-	case '~':
-		if (! Unix_mode)
-			goto shellcom;
-		/* else
-			fall through to default
-			which will generate an error */
 
 	default:
 		Errcode = EWHATZAT;	/* command not recognized */
@@ -503,14 +501,6 @@ int *i, *status;
 	for (j = 0; filename[j] != EOS; j++)
 		if (isupper (filename[j]))
 			filename[j] = tolower (filename[j]);
-
-	sprintf (swt_filename, "%s_swt", filename);
-
-	if (! Unix_mode && access (swt_filename, 4) == 0)
-		strcpy (filename, swt_filename);
-		/* SWT version of help file exists, use it */
-	/* else
-		use Unix or normal version of the help file */
 
 	*status = OK;
 	if ((fp = fopen (filename, "r")) == NULL)
@@ -597,19 +587,8 @@ int *i;
 #ifdef BSD
 			if (Catching_stops)
 			{
-				char *getenv ();
-
-				/*
-				 * order the test this way so that it fails
-				 * immediately in the usual case
-				 */
-				if (getenv ("RSE") != NULL && At_gtics)
-				{
-					remark ("You may not suspend me");
-					break;	/* switch */
-				}
-				else if (Buffer_changed == YES)
-					fprintf (stderr, "WARNING: buffer not saved\n");
+				if (Buffer_changed == YES)
+					fprintf (stderr, "WARNING: buffer not saved\r\n");
 				kill (getpid(), SIGTSTP);
 				/* stop_hdlr() will do all the work for us */
 			}
@@ -892,51 +871,6 @@ int *i;
 		}
 		break;
 
-	case 'p':		/* toggle pattern and command style */
-	case 'P':		/* if additional letter there, it forces mode */
-		ret = OK;
-		switch (lin[*i + 1]) {
-		case EOS:
-		case '\n':	/* toggle */
-			if (Unix_mode)
-				goto no_unix;
-				/* currently in Unix mode */
-				/* switch to SWT style patterns */
-			else
-				goto yes_unix;
-				/* currently in SWT mode */
-				/* switch to Unix style patterns */
-
-			break;
-
-		case 's':	/* force SWT mode */
-		case 'S':
-	no_unix:	Unix_mode = NO;
-			BACKSCAN = '\\';
-			NOTINCCL = '~';
-			XMARK = '!';
-			ESCAPE = '@';
-			break;
-
-		case 'u':	/* force UNIX mode */
-		case 'U':
-	yes_unix:	Unix_mode = YES;
-			BACKSCAN = '?';
-			NOTINCCL = '^';
-			XMARK = '~';
-			ESCAPE = '\\';
-			break;
-		
-		default:
-			Errcode = EOWHAT;
-			ret = ERR;
-			goto out_of_here;
-		}
-		set_patterns (Unix_mode);
-		mesg (Unix_mode ? "UNIX" : "SWT", MODE_MSG);
-	out_of_here:
-		break;
-	
 	case 'x':
 	case 'X':	/* toggle tab compression */
 		if (lin[*i + 1] == '\n')
@@ -1175,47 +1109,40 @@ char lin[];
 		return (ERR);
 	}
 
+	/*
+	 * these are all the same under Unix, so factor
+	 * them out of the switch.
+	 */
+
+	Rel_a = 'A';
+	Rel_z = 'Z';
+	Invert_case = NO;
+	Compress = NO;
+
 	switch (ltxt[i].val) {
 	case 1:
 		Warncol = 74;
-		Rel_a = 'A';
-		Rel_z = 'Z';
-		Invert_case = NO;
 		strcpy (Tabstr, "+4");
-		settab (Tabstr);
-		Compress = NO;
-		break;
-
-	case 3:
-		Warncol = 74;
-		Rel_a = 'A';
-		Rel_z = 'Z';
-		Invert_case = NO;
-		strcpy (Tabstr, "+8");
-		settab (Tabstr);
-		Compress = YES;
-		break;
-	case 4:
-		Warncol = 72;
-		Rel_a = 'A';
-		Rel_z = 'Z';
-		Invert_case = NO;
-		strcpy (Tabstr, "7+3");
-		settab (Tabstr);
-		Compress = YES;
 		break;
 
 	case 2:
 		Warncol = 72;
-		Rel_a = 'A';
-		Rel_z = 'Z';
-		Invert_case = NO;
 		strcpy (Tabstr, "17+8");
-		settab (Tabstr);
-		Compress = YES;
+		Compress = YES;		/* except this one */
+		break;
+
+	case 3:
+		Warncol = 74;
+		strcpy (Tabstr, "+8");
+		break;
+
+	case 4:
+		Warncol = 72;
+		strcpy (Tabstr, "7+3");
 		break;
 	}
 
+	settab (Tabstr);
 	mesg (Invert_case == YES ? "CASE" : "", CASE_MSG);
 	mesg (Compress == YES ? "XTABS" : "", COMPRESS_MSG);
 
@@ -1447,7 +1374,7 @@ char *file;
 char *expand_env (file)
 register char *file;
 {
-	register int i, j, k;	/* indices */
+	register int i, j, k;		/* indices */
 	char *getenv ();
 	char var[MAXLINE];		/* variable name */
 	char *val;			/* value of environment variable */
@@ -1481,9 +1408,9 @@ register char *file;
 				for (k = 0; val[k] != EOS; k++)
 					buf[j++] = val[k];
 					/* copy val into file name */
-			/* else
-				var not in enviroment; leave file
-				name alone, multiple slashes are legal */
+			else if (file[i] == '/')
+				i++;	/* var not in enviroment; strip */
+					/* extra slash */
 		}
 	}
 	buf[j] = EOS;
@@ -1506,7 +1433,7 @@ char *file, *mode;
 	{
 		getkey ();
 		if (Key[0] == EOS)
-			printf ("The key must be non-empty!\n");
+			fprintf (stderr, "The key must be non-empty!\r\n");
 	}
 
 	switch (mode[0]) {

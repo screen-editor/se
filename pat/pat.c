@@ -1,8 +1,22 @@
+#ifndef lint
+static char RCSid[] = "$Header: pat.c,v 1.2 86/07/11 15:24:44 osadr Exp $";
+#endif
+
+/*
+ * $Log:	pat.c,v $
+ * Revision 1.2  86/07/11  15:24:44  osadr
+ * Removed Georgia Tech-ism of changeable pattern characters.
+ * 
+ * Revision 1.1  86/05/06  13:32:49  osadr
+ * Initial revision
+ * 
+ * 
+ */
+
 /*
 ** pat.c
 **
 ** pattern matching subroutines for the se screen editor.
-** knows about both Unix and SWT style patterns.
 **
 ** routines declared static are not necessary for the rest
 ** of the editor, therefore make them static in the name
@@ -27,49 +41,18 @@
 #define NCCL            'n'
 #define NEWLINE         '\n'
 #define TAB             '\t'
-
-/* variables which are changeable if using unix style or swt style */
-/* initially unix style */
-static char ANY = '.';
-static char BOL = '^';
-static char NOTINCCL = '^';
-static char START_TAG = '(';
-static char STOP_TAG = ')';
-static char ESCAPE = '\\';
-static int unix_style = YES;
+#define ANY		'.'
+#define BOL		'^'
+#define NOTINCCL	'^'
+#define START_TAG	'('
+#define STOP_TAG	')'
+#define ESCAPE		'\\'
 
 /* Array dimensions and other limit values */
 #define MAXLINE         128
 #define MAXPAT          128
 
 /* Pattern matching subroutines: */
-
-/* set_patterns -- tell the pattern routines what style patterns we're using */
-
-set_patterns(tounix)
-int tounix;
-{
-	if (tounix == YES)
-	{
-		ANY = '.';
-		BOL = '^';
-		NOTINCCL = '^';
-		START_TAG = '(';
-		STOP_TAG = ')';
-		ESCAPE = '\\';
-		unix_style = YES;
-	}
-	else
-	{
-		ANY = '?';
-		BOL = '%';
-		NOTINCCL = '~';
-		START_TAG = '{';
-		STOP_TAG = '}';
-		ESCAPE = '@';
-		unix_style = NO;
-	}
-}
 
 /* match () --- find match anywhere on line */
 
@@ -116,8 +99,8 @@ char lin[], pat[];
 				if ((k = amatch (lin, ch - lin, ppat, tagbeg,
 				    tagend)) >= 0)
 					break;
-			lastc = lin + k;        /* if k < 0, failure;
-						 * if k >= 0, success */
+			lastc = lin + k;        /* if k < 0, failure */
+						/* if k >= 0, success */
 			break;
 		}
 		else if (*ppat == START_TAG)
@@ -132,7 +115,6 @@ char lin[], pat[];
 	return (lastc - lin);
 }
 
-
 /* omatch () --- try to match a single pattern at ppat */
 
 static omatch (lin, adplin, ppat)
@@ -146,43 +128,40 @@ char lin[], **adplin, *ppat;
 	if (*plin == EOS)
 		return (retval);
 	bump = -1;
-	if (*ppat == CHAR)
-	{
+	switch (*ppat) {
+	case CHAR:
 		if (*plin == *(ppat + 1))
 			bump = 1;
-	}
+		break;
 
-	else if (*ppat == BOL)
-	{
+	case BOL:
 		if (plin == lin)
 			bump = 0;
-	}
+		break;
 
-	else if (*ppat == ANY)
-	{
+	case ANY:
 		if (*plin != NEWLINE)
 			bump = 1;
-	}
+		break;
 
-	else if (*ppat == EOL)
-	{
+	case EOL:
 		if (*plin == NEWLINE)
 			bump = 0;
-	}
+		break;
 
-	else if(*ppat == CCL)
-	{
+	case CCL:
 		if (locate (*plin, ppat + 1) == YES)
 			bump = 1;
-	}
+		break;
 
-	else if(*ppat == NCCL)
-	{
+	case NCCL:
 		if (*plin != NEWLINE && locate (*plin, ppat + 1) == NO)
 			bump = 1;
-	}
-	else
+		break;
+
+	default:
 		error ("in omatch: can't happen.");
+	}
 
 	if (bump >= 0)
 	{
@@ -214,20 +193,27 @@ static patsiz (ppat)
 register char *ppat;
 {
 
-	if (*ppat == CHAR || *ppat == START_TAG || *ppat == STOP_TAG)
+	switch (*ppat) {
+	case CHAR:
+	case START_TAG:
+	case STOP_TAG:
 		return (2);
 
-	else if (*ppat == BOL || *ppat == EOL || *ppat == ANY)
+	case BOL:
+	case EOL:
+	case ANY:
 		return (1);
 
-	else if (*ppat == CCL || *ppat == NCCL)
+	case CCL:
+	case NCCL:
 		return (*(ppat + 1) + 2);
 
-	else if (*ppat == CLOSURE)
+	case CLOSURE:
 		return (CLOSIZE);
 
-	else
+	default:
 		error ("in patsiz: can't happen.");
+	}
 }
 
 
@@ -268,7 +254,6 @@ int from;
 			stclos (pat, &patsub, &lastsub);
 		}
 		else if (start_tag(arg, &argsub))
-				/* start_tag knows about unix or not */
 		{
 			/* too many tagged sub-patterns */
 			if (tag_num >= 8)
@@ -280,7 +265,6 @@ int from;
 			junk = addset (tag_num, pat, &patsub, MAXPAT);
 		}
 		else if (stop_tag(arg, &argsub) && tag_nest > -1)
-				/* stop_tag knows about unix or not */
 		{
 			junk = addset (STOP_TAG, pat, &patsub, MAXPAT);
 			junk = addset (tag_stack[tag_nest], pat, &patsub, MAXPAT);
@@ -512,19 +496,13 @@ static int start_tag(arg, argsub)
 char *arg;
 int *argsub;
 {
-	if (unix_style)
-		if (arg[*argsub] == ESCAPE && arg[*argsub + 1] == START_TAG)
-		{
-			(*argsub)++;
-			return (YES);
-		}
-		else
-			return (NO);
+	if (arg[*argsub] == ESCAPE && arg[*argsub + 1] == START_TAG)
+	{
+		(*argsub)++;
+		return (YES);
+	}
 	else
-		if (arg[*argsub] == START_TAG)
-			return (YES);
-		else
-			return (NO);
+		return (NO);
 }
 
 /* stop_tag --- determine if we've seen the end of a tagged pattern */
@@ -533,17 +511,11 @@ static int stop_tag(arg, argsub)
 char *arg;
 int *argsub;
 {
-	if (unix_style)
-		if (arg[*argsub] == ESCAPE && arg[*argsub + 1] == STOP_TAG)
-		{
-			(*argsub)++;
-			return (YES);
-		}
-		else
-			return (NO);
+	if (arg[*argsub] == ESCAPE && arg[*argsub + 1] == STOP_TAG)
+	{
+		(*argsub)++;
+		return (YES);
+	}
 	else
-		if (arg[*argsub] == STOP_TAG)
-			return (YES);
-		else
-			return (NO);
+		return (NO);
 }

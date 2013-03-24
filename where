@@ -1,4 +1,16 @@
 #! /bin/sh
+# 
+# $Header: where,v 1.2 86/07/11 15:14:10 osadr Exp $
+# 
+# $Log:	where,v $
+# Revision 1.2  86/07/11  15:14:10  osadr
+# Removed Georgia Tech specific items.
+# 
+# Revision 1.1  86/05/06  13:34:27  osadr
+# Initial revision
+# 
+# 
+# 
 
 # where --- shell file to determine what kind of environment we are in
 
@@ -25,28 +37,15 @@ then
 		;;
 	esac
 	PATH=$OPATH
-	echo -UGITVAX	# pyramid is never GITVAX
-else		# on something that is not a pyrmaid
+else		# on something that is not a pyramid
 	if grep SIGTSTP /usr/include/signal.h > /dev/null
 	then		# berkeley unix
 		if test -r /usr/include/whoami.h	# 4.1
 		then
 			echo "-UUSG -DBSD -UBSD4_2"
-			host="`sed 's/[^\"]*\"\([^\"]*\)\"/\1/' < /usr/include/whoami.h`"
 		else					# 4.2
 			echo "-UUSG -DBSD -DBSD4_2"
-			host=`hostname`
 		fi
-		case $host in
-		gatech | \
-		gt-nimbus | nimbus | \
-		gt-cirrus | cirrus | \
-		gt-stratus | stratus)	echo -DGITVAX
-				;;
-		
-		*)	echo -UGITVAX
-			;;
-		esac
 		echo -US5R2
 	else			# ATT unix
 		echo "-DUSG -UBSD -UBSD4_2"
@@ -56,6 +55,5 @@ else		# on something that is not a pyrmaid
 		else
 			echo -US5R2
 		fi
-		echo -UGITVAX
 	fi
 fi

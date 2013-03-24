@@ -1,3 +1,15 @@
+#ifndef lint
+static char RCSid[] = "$Header: detab.c,v 1.1 86/05/06 14:04:37 arnold Locked $";
+#endif
+
+/*
+ * $Log:	detab.c,v $
+ * Revision 1.1  86/05/06  14:04:37  arnold
+ * Initial revision
+ * 
+ * 
+ */
+
 /* Detab - convert tabs to appropriate number of spaces */
 
 /* transcribed from Kernighan and Plaguer (Software Tools) */

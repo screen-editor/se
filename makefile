@@ -1,3 +1,19 @@
+# 
+# $Header: makefile,v 1.3 86/09/19 12:16:19 arnold Exp $
+# 
+# $Log:	makefile,v $
+# Revision 1.3  86/09/19  12:16:19  arnold
+# Fixed to ignore return code from shell if statement.
+# 
+# Revision 1.2  86/05/27  17:47:50  osadr
+# Changes to support the Unix PC (no egrep, shared library), and
+# to support making if . is not in the search path.
+# 
+# Revision 1.1  86/05/06  13:39:18  osadr
+# Initial revision
+# 
+# 
+# 
 # makefile for the Georgia Tech Screen Editor, 'se'
 
 HEADERS= ascii.h constdefs.h extern.h se.h
@@ -7,9 +23,7 @@ OBJS= docmd1.o docmd2.o edit.o main.o misc.o scratch.o screen.o term.o
 
 LIBRARIES= libchangetty/libchangetty.a pat/libpat.a
 
-LIBS=`echo $(LIBRARIES); if egrep 'DBSD|US5R2' flags > /dev/null; then echo -ltermlib; else echo -lcurses; fi`
-
-DOCS= makefile README changes.made
+DOCS= makefile README
 MANS= scriptse.1 se.1
 
 CFLAGS= -O `cat flags`
@@ -23,7 +37,7 @@ SHELL=/bin/sh
 
 # PR is to print the files nicely.  Use pr -n if available, or else just pr
 # I use a private utility called 'prt'
-PR=prt
+PR=pr
 
 # NROFF is for nroffing.  we use the System V nroff. 
 NROFF=/usr/5bin/nroff
@@ -36,7 +50,7 @@ DESTBIN= /usr/local/bin
 
 # OWNER and GROUP are the owner and group respectively
 OWNER= root
-GROUP= admin
+GROUP= sys
 
 # INSTALL is the program to do the installation, use cp for real work
 INSTALL= cp
@@ -62,12 +76,20 @@ all: se scriptse se.1
 	@echo all done
 
 se: $(OBJS) $(LIBRARIES)
-	$(CC) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
+	if grep DBSD flags > /dev/null || grep US5R2 flags > /dev/null; \
+	then	echo -ltermlib > libs; \
+	else	echo -lcurses > libs ; \
+	fi
+	-if [ -f /lib/shlib.ifile ] ; \
+	then	ld /lib/crt0s.o /lib/shlib.ifile $(OBJS) $(LIBRARIES) -o $@ ; \
+	else	$(CC) $(LDFLAGS) $(OBJS) $(LIBRARIES) `cat libs` -o $@ ; \
+	fi
+	rm libs
 
 $(OBJS): $(HEADERS) flags
 
 flags: where
-	where > flags
+	./where > flags
 
 libchangetty/libchangetty.a: libchangetty/changetty.c
 	cd libchangetty; make
@@ -79,7 +101,7 @@ scriptse: scriptse.c
 	$(CC) -O scriptse.c -o scriptse
 
 se.1: se.m4 flags
-	(m4munge $(CFLAGS) ; cat se.m4) | m4 | sed '/^$$/d' > se.1
+	(./m4munge $(CFLAGS) ; cat se.m4) | m4 | sed '/^$$/d' > se.1
 
 install: all $(MANS)
 	$(INSTALL) se $(DESTBIN)

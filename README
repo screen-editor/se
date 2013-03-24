@@ -1,6 +1,21 @@
+# 
+# $Header: README,v 1.3 86/07/17 17:52:23 arnold Exp $
+# 
+# $Log:	README,v $
+# Revision 1.3  86/07/17  17:52:23  arnold
+# Fixed some spelling mistakes.
+# 
+# Revision 1.2  86/07/17  17:19:06  arnold
+# Removed GT specific stuff, added discussion of window sensitivities.
+# 
+# Revision 1.1  86/05/06  13:34:09  osadr
+# Initial revision
+# 
+# 
+# 
 README:
 
-This directory contains the source files for the Vax version of the Georgia
+This directory contains the source files for the Unix version of the Georgia
 Tech Screen Editor "Se".  It has three subdirectories which contain things
 that se needs. Here is a rundown of the various files.
 
@@ -53,16 +68,16 @@ scriptse	-- the executable version of the script maker.
 Conditional Compilation flags:
 
 	The flag HARD_TERMS, if added to the CFLAGS macro in the makefile,
-will remove the terminal-independant code which uses termlib, and put back
+will remove the terminal-independent code which uses termlib, and put back
 the original, terminal-types-hardwired-into-the-program code.  The only
-reason to do this is if se has to run on a system without the termlib pacakage.
+reason to do this is if se has to run on a system without the termlib package.
 Using termlib, se is considerably smaller, as well as more flexible.
 
 	The flag OLD_SCRATCH, if added to the CFLAGS macro in the makefile,
 will cause se to use the original, linked-list method for keeping track of
 lines in the buffer.  This method is faster for rearranging lines, but
 considerably slower for simply looking up lines.  Currently, se uses the
-method given is Software Tools in Pascal, which keeps the lines in order in
+method given in Software Tools in Pascal, which keeps the lines in order in
 an array.  It is slower at rearranging, but as fast as possible for finding
 lines in the buffer.  This version also takes less data and code space.
 
@@ -75,10 +90,9 @@ line handling.
 
 	The flag LOG_USAGE, if added to the CFLAGS macro in the makefile,
 will cause se to write usage "statistics" to a log file, consisting of the
-login name and time and date when an individual used se.  This is only done
-at Georgia Tech, and the logfile path name in the log() routine in edit.c
-should be changed to use a system accounting file somewhere.  It currently
-creates a file in /usr/tmp.
+login name and time and date when an individual used se. The logfile path
+name in the log() routine in edit.c should be changed to use a system
+accounting file somewhere.  It currently creates a file in /usr/tmp.
 
 	The 'where' command creates a file called 'flags', which the makefile
 cats inside ``s.  These define and/or undefine the flags USG for System V,
@@ -86,7 +100,7 @@ S5R2 if for Release 2, BSD for 4.1 and 4.2, and BSD4_2 for 4.2 specific code.
 
 Miscellanious:
 
-	Code which is dependant on the Berkeley job control stuff is also
+	Code which is dependent on the Berkeley job control stuff is also
 conditionally compiled in, so that on systems without it, it won't get in
 the way.
 
@@ -95,9 +109,10 @@ the way.
 Otherwise, it assumes Release 1, and that the BSD termlib package has
 been ported and is available.
 
-	The where program will also define or undefine GITVAX.  This is
-is used 1) to allow control-s and control-q as control characters, and
-2) to come up in SWT mode.
+	There is code in term.c to test if se is running on a system with
+windows or not. It currently understands the windows on an ATT Unix PC (or 3B1)
+and the windowing ioctl's in BRL Unix, which should be identical to those
+in 4.3 BSD.
 
 Comments:
 
@@ -108,7 +123,7 @@ able to understand, and eventually make changes to it, as necessary.
 
 Authors:
 
-	Se started out as the version of 'ed' that came with the book 'Sofware
+	Se started out as the version of 'ed' that came with the book 'Software
 Tools', by Kernighan and Plauger, which was written in Ratfor. On the Pr1me
 computers at the School of Information and Computer Science at Georgia Tech,
 Dan Forsyth, Perry Flinn, and Alan Akin added all the enhancements suggested
@@ -116,7 +131,7 @@ in the exercises in the book, and some more of their own. Jack Waugh made
 extensive modifications to turn it into a screen editor; further work was done
 by Dan Forsyth. All of this was in an improved Georgia Tech version of Ratfor.
 
-	Later, Dan Forsyth, then (and now) at Medical Systems Develepment
+	Later, Dan Forsyth, then (and now) at Medical Systems Development
 Corporation, converted the Ratfor version into C, for Berkeley Unix (4.1 BSD).
 At Georgia Tech, Arnold Robbins took the C version and added many new features
 and improvements, the most important of which was termcap support and System V

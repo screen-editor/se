@@ -1,4 +1,19 @@
 /*
+ * $Header: extern.h,v 1.2 86/07/14 16:44:30 arnold Exp $
+ */
+
+/*
+ * $Log:	extern.h,v $
+ * Revision 1.2  86/07/14  16:44:30  arnold
+ * Removed stuff that was Georgia Tech specific.
+ * 
+ * Revision 1.1  86/05/06  13:36:05  osadr
+ * Initial revision
+ * 
+ * 
+ */
+
+/*
 ** extern.h
 **
 ** external data definitions
@@ -112,16 +127,6 @@ extern int Hup_caught;		/* caught a SIGHUP when phone line dropped */
 #ifdef SIGTSTP
 extern int Catching_stops;	/* catching or ignoring SIGTSTP's? */
 #endif
-
-/* Concerning Unix and SWT compatiblity: */
-extern int Unix_mode;		/* behaving like Unix editors? */
-extern char BACKSCAN;		/* back scan character */
-extern char NOTINCCL;		/* class negation character */
-extern char XMARK;		/* global exclude on mark name */
-extern char ESCAPE;		/* escape character */
-
-/* Concerning Georgia Tech I.C.S. specific code: */
-extern int At_gtics;		/* are we at Georgia Tech ICS? */
 
 /* Concerning file encryption: */
 extern int Crypting;		/* doing file encryption? */

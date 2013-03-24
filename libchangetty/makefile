@@ -1,3 +1,15 @@
+# 
+# $Header: makefile,v 1.2 86/07/11 15:23:24 osadr Exp $
+# 
+# $Log:	makefile,v $
+# Revision 1.2  86/07/11  15:23:24  osadr
+# Changed to ensure the proper 'ar' program is used.
+# 
+# Revision 1.1  86/05/06  13:31:30  osadr
+# Initial revision
+# 
+# 
+# 
 # makefile for libchangetty.a -- terminal resetting functions
 
 TARGET= libchangetty.a
@@ -8,7 +20,7 @@ PRINTS= $(SRCS) makefile
 CFLAGS= -O `cat ../flags`
 
 $(TARGET): $(OBJS) ../flags
-	ar ruv $(TARGET) $(OBJS)
+	/bin/ar ruv $(TARGET) $(OBJS)
 	if test -r /usr/bin/ranlib; then /usr/bin/ranlib $(TARGET); fi
 
 clean:

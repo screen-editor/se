@@ -1,3 +1,27 @@
+.\" 
+.\" $Header: se.m4,v 1.6 86/11/12 11:34:49 arnold Exp $
+.\" 
+.\" $Log:	se.m4,v $
+.\" Revision 1.6  86/11/12  11:34:49  arnold
+.\" Fixed use of `BSD'. Changed discussion of windows. ADR.
+.\" 
+.\" Revision 1.5  86/09/19  12:14:12  arnold
+.\" Typo fix.
+.\" 
+.\" Revision 1.4  86/07/17  17:52:34  arnold
+.\" Added discussion of windowing systems, and AUTHORS section.
+.\" 
+.\" Revision 1.3  86/07/11  15:17:50  osadr
+.\" Removal of Georgia Tech specific items, and some cleaning up.
+.\" 
+.\" Revision 1.2  86/05/27  17:50:37  osadr
+.\" Fix to quote an m4 keyword which was getting deleted.
+.\" 
+.\" Revision 1.1  86/05/06  13:41:04  osadr
+.\" Initial revision
+.\" 
+.\" 
+.\" 
 .ie t \{ .de CW
 .vs 10.5p
 .ta 16m/3u 32m/3u 48m/3u 64m/3u 80m/3u 96m/3u
@@ -7,6 +31,7 @@
 .. \}
 .el \{ .de CW
 .nf
+.ft B
 .. \}
 .ie t \{ .de CN
 .ta 0.5i 1i 1.5i 2i 2.5i 3i 3.5i 4i 4.5i 5i 5.5i 6i
@@ -17,6 +42,7 @@
 .. \}
 .el \{ .de CN
 .fi
+.ft
 .. \}
 changequote([])
 .if n .ds lq ""
@@ -24,7 +50,7 @@ changequote([])
 .if t .ds lq ``
 .if t .ds rq ''
 changequote
-.TH SE 1 ifelse(GITVAX,YES,GT-SWT,local)
+.TH SE 1 local
 .SH NAME
 se \- screen editor
 .SH SYNOPSIS
@@ -32,8 +58,11 @@ se \- screen editor
 ifelse(HARD_TERMS,YES,
 [
 .B \-t
-<term> ],)
-[ file ... ] [ \-option ... ]
+.I term
+],)
+[
+.B \-\-acdfghiklmstuvwxyz
+] [ file ... ]
 .SH DESCRIPTION
 .I Se
 is a screen oriented version of
@@ -44,7 +73,9 @@ commands with a few differences.
 ifelse(HARD_TERMS,YES,,`divert(-1)')
 .I Se
 must be run from a CRT terminal and must be told what sort
-of terminal it is; hence the <term> parameter.  The terminals
+of terminal it is; hence the
+.I term
+parameter.  The terminals
 currently supported are:
 .CW
 	adds980   bee200   haz1510  sol      vi200
@@ -63,56 +94,31 @@ your terminal type.
 ifelse(HARD_TERMS,YES,`divert(-1)',divert)
 .I Se
 must be run from a CRT terminal.
-To use
-.I se
-on your terminal, your terminal must be able to do cursor positioning,
-and there must either be an entry for your terminal in the
-ifelse(S5R2,YES,
-.B /usr/lib/terminfo/?/*
-database,
-.B /etc/termcap
-file)`,'
-or you must have the
-ifelse(S5R2,YES,`\*`('lqTERMINFO\*`('rq',`\*`('lqTERMCAP\*`('rq')
-environment variable
-set to
-ifelse(S5R2,YES,
-the pathname of a directory containing an entry for it,
-a termcap entry or the name of a file containing one)
-(see
-.IR ifelse(S5R2,YES,curses (3X),termlib (3))
-for details).
-.I Se
-uses the
+It uses the
 .IR ifelse(S5R2,YES,curses (3X),termlib (3))
 terminal operations library, which
 retrieves terminal capabilities from the
 .B ifelse(S5R2,YES, /usr/lib/terminfo, /etc/termcap)
 database.
-.I Se
-looks to see if you have the shell variable \*(lqTERM\*(rq set; if so,
+For
 .I se
-recognizes that value as
-your terminal type.
-.PP
-.I Se
-will exit if any one of the following is true:
+to function, all of the following must be true:
 .IP 1.
-You do not have the shell variable \*(lqTERM\*(rq set.
+You must have the environment variable \*(lqTERM\*(rq set
+to the name of your terminal type.
 .IP 2.
 The
 .B ifelse(S5R2,YES, /usr/lib/terminfo, /etc/termcap)
 database
-cannot be found.
-.IP 3.
-Your terminal does not have an entry in the
-ifelse(S5R2,YES,terminfo,termcap)
-database,
-or in the
+must be accessible, and contain an entry for your terminal;
+or the
 ifelse(S5R2,YES,`\*`('lqTERMINFO\*`('rq',`\*`('lqTERMCAP\*`('rq')
-environment variable.
-.IP 4.
-Your terminal does not have cursor motion.
+environment variable must contain a description for your terminal.
+(See
+.IR ifelse(S5R2,YES, curses (3X), termlib (3))
+for details.)
+.IP 3.
+Your terminal must have the capability to do cursor motion.
 ifelse(HARD_TERMS,YES,divert,)
 .PP
 .I Se
@@ -120,8 +126,10 @@ first
 clears the screen,
 draws in its margins,
 and executes the commands in the file
+.BR ./.serc ,
+or failing that,
 .BR $HOME/.serc ,
-if it exists.
+if either file exists.
 It then processes the command line,
 obeying the options given there, and begins
 reading your file (if you specified one).  The screen it draws
@@ -130,7 +138,7 @@ looks something like this.
 but are there to aid in the following discussion.)
 .PP
 .CW
-	(1) (2)              (3)
+	\fR(1) (2)              (3)\fP
 	A     |
 	B     |#include <stdio.h>
 	C     |
@@ -139,8 +147,8 @@ but are there to aid in the following discussion.)
 	.  -> |   for (i = 1; i <= 12; i++)
 	G     |      putc ('\en', stderr);
 	$     |
-	cmd>  |_  (4)
-	11:39   myfile  UNIX ....(5).........................
+	cmd>  |_  \fR(4)\fP
+	11:39   myfile ........................  \fR(5)\fP
 .CN
 .PP
 The display is divided into five parts:
@@ -153,7 +161,7 @@ The current line
 is indicated by the symbol \*(lq.\*(rq in the
 line number area of the screen.
 In addition, a rocket
-.if n (\*(lq->\*(rq)
+.if n (\*(lq\fB->\fP\*(rq)
 .if t (\*(lq\f(CW->\fP\*(rq)
 is displayed to make the current line
 more obvious.  The current mark name of each line is shown in the
@@ -165,7 +173,7 @@ displayed in the status line.
 The cursor is positioned at the beginning of the command
 line, showing you that
 .I se
-awaits your command.  You may now enter any of the
+awaits your command.  You may now enter any of the standard
 .I ed
 commands and 
 .I se
@@ -181,14 +189,14 @@ These options can also be set after invoking
 .I se
 with the options command, \*(lqo\*(rq, explained in detail in the section
 on commands. Here is a summary:
-.PP
-.CW
-	<opt> = a | c | d[<dir>] | f | g | h | i[a | <indent>] | k |
-	        l[<lop>] | lm[<col>] | m | p[s | u] | s[<filetype>] |
-	        t[<tabs>] | u[<char>] | v[<col>] | w[<col>] |
-	        x | y[<key>] | z | -[<lnr>]
-.CN
-.PP
+.sp
+.nf
+	opt = a | c | d[\fIdir\fP] | f | g | h | i[\fIa\fP | \fIindent\fP] |
+		k | l[\fIlop\fP] | lm[\fIcol\fP] | m | s[\fIfiletype\fP] |
+	        t[\fItabs\fP] | u[\fIchar\fP] | v[\fIcol\fP] | w[\fIcol\fP] |
+	        x | y[\fIkey\fP] | z | -[\fIlnr\fP]
+.fi
+.sp
 There are only a few other things that you need know to
 successfully use
 .IR se :
@@ -224,34 +232,6 @@ functions of
 while giving the advantage of a \*(lqwindow\*(rq into
 the edit buffer.
 .PP
-When
-.I se
-is running at the School of Information and Computer Science at Georgia Tech,
-it starts off in Software Tools compatibility mode.
-In this mode, the pattern matching characters and command letters
-are identical to those of the version of
-.I se
-which runs on Prime computers under the Georgia Tech Software Tools Subsystem.
-This mode is indicated by the message \*(lqSWT\*(rq in the status line.
-Software Tools compatibility mode is designed to ease the transition to
-.SM UNIX
-for Georgia Tech I.C.S. users
-who are already familiar with the Georgia Tech
-Software Tools Subsystem.
-.PP
-The discussion immediately below pertains to regular expressions and command
-letters when in Unix mode.  Unix mode is indicated by the message
-\*(lqUNIX\*(rq in
-the status line (see the example screen above), and is the default at any
-place but the I.C.S. school at Georgia Tech.
-The \*(lqop\*(rq command, discussed below under the \*(lqo\*(rq (option)
-command, controls
-which mode
-.I se
-operates in.
-The discussion there indicates which characters are used for which commands
-when in Software Tools compatibility mode.
-.PP
 Below is a summary of line number expressions, regular expressions
 and commands.
 Where there is no difference between
@@ -260,18 +240,25 @@ no explanation is given.
 .SS "Line Number Expressions"
 .PP
 .TP
- <n>   <n>th line.
+.I n
+.IR n th
+line.
 .TP
- .     current line.
+\&.
+current line.
 .TP
- $     last line.
+$
+last line.
 .TP
- ^     previous line.
+^
+previous line.
 .TP
- \-     previous line.
+\-
+previous line.
 .TP 
- capital letter <A>
-<A>th line on the screen.
+.RI "capital letter " A
+.IR A th
+line on the screen.
 .I Se
 has a number of features that take advantage of the window
 display to minimize keystrokes and speed editing.
@@ -283,22 +270,24 @@ for each line, but in \*(lqabsolute line number\*(rq mode (controlled by the
 .I se
 displays the actual line number of each line.
 .TP
- #  
+#
 number of the first line on the screen.
 .TP
- /regular expression[/]  next line with pattern.
+.RI / "regular expression" [/]
+next line with pattern.
 .TP
- ?regular expression[?]  previous line with pattern.
+.RI ? "regular expression" [?]
+previous line with pattern.
 .TP
- >name
+>name
 number of the next line having the given markname
 (search wraps around, like //).
 .TP
- <name
+<name
 number of the previous line having the given markname
 (search proceeds in reverse, like ??).
 .TP
- <expression>
+.I expression
 any of the above operands may be combined with plus
 or minus signs to produce a line number expression.  Plus
 signs may be omitted if desired (e.g., /parse/\-5, /lexical/+2,
@@ -308,60 +297,59 @@ Unlike
 does not recognize trailing \*(lq+\*(rq or \*(lq\-\*(rq signs.  They must always
 be followed by a integer.  Successive \*(lq+\*(rq or \*(lq\-\*(rq signs
 (e.g. \*(lq\-\-\*(rq) are also not allowed.
-Like
+However, like
 .IR vi (1), " se"
 will allow you to leave off the trailing delimiter in
 forward searches, backward searches, in the substitute command,
 the join command,
-and in the transliteration command (\*(lqy\*(rq or \*(lqt\*(rq,
-for UNIX and SWT modes
-respectively).
-This is true whether or not Software Tools compatibility mode
-is in effect.
+and in the transliteration command.
 .SS "Regular Expression Notation"
 .PP
 .TP
- ^
+^
 beginning of line if first character in regular expression.
 .TP
- .
+\&.
 any single character other than newline.
 .TP
- $
+$
 end of line if last character in regular expression.
 .TP
- [<ccl>] [^<ccl>]
+.RI [ ccl "] [^" ccl ]
 character set.
 .TP
- *
+*
 0 or more matches of the preceding regular expression element.
 .TP
- \e
+\e
 ignore special meaning of the immediately following character
 except \*(lq\e(\*(rq and \*(lq\e)\*(rq.
 .TP                 
- \e(<regular expression>\e)
+.RI \e( "regular expression" \e)
 Tags the text actually matched by the sub-pattern
-specified by <regular expression> for use in the replacement part
+specified by
+.I "regular expression"
+for use in the replacement part
 of a substitute
 command.                          
 .TP
- &
+&
 Appearing in the replacement part of a substitute command, represents
 the text actually matched by the pattern part of the command.
 .TP
- %
+%
 Appearing as
 the only character in the replacement part,
 represents the replacement part used in the previous substitute command.
 (This allows an empty replacement pattern as well.)
-If there are other characters in the replacement part along with the \*(lq%\*(rq,
-the \*(lq%\*(rq is left alone.
+If there are other characters in the replacement part along with the
+\*(lq%\*(rq, the \*(lq%\*(rq is left alone.
 .TP
- \e<digit>
+.RI \e digit
 Appearing in the replacement part of a substitute command,
 represents the text actually matched by the tagged sub-pattern
-specified by <digit>.
+specified by
+.IR digit .
 .SS File names
 .PP
 .I Se
@@ -370,8 +358,7 @@ a path name. Identifiers in a path name are treated as
 environment variables if they start with a dollar sign \*(lq$\*(rq.
 A real \*(lq$\*(rq can be used if it is escaped.
 If the named environment variable is not found, it is
-deleted from the path name.  This presents no difficulty,
-since multiple contiguous slashes are allowed in path names.
+deleted from the path name.
 The expanded path name will be placed in the status line.
 .SS The .serc File
 .PP
@@ -379,13 +366,14 @@ When
 .I se
 starts up, it tries to open the file
 .B .serc
+in your current directory.
+If that file cannot be found, it will attempt to open the file
+.B .serc
 in your home directory.
-If that file exists,
+If either file exists,
 .I se
-reads it, one line at a time, and executes each line as a command.
-changequote([])
-If a line has a `#' as the
-changequote
+will read it, one line at a time, and execute each line as a command.
+If a line has a \*(lq#\*(rq as the
 .I first
 character on the line, or if the line is empty,
 the entire line is treated as a comment,
@@ -395,8 +383,7 @@ Here is a sample
 file:
 .PP
 .CW
-	# turn on unix mode, tabs every 8 columns, auto indent
-	opu
+	# turn on tabs every 8 columns, auto indent
 	ot+8
 	oia
 .CN
@@ -409,11 +396,6 @@ using a special shell file in your bin (for
 .IR sh (1))ifelse(BSD,YES,`,'
 or a special alias (for
 .IR csh (1))).
-In particular, it is useful at the I.C.S. school at
-Georgia Tech for automagically turning
-on Unix mode, for users who are familiar with the
-.SM UNIX
-system.
 .PP
 Command line options are processed
 .I after
@@ -461,7 +443,7 @@ automatically entered with \*(lqXTABS\*(rq turned on.
 .TP
 f [filename]  File
 .TP
-(.,$)\^g/reg expr/command  Global on pattern
+(.,$)\^g/\fIreg expr\fP/command  Global on pattern
 .TP
 none h\^[stuff] Help
 This command provides access to on-line documentation on
@@ -497,7 +479,7 @@ allows only lower case letters to be marks.)
 .TP
 none  l  Locate
 The Locate command places the system name into the status line
-(e.g. \*(lqgatech\*(rq or \*(lqgitpyr\*(rq).
+(e.g. \*(lqgatech\*(rq or \*(lqemory\*(rq).
 This is so that one
 can tell what machine he is using from within the screen
 editor. This is particularly useful for installations with
@@ -505,7 +487,8 @@ many machines that can run the editor, where the user can
 switch back and forth between them, and become confused as
 to where he is at a given moment.
 .TP
-(.,.)\^m\^<line>     Move
+.RI (.,.)\^m\^ line
+Move
 .TP
 (.,.)\^n\^[m]  Name
 If \*(lqm\*(rq is present, the last line in the
@@ -538,8 +521,8 @@ and tab stops at column 8 and every fourth thereafter with the
 \*(lqo\*(rq command, just enter
 .sp
 .CW
-oa
-ot 8 +4
+	oa
+	ot 8 +4
 .CN
 .sp
 when
@@ -549,7 +532,7 @@ To enter the same options on the invoking command line, you might
 use
 .sp
 .CW
-se myfile -a "-t 8 +4"
+	se myfile -a "-t 8 +4"
 .CN
 .sp
 You may also choose to put options that you will always want into
@@ -558,7 +541,9 @@ your
 file.  Commands in the
 .B .serc
 file should look exactly the same
-as they would if they were typed at the command line.
+as they would if they were typed at the
+.I se
+command line.
 Command line options will always over-ride option
 commands given in your
 .B .serc
@@ -586,25 +571,23 @@ and expects its command letters in upper case.  Unshifted letters
 from the terminal are converted to upper case and shifted
 letters to lower case.
 .TP
-d\^[<dir>]
+.RI d\^[ dir ]
 selects the placement of the current line pointer following
-a \*(lqd\*(rq (delete) command. <dir> must be either \*(lq>\*(rq or \*(lq<\*(rq.
+a \*(lqd\*(rq (delete) command.
+.I Dir
+must be either \*(lq>\*(rq or \*(lq<\*(rq.
 If \*(lq>\*(rq is specified, the default behavior is
 selected: the line following the deleted lines becomes the new
 current line.  If \*(lq<\*(rq is specified, the line immediately preceding
 the deleted lines becomes the new current line.  If neither is
-specified, the current value of <dir> is displayed in the status
-line.
+specified, the current value of
+.I dir
+is displayed in the status line.
 .TP
 f
 selects Fortran oriented options. This is equivalent to specifying
-the \*(lqt7 +3\*(rq option, and \*(lqXTABS\*(rq is turned on (i.e.
+the \*(lqot7 +3\*(rq option, and \*(lqXTABS\*(rq is turned on (i.e.
 tabs are expanded).
-(On the primes, this would also turn on the \*(lqc\*(rq option, however the
-.SM UNIX
-fortran compiler,
-.IR f77 (1),
-only recognizes lower case input.)
 .TP
 g
 controls the behavior of the \*(lqs\*(rq (substitute) command
@@ -627,37 +610,49 @@ lines may be scrambling the control characters.
 Each successive \*(lqoh\*(rq merely toggles a switch within the editor.
 An explanatory message is placed in the status line.
 .TP
-i\^[a | <indent>]
-selects indent value for lines inserted with \*(lqa\*(rq, \*(lqc\*(rq and \*(lqi\*(rq commands
+.RI "i\^[ a | " indent " ]"
+selects indent value for lines inserted with
+\*(lqa\*(rq, \*(lqc\*(rq and \*(lqi\*(rq commands
 (initially 1).
 \*(lqa\*(rq selects auto-indent which sets the indent to the value which
 equals the indent of the previous line.
-If neither \*(lqa\*(rq nor \*(lq<indent>\*(rq are specified, the current value of
-indent is displayed.
+If neither \*(lqa\*(rq nor
+.I indent
+are specified,
+the current indent value is displayed in the status line.
 .TP
 k
 indicates whether the current contents of your edit buffer
 have been saved or not by printing either a \*(lqsaved\*(rq or
 \*(lqnot saved\*(rq message on your status line.
 .TP
-l\^[<lop>]
+.RI l\^[ lop ]
 sets the line number display option.
 Under control of this option, 
 .I se
 continuously displays
 the value of one of three symbolic line numbers.
-<lop> may be \*(lq.\*(rq, \*(lq#\*(rq, or \*(lq$\*(rq.
-If <lop> is omitted, the line number display is disabled.
+.I lop
+may be \*(lq.\*(rq, \*(lq#\*(rq, or \*(lq$\*(rq.
+If
+.I lop
+is omitted, the line number display is disabled.
 .TP
-lm\^[<col>]
-sets the left margin to <col> which must be a positive integer.
+.RI lm\^[ col ]
+sets the left margin to
+.I col
+which must be a positive integer.
 This option will `shift' your entire screen to the left,
 enabling you to see characters at the end of the line that
 were previously off the screen; the characters in columns
-1 through <col> \- 1 will not be visible.  You may continue
+1 through
+.I col
+\- 1 will not be visible.  You may continue
 editing in the normal fashion.  To reset your screen enter
 the command \*(lqolm 1\*(rq.
-If <col> is omitted, the current left margin column
+If
+.I col
+is omitted, the current left margin column
 is displayed in the status line.
 .TP
 m
@@ -666,7 +661,7 @@ the presence of existing mail
 and/or
 the arrival of new mail
 in the user's mail file. 
-The mail file is taken from the \*(lqMAIL\*(rq shell variable in the user's
+The mail file is taken from the \*(lqMAIL\*(rq variable in the user's
 environment.
 On startup, if the mail file is not empty,
 .I se
@@ -682,100 +677,19 @@ the user can turn off this notification.
 The \*(lqom\*(rq command displays the current setting of the notify
 switch in the status line.
 .TP
-p\^[s | u]
-converts to or from SWT compatibility mode.
-The \*(lqop\*(rq command, by itself, will toggle between SWT mode and UNIX mode.
-When running at the I.C.S. school at Georgia Tech,
-.I se
-automagically comes up in SWT mode.
-The command \*(lqopu\*(rq will force
-.I se
-to use UNIX mode, while the command \*(lqops\*(rq will force
-.I se
-to use SWT mode.
-During initialization,
-.I se
-simply checks if it is running at the I.C.S. school at Georgia Tech,
-and if it is, it executes an \*(lqops\*(rq.
-(The editor checks if the site name is one of
-\*(lqgatech\*(rq,
-\*(lqstratus\*(rq,
-\*(lqnimbus\*(rq,
-or
-\*(lqcirrus\*(rq.
-If it is, then it figures it is running at the I.C.S. school.
-These machines are the CSnet and Clouds Project Vaxes.
-.I Se
-also knows about the \*(lqgt-\*(rq prefix convention
-for Georgia Tech machine names.
-The site name of your machine can be checked with the \*(lql\*(rq command.)
-.sp
-When in SWT mode,
-.I se
-uses the following for its patterns and commands:
-.RS
-.TP
- \epattern[\e]
-searches backwards for a pattern.
-.TP
- %
-matches the beginning of a line.
-.TP
- ?
-matches any character.
-.TP
- ~
-is used to negate character classes.
-.TP
- &
-used by itself in the replacement part of a substitute command
-represents the replacement part of the previous substitute command.
-Otherwise, it represents the matched search pattern. This last is the
-same behavior as in Unix mode.
-When used by itself in the replacement part of a transliterate command,
-it represents the replacement part of the previous transliterate command.
-.TP
- {<regular expression>}
-tags pieces of a pattern.
-.TP
- @<digit>
-represents the text matched by the tagged sub-pattern
-specified by <digit>.
-.TP
- @
-is the escape character, instead of \e.
-.TP
- y
-copies lines.
-.TP
- t
-transliterates characters.
-.TP
- !
-does the global exclude on markname (see the \*(lq~\*(rq command, below).
-.TP
- ~[<\s-1UNIX\s+1 Command>]
-will fork a shell, or execute <\s-1UNIX\s+1 command> if it is present
-(see the \*(lq!\*(rq command, below).
-.PP
-All other characters and commands are the same for both SWT and UNIX mode.
-The help command will always call up documentation appropriate
-to the current mode.
-.RE
-.TP
 s\^[d | data | as | s | c | h | n | nr | nroff | p | r | f]
 sets other options for case, tabs, etc., for
 data files, \*(lqd\*(rq or \*(lqdata\*(rq,
 assembly files, \*(lqas\*(rq or \*(lqs\*(rq,
 C files, \*(lqc\*(rq,
-`include' files \*(lqh\*(rq,
+`include' files, \*(lqh\*(rq,
 nroff files, \*(lqn\*(rq or \*(lqnr\*(rq or \*(lqnroff\*(rq,
 ratfor files, \*(lqr\*(rq,
 pascal files, \*(lqp\*(rq,
 and fortran files, \*(lqf\*(rq.
 Options set for data and nroff files are \*(lqow74\*(rq and \*(lqot+4\*(rq;
 for assembly files \*(lqot 17+8\*(rq and \*(lqXTABS\*(rq is turned on;
-for C, include, pascal and ratfor files
+for C, `include', pascal and ratfor files
 \*(lqow74\*(rq, \*(lqot+4\*(rq and \*(lqXTABS\*(rq is turned on;
 for fortran files
 \*(lqot 7+3\*(rq and \*(lqXTABS\*(rq is turned on.
@@ -783,8 +697,11 @@ If \*(lqXTABS\*(rq is turned on then tabs are expanded.
 If no argument is specified the options effected by this
 command revert to their default value.
 .TP
-t\^[<tabs>]
-sets tab stops according to <tabs>.  <tabs> consists of
+.RI t\^[ tabs ]
+sets tab stops according to
+.IR tabs .
+.I Tabs
+consists of
 a series of numbers indicating columns in which tab stops
 are to be set.  If a number is preceded by a plus sign (\*(lq+\*(rq),
 it indicates that the number is an increment; stops are set
@@ -793,21 +710,25 @@ the most recently specified absolute column number.  If no such
 number precedes the first increment specification, the stops are
 set relative to column 1.
 By default, tab stops are set in every third column starting with
-column 1, corresponding to a <tabs> specification of \*(lq+3\*(rq.
-If <tabs> is omitted, the current tab spacing is
+column 1, corresponding to a
+.I tabs
+specification of \*(lq+3\*(rq.
+If
+.I tabs
+is omitted, the current tab spacing is
 displayed in the status line. Examples
 .sp
 .CW
-ot 1 4 7 10 13 16 19 22 25 28 31 34  ...
-ot +3
-ot 7 +3
+	ot 1 4 7 10 13 16 19 22 25 28 31 34  ...
+	ot +3
+	ot 7 +3
 .CN
 .sp
 Once the tab stops are set, the control-i and control-e keys
 can be used to move the cursor from its current position forward or
 backward to the nearest stop, respectively.
 .TP
-u\^[<chr>]
+.RI u\^[ chr ]
 Normally,
 .I se
 displays a non-printing character (e.g. \s-1NEWLINE\s+1, \s-1TAB\s+1 ...)
@@ -816,8 +737,12 @@ With this option, you can
 select the character that
 .I se
 displays in place of 
-unprintable characters.  <chr> may be any printable character.
-If <chr> is omitted,
+unprintable characters.
+.I Chr
+may be any printable character.
+If
+.I chr
+is omitted,
 .I se
 displays the current replacement character on the status line.
 Non-printing characters (such as
@@ -831,19 +756,26 @@ Note, however, that the character you type is taken literally,
 exactly as it is generated by your terminal, so case conversion
 does not apply.
 .TP
-v\^[<col>]
+.RI v\^[ col ]
 sets the default \*(lqoverlay column\*(rq.  This is the column
 at which the cursor is initially positioned by the \*(lqv\*(rq command.
-<Col> must be a positive integer, or a dollar sign ($) to indicate
-the end of the line.  If <col> is omitted, the current overlay
+.I Col
+must be a positive integer, or a dollar sign ($) to indicate
+the end of the line.  If
+.I col
+is omitted, the current overlay
 column is displayed in the status line.
 .TP
-w\^[<col>]
-sets the \*(lqwarning threshold\*(rq to <col> which must be
+.RI w\^[ col ]
+sets the \*(lqwarning threshold\*(rq to
+.I col
+which must be
 a positive integer. Whenever the cursor is  positioned at or
 beyond this column, the column number is displayed in the status
 line and the terminal's bell is sounded.
-If <col> is omitted, the current warning threshold is displayed
+If
+.I col
+is omitted, the current warning threshold is displayed
 in the status line.
 The default warning threshold is 74, corresponding to the first column
 beyond the right edge of the screen on an 80 column crt.
@@ -858,7 +790,7 @@ command checks the source option for files;
 use the \*(lqex\*(rq command to force
 tab expansion.
 .TP
-y\^[<key>]
+.RI y\^[ key ]
 allows you to edit encrypted files. \*(lqoy\*(rq followed by a key
 will cause the
 \*(lqe\*(rq, \*(lqr\*(rq, and \*(lqw\*(rq
@@ -871,7 +803,8 @@ will ask you for one.
 Echoing is turned off while you type your key in, and
 .I se
 asks you to type it in twice, just to be sure.
-If encryption is turned on, and you type a plain \*(lqoy\*(rq, it will be turned off.
+If encryption is turned on, and you type a plain \*(lqoy\*(rq,
+it will be turned off.
 Note that doing so causes
 .I se
 to forget the value of the encryption key.
@@ -883,13 +816,9 @@ shown on your screen.
 .TP
 z
 suspends the editor (puts it in the background)
-and returns to the user's shell (either
-.BR /bin/csh ,
-or, on
-.SM "BRL UNIX"
-systems,
-.BR /bin/sh
-with job control turned on (the \-J option)).
+and returns to the user's shell.
+(It has to be a shell that understands Berkeley job control,
+or else you'll be in trouble.)
 The editor will warn you if the edit buffer has not been saved.
 This is the
 .I only
@@ -900,30 +829,25 @@ If you normally run
 without job control,
 this command has no effect at all.
 .sp
-At the I.C.S. school at Georgia Tech
-.IR only ,
-if the shell environment variable \*(lqRSE\*(rq exists, you will not be
-allowed to suspend the editor.
-This is so that users with mail\-only logins may edit their files,
-but not do anything else (see the \*(lq!\*(rq command, below).
-This does not apply if
-.I se
-is running at someplace other than the I.C.S. school at Georgia Tech.
-.sp
 On
 .SM UNIX
 systems without the Berkeley job control mechanism, this option
 will be recognized, but will have no effect.
 Instead, an explanatory message will be placed in the status line.
 .TP
-\-[<lnr>]
-splits the screen at the line specified by <lnr> which must
+.RI \-[ lnr ]
+splits the screen at the line specified by
+.I lnr
+which must
 be a simple line number within the current window.  All lines above
-<lnr> remain frozen on the screen, the line specified by <lnr> is
-replaced by a row of dashes, and the space below this row becomes
+.I lnr
+remain frozen on the screen, the line specified by
+.I lnr
+is replaced by a row of dashes, and the space below this row becomes
 the new window on the file. Further editing commands do not affect the
-lines displayed in the top part of the screen.  If <lnr> is
-omitted, the screen is restored to its full size.
+lines displayed in the top part of the screen.  If
+.I lnr
+is omitted, the screen is restored to its full size.
 .RE
 .TP
 (.,.)\^p  Print
@@ -937,14 +861,14 @@ q\^[!]  Quit
 \*(lqq!\*(rq, exit immediately, is the same as \*(lqQ\*(rq in 
 .IR ed .
 .TP
-r\^[x] [filename]  Read
+(.)r\^[x] [filename]  Read
 If no line number is specified, the named file is read starting after current
 line (as opposed to
 .I ed
 where the file is read at the end of the edit buffer).
 \*(lqrx\*(rq causes tabs to be expanded in the lines read.
 .TP
-(.,.)\^s\^[\^/reg expr/sub\^[/]\^[g]\^[p]]     Substitute
+.RI "(.,.)\^s\^[\^/" "reg expr" / sub "\^[/]\^[g]\^[p]]     Substitute"
 If no pattern and replacement are specified after the \*(lqs\*(rq,
 .I se
 will behave as if you had typed \*(lqs//%/\*(rq, i.e. for the
@@ -1016,7 +940,7 @@ the buffer replaces the file.
 \*(lqw!\*(rq, write immediately, is the same as \*(lqW\*(rq in
 .IR ed .
 .TP
-(1,$)\^x\^/reg expr/command     eXclude on reg expr
+.RI "(1,$)\^x\^/" "reg expr" "/command     eXclude on pattern"
 .TP
 (.,.)\^y\^[\^/from/to\^[/]\^[p]]  TranslYterate (sic)
 The range of characters
@@ -1033,18 +957,21 @@ into the saved \*(lqto\*(rq range.
 The \*(lq%\*(rq is special only if it is the only character
 in the \*(lqto\*(rq part of the command.
 .TP
-(.,.)\^zb\^<left>\^[,<right>]\^[<char>]  Draw Box
+.RI (.,.)\^zb\^\fIleft\fP\^[,\fIright\fP]\^[\fIchar\fP]  Draw Box
 A box is drawn on the given lines, in the given columns,
-using the given <char>.
+using the given
+.IR char .
 This command can be used as an aid for preparing block diagrams,
 flowcharts, or tables.
 .sp
 Line numbers are used to specify top and bottom row positions of the box.
-<Left> and <right> specify left and right column positions of the box.
-If second line number is omitted, the box degenerates to a horizontal
-line.
+.IR Left " and " right
+specify left and right column positions of the box.
+If second line number is omitted, the box degenerates to a horizontal line.
 If right-hand column is omitted, the box degenerates to a vertical line.
-If <char> is omitted, it defaults to blank,
+If
+.I char
+is omitted, it defaults to blank,
 allowing erasure of a previously-drawn box.
 .sp
 For example, \*(lq1,10zb15,25*\*(rq would draw a box 10 lines high
@@ -1072,10 +999,12 @@ buffer is displayed and the current line pointer is placed at
 the top of the window.
 .TP
 changequote({})
-none ![<\s-1UNIX\s+1 command>]   escape to the shell.
+.RI "none ![" "\s-1UNIX\s+1 command" "]   escape to the shell"
 The user's choice of shell is taken from the \*(lqSHELL\*(rq environment
 variable (if it exists),
-and is used to execute <\s-1UNIX\s+1 command> if it is present. Otherwise, an
+and is used to execute
+.I "\s-1UNIX\s+1 command"
+if it is present. Otherwise, an
 interactive shell is created.
 After an interactive shell exits, the screen is immediately redrawn.
 If a command was run, the results are left on the screen, and the
@@ -1085,10 +1014,13 @@ to redraw the editing window.
 This is how
 .IR vi (1)
 behaves.
-If the first character of the <\s-1UNIX\s+1 command> is a `!' (regardless of the
-current mode, SWT or UNIX), then the `!' is replaced with the text of
+If the first character of the
+.I "\s-1UNIX\s+1 command"
+is a `!', then the `!' is replaced with the text of
 the previous shell command.
-An unescaped `%' in the <\s-1UNIX\s+1 command> will be replaced with the current
+An unescaped `%' in the
+.I "\s-1UNIX\s+1 command"
+will be replaced with the current
 saved file name.
 If the shell command is expanded,
 .I se
@@ -1096,22 +1028,9 @@ will echo it first, and then execute it.
 This behavior is identical to the version of
 changequote
 .I ed
-in `USG'
+in
 .SM UNIX
-5.0 (also known as
-.SM UNIX
-System V).
-.sp
-At the I.C.S. school at Georgia Tech
-.IR only ,
-if the shell environment variable \*(lqRSE\*(rq exists,
-.I se
-will not allow you to fork a shell.
-The editor behaves this way to allow users who have mail\-only privileges
-to be able to edit their messages, without having access to any
-other resources.  This does not apply when
-.I se
-is running someplace other than the I.C.S. school at Georgia Tech.
+System V.
 .SS Control Characters
 .PP
 The set of control characters defined below can be used for correcting
@@ -1256,7 +1175,7 @@ quits from the terminal.  The editor uses
 own purposes, and changes the terminal driver to make control-p be the
 interrupt character.
 .TP
-ifelse(GITVAX,YES, control-q, control-])
+control-]
 Fix screen.
 The screen is reconstructed from
 .IR se 's
@@ -1267,7 +1186,7 @@ Erase right.  The character at the current cursor position
 is erased and
 all characters to its right are moved left one position.
 .TP
-ifelse(GITVAX,YES, control-s, control-j)
+control-j
 Scan right.  This key is identical to the control-l key
 described above, except that the scan proceeds to the right from
 the current cursor position.
@@ -1318,13 +1237,7 @@ to the \*(lqcase inversion\*(rq option (see the description of options under the
 option command).
 ifelse(BSD,NO,`divert(-1)',)
 .sp
-Also note that when running the C-shell,
-.BR /bin/csh ,
-or a Bourne shell with job control (e.g. the
-.B /bin/sh
-supplied with
-.SM "BRL UNIX\\c"
-)
+Also note that when running shell that understands Berkeley job control,
 the only way to
 suspend (stop) the editor is with the \*(lqoz\*(rq command
 (see the options command, \*(lqoz\*(rq, above).
@@ -1376,13 +1289,18 @@ If the character is non-printing (as are all of
 control characters),
 it appears on the screen as the current non-printing replacement character
 (normally a blank \(em see the options command \*(lqou\*(rq).
+.SS Windowing Systems
+On 4.3 `BSD', and on the AT&T Unix/PC or 3B1,
+.I se
+notices when its current window changes size or is repositioned,
+and adjusts the screen image accordingly.
 .SH FILES
 .TP
 .B $HOME/.serc
 .I se
 initialization file.
 .TP
-.B /usr/tmp/<process id>.<sequence_number>
+.BI /usr/tmp/ "process id" . sequence_number
 for scratch file.
 .TP
 .B ./se.hangup
@@ -1411,6 +1329,7 @@ Software Tools Subsystem User's Guide,
 ifelse(BSD,YES,.IR csh (1)`,',)
 .IR ed (1),
 .IR crypt (1),
+.IR ksh (1),
 .IR scriptse (1),
 .IR sh (1),
 .IR vi (1),
@@ -1444,7 +1363,7 @@ due to problems within the
 .IR ifelse(S5R2,YES, curses (3X), termlib (3))
 package in putting out the right number of padding characters.
 Type a
-ifelse(GITVAX,YES, control-q, control-])
+control-]
 to redraw the screen.
 .PP
 The auto\-indent feature does not recognize a line consisting
@@ -1452,11 +1371,6 @@ of just blanks and then a \*(lq.\*(rq to terminate input,
 when the \*(lq.\*(rq is
 not in the same position as the first non-blank character of the
 previous line.
-ifelse(GITVAX,YES,
-.PP
-The use of control-s and control-q for control characters could be
-considered a very poor design choice.
-)
 ifelse(S5R2,YES,
 .PP
 .I Se
@@ -1475,3 +1389,27 @@ will toggle the case of its input.
 There is no global undo capability.
 .PP
 The help screens could use a rewrite.
+.SH AUTHORS
+.I Se
+started out as the version of
+.I ed
+that came with the book \*(lqSoftware Tools,\*(rq
+by Kernighan and Plauger, which was written in Ratfor. On the Pr1me
+computers at the School of Information and Computer Science at Georgia Tech,
+Dan Forsyth, Perry Flinn, and Alan Akin added all the enhancements suggested
+in the exercises in the book, and some more of their own. Jack Waugh made
+extensive modifications to turn the line editor into a screen editor;
+further work was done by Dan Forsyth.
+All of this was in an improved Georgia Tech version of Ratfor.
+.PP
+Later, Dan Forsyth, then (and now) at Medical Systems Development
+Corporation, converted the Ratfor version into C, for Berkeley Unix (4.1 `BSD').
+At Georgia Tech, Arnold Robbins took the C version and added many new features
+and improvements, the most important of which was termlib support and System V
+support. The existing help screens were edited and completed at that time, as
+well. This was finished in early 1985.
+.PP
+Arnold Robbins is now at ...!emory!arnold, and will make every
+reasonable attempt to answer any questions anyone may have about
+.IR se ,
+but in no way promises to support or enhance it.

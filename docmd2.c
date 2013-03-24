@@ -1,3 +1,21 @@
+#ifndef lint
+static char RCSid[] = "$Header: docmd2.c,v 1.3 86/07/17 17:20:29 arnold Exp $";
+#endif
+
+/*
+ * $Log:	docmd2.c,v $
+ * Revision 1.3  86/07/17  17:20:29  arnold
+ * Some general code cleaning up.
+ * 
+ * Revision 1.2  86/07/11  15:11:04  osadr
+ * Removed Georgia Tech specific code.
+ * 
+ * Revision 1.1  86/05/06  13:36:57  osadr
+ * Initial revision
+ * 
+ * 
+ */
+
 /*
 ** docmd2.c
 **
@@ -719,9 +737,6 @@ char name[];
 ** also emulate USG Unix 5.0 ed: a ! as the first character is
 ** replaced by the previous shell command; an unescaped % is replaced
 ** by the saved file name. The expanded command is echoed.
-**
-** If running at ICS school at Tech, and RSE is in the environment, don't
-** allow forking, since it's called by a mail-only user.
 */
 
 #ifdef BSD
@@ -746,12 +761,6 @@ int *pi;
 	int j, k;
 	static char sav_com[MAXLINE] = "";
 	int expanded = NO;
-
-	if (At_gtics && getenv ("RSE") != NULL)	/* yes in environment */
-	{
-		remark ("You may not run the shell");
-		return OK;	/* will wipe out command line */
-	}
 
 	if (Nlines == 0)        /* use normal 'ed' behavior */
 	{
@@ -907,17 +916,6 @@ int *pi;
 			Errcode = ENOSHELL;
 			return ERR;
 		}
-
-/* this was the old way, so you can compare to what we do now. */
-/*
-/*		if (auto_redraw)
-/*		{
-/*			ttyedit();
-/*			restore_screen ();
-/*		}
-/*		else
-/*			remark("Type control-q to rebuild screen");
-*/
 
 		/* a la vi: */
 		if (! auto_redraw)

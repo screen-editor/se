@@ -1,3 +1,38 @@
+#ifndef lint
+static char RCSid[] = "$Header: term.c,v 1.7 86/11/12 11:37:30 arnold Exp $";
+#endif
+
+/*
+ * $Log:	term.c,v $
+ * Revision 1.7  86/11/12  11:37:30  arnold
+ * Fixed winsize() to verify that cols and rows not 0 before assigning
+ * them to Nrows and Ncols.
+ * 
+ * Revision 1.6  86/10/14  11:10:36  arnold
+ * Reorganization of window handling stuff. Added (untested) code for sun.
+ * 
+ * Revision 1.5  86/10/07  14:50:48  arnold
+ * Changed setterm to set_term, to avoid Unix/PC shared library conflict.
+ * Fixed winsize() to set Nrows and Ncols on first call, as well.
+ * 
+ * Revision 1.4  86/09/19  12:15:28  arnold
+ * Fixes to BSD windowing for real 4.3, from BRL.
+ * 
+ * Revision 1.3  86/07/17  17:23:19  arnold
+ * Massive reorganization and cleaning up. Terminal initialization
+ * stuff moved here, and homogenized.
+ * 
+ * Revision 1.2  86/07/14  17:19:33  arnold
+ * Added code that notices whether or not the window we are runnng in has
+ * changed sizes. It definitely works on the Unix PC, and should work on
+ * BRL Unix and 4.3 BSD.
+ * 
+ * Revision 1.1  86/05/06  13:38:53  osadr
+ * Initial revision
+ * 
+ * 
+ */
+
 /*
 ** term.c
 **
@@ -15,15 +50,30 @@
 ** the terminfo package, so we assume that if it is Release 1, someone will
 ** have ported the BSD termlib library.  If it is Release 2, then the new
 ** terminfo package is there, and we wil use it.
+**
+** This file is large. It is organized as follows.
+**
+** Routines that do not care whether or not HARD_TERMS is defined.
+** Routines that are only if HARD_TERMS is NOT defined. These contain:
+**	BSD/termlib routines
+**	System V/terminfo routines
+**	Routines idenpendant of BSD/System V
+** Routines that are only if HARD_TERMS is defined.
+** Routines that have regular and conditonal code mixed.
 */
 
 #include "se.h"
 #include "extern.h"
 
+/* outc -- write a character to the terminal */
+
+int outc (c)
+char c;
+{
+	twrite (1, &c, 1);
+}
+
 #ifndef HARD_TERMS
-
-int outc ();	/* defined later */
-
 #if defined (BSD) || !defined (S5R2)
 /*
  * code for using BSD termlib -- getting capabilities, and writing them out.
@@ -53,65 +103,6 @@ static char *addr_caps;		/* address of caps for relocation */
 
 #define TERMBUFSIZ	1024+1
 static char termbuf[TERMBUFSIZ];
-
-
-
-/* setterm -- initialize terminal parameters and actual capabilities */
-
-static setterm (type)
-char *type; 
-{
-	if (type[0] == EOS)
-	{
-		ttynormal ();
-		fprintf (stderr, "in setterm: can't happen.\n");
-		exit (1);
-	}
-
-	Ncols = Nrows = 0;
-
-	/*
-	 * we used to set certain mininum and maximum screen sizes,
-	 * but since we could end up on things like ATT 5620s, with big
-	 * screens, we just do it dynamically, but add some error
-	 * checking, and exit if can't do it.
-	 */
-	Nrows = tgetnum ("li");
-	Ncols = tgetnum ("co");
-
-	if (Nrows == -1)
-	{
-		ttynormal ();
-		fprintf (stderr, "se: could not determine number of rows\n");
-		exit (1);
-	}
-
-	if (Ncols == -1)
-	{
-		ttynormal ();
-		fprintf (stderr, "se: could not determine number of columns\n");
-		exit (1);
-	}
-
-	
-	addr_caps = caps;
-
-	getdescrip ();			/* get terminal description */
-
-	if (*tgoto (CM, 0, 0) == 'O')	/* OOPS returned.. */
-		CM = 0;
-
-	PC = pcstr ? pcstr[0] : EOS;
-
-	if (CM == 0)
-	{
-		ttynormal ();
-		fprintf (stderr, "se: terminal does not have cursor motion.\n");
-		exit (2);
-	}
-
-	return OK;
-}
 
 /* getdescrip --- get descriptions out of termcap entry */
 
@@ -143,28 +134,27 @@ static getdescrip ()
 		*(table[i].ptr_to_cap) = tgetstr (table[i].name, & addr_caps);
 }
 
-
 /* setcaps -- get the capabilities from termcap file into termbuf */
 
-setcaps (term)
+static setcaps (term)
 char *term;
 {
 	switch (tgetent (termbuf, term)) {
 	case -1:
-		ttynormal ();
-		fprintf (stderr, "se: couldn't open termcap file.\n");
-		return (ERR);
+		error (NO, "se: couldn't open termcap file.");
 
 	case 0:
-		ttynormal ();
-		fprintf (stderr, "se: no termcap entry for %s terminals.\n", term);
-		return (ERR);
+		error (NO, "se: no termcap entry for %s terminals.", term);
 
 	case 1:
+		addr_caps = caps;
+		getdescrip ();		/* get terminal description */
+		Nrows = tgetnum ("li");
+		Ncols = tgetnum ("co");
 		break;
 
 	default:
-		error ("in setcaps: can't happen.\n");
+		error (YES, "in setcaps: can't happen.\n");
 	}
 
 	return (OK);
@@ -175,7 +165,7 @@ char *term;
 /* use the new terminfo package */
 /*
  * Do NOT include <curses.h>, since it redefines
- * USG, ERR, and OK, to values inconsisten with what
+ * USG, ERR, and OK, to values inconsistent with what
  * we use.
  */
 
@@ -195,9 +185,9 @@ typedef struct termio SGTTY;
 #define DL	delete_line
 #define AL	insert_line
 
-/* setcaps --- called from main() to get capabilities */
+/* setcaps -- get the capabilities from the terminfo database */
 
-setcaps (term)
+static setcaps (term)
 char *term;
 {
 	int ret = 0;
@@ -207,18 +197,10 @@ char *term;
 		return (ERR);
 	Nrows = lines;
 	Ncols = columns;
+
 	return (OK);
 }
-
 #endif
-
-/* outc -- write a character to the terminal */
-
-int outc (c)
-char c;
-{
-	twrite (1, &c, 1);
-}
 
 /* t_init -- put out terminal initialization string */
 
@@ -241,599 +223,115 @@ t_exit ()
 		tputs (VE, 1, outc);
 	tflush ();	/* force it out */
 }
+
+/* winsize --- get the size of the window from the windowing system */
+/*		also arrange to catch the windowing signal */
+
+#include <signal.h>
+
+#ifdef SIGWIND			/* UNIX PC */
+#include <sys/font.h>
+#include <sys/window.h>
+#define WINSIG		SIGWIND
+#define WINIOCTL	WIOCGETD
+#define WINSTRUCT	uwdata
+#define COLS		(w.uw_width / w.uw_hs)
+#define ROWS		(w.uw_height / w.uw_vs)
 #endif
 
-/* send --- send a printable character, predict cursor position */
+#ifdef SIGWINCH			/* 4.3 BSD and/or Sun 3.x */
 
-send (chr)
-char chr;
+#define WINSIG		SIGWINCH
+
+#ifdef sun
+#undef NEWLINE		/* shouldn't hurt; these are in sun include files */
+#undef TAB
+#include <sys/types.h>
+#include <sys/ioctl.h>
+#include <sys/tty.h>
+#define WINIOCTL TIOCGSIZE
+#define WINSTRUCT ttysize
+#define COLS w.ts_cols
+#define ROWS w.ts_lines
+
+#else
+
+#include <sys/ioctl.h>
+#define WINIOCTL	TIOCGWINSZ
+#define WINSTRUCT	winsize
+#define COLS w.ws_col
+#define ROWS w.ws_row
+#endif
+#endif
+
+static struct WINSTRUCT w;
+
+winsize ()
 {
-	if (Currow == Nrows - 1 && Curcol == Ncols - 1)
-		return;         /* anything in corner causes scroll... */
+#if defined(SIGWIND) || defined(SIGWINCH)
+	static int first = 1;
+	static char savestatus[MAXCOLS];
+	int row, oldstatus = Nrows - 1;
+	int cols, rows;
 
-#ifndef HARD_TERMS
-	outc (chr);
-#else
-	twrite (1, &chr, 1);
-#endif
+	signal (WINSIG, winsize);
 
-	if (Curcol == Ncols - 1)
+	if (ioctl (0, WINIOCTL, (char *) & w) != -1)
 	{
-#ifndef HARD_TERMS
-		if (AM)		/* terminal wraps when hits last column */
-#else
-		if (Term_type != TVT && Term_type != NETRON
-		    && Term_type != ESPRIT && Term_type != VI300)
-#endif
+		cols = COLS;
+		rows = ROWS;
+
+		if (first)
 		{
-			Curcol = 0;
-			Currow++;
+			first = 0;
+			if (cols && rows)
+			{
+				Ncols = cols;
+				Nrows = rows;
+			}
+			return;		/* don't redraw screen */
 		}
-	}
-	else		/* cursor not at extreme right */
-		Curcol++;
-}
-
-/* terminal handling functions used throughout the editor */
-
-/* clrscreen --- clear entire screen */
-
-clrscreen ()
-{
-	Curcol = Currow = 0;
-	/* clearing screen homes cursor to upper left corner */
-	/* on all terminals */
-
-#ifndef HARD_TERMS
-	tputs (CL, 1, outc);
-#else
-	switch (Term_type) {
-	case ADDS980:
-	case ADDS100:
-	case GT40:
-	case CG:
-	case ISC8001:
-	case ANP:
-	case NETRON:
-		twrite (1, "\014", 1);
-		break;
-	case FOX:
-		twrite (1, "\033K", 2);		/* clear display and all tabs */
-		break;
-	case TVT:
-		twrite (1, "\014\017", 2);	/* home, erase to end of screen */
-		break;
-	case BEE150:
-	case BEE200:
-	case SBEE:
-	case SOL:
-	case H19:
-		twrite (1, "\033E", 2);
-		break;
-	case HAZ1510:
-	case ESPRIT:
-		twrite (1, "\033\034", 2);
-		break;
-	case ADM3A:
-	case VC4404:
-	case TVI950:
-		twrite (1, "\032", 1);
-		break;
-	case TS1:
-		twrite (1, "\033*", 2);
-		break;
-	case ADM31:
-		twrite (1, "\033+", 2);
-		break;
-	case IBM:
-		twrite (1, "\033L", 2);
-		break;
-	case HP21:
-		twrite (1, "\033H\033J", 4);	/* home cursor, erase to end of screen */
-		break;
-	case TRS80:
-		twrite (1, "\034\037", 2);
-		break;
-	case VI200:
-		twrite (1, "\033v", 2);
-		break;
-	case VI300:
-		twrite (1, "\033[H\033[J", 6);
-		/* home cursor, clear screen */
-		break;
-	case VI50:
-		twrite (1, "\033v", 2);
-		senddelay (30);
-		break;
-	}
-
-	senddelay (20);
-#endif
-}
-
-
-/* position_cursor --- position terminal's cursor to (row, col) */
-
-position_cursor (row, col)
-int row, col;
-{
-	if (row < Nrows && row >= 0		/* within vertical range? */
-	    && col < Ncols && col >= 0		/* within horizontal range? */
-	    && (row != Currow || col != Curcol))/* not already there? */
-#ifndef HARD_TERMS
-	{
-		if (row == Currow && abs (Curcol - col) <= 4)
+		else if (Ncols == cols && Nrows == rows)
 		{
-			/* short motion in current line */
-			if (Curcol < col)
-				for (; Curcol != col; Curcol++)
-					twrite (1, &Screen_image[Currow][Curcol], 1);
-			else
-				for (; Curcol != col; Curcol--)
-					twrite (1, "\b", 1);
+			/* only position changed */
+#ifdef SIGWIND
+			remark ("window repositioned");
+#endif
+			return;
 		}
 		else
 		{
-#if defined (USG) && defined(S5R2)
-			tputs (tparm (cursor_address, row, col), 1, outc);
-#else
-			tputs (tgoto (CM, col, row), 1, outc);
-#endif
-			Currow = row;
-			Curcol = col;
-		}
-	}
-#else
-		switch (Term_type) {
-		case ADDS980:
-			addspos (row, col);
-			break;
-		case ADDS100:
-			regentpos (row, col);
-			break;
-		case HP21:
-			hp21pos (row, col);
-			break;
-		case FOX:
-			pepos (row, col);
-			break;
-		case TVT:
-			tvtpos (row, col);
-			break;
-		case GT40:
-			gt40pos (row, col);
-			break;
-		case BEE150:
-		case BEE200:
-		case SBEE:
-		case SOL:
-			beepos (row, col);
-			break;
-		case VC4404:
-			vcpos (row, col);
-			break;
-		case HAZ1510:
-			hazpos (row, col);
-			break;
-		case ESPRIT:
-			espritpos (row, col);
-			break;
-		case CG:
-			cgpos (row, col);
-			break;
-		case ISC8001:
-			iscpos (row, col);
-			break;
-		case ADM3A:
-		case ADM31:
-		case TS1:
-		case TVI950:
-			admpos (row, col);
-			break;
-		case IBM:
-			ibmpos (row, col);
-			break;
-		case ANP:
-			anppos (row, col);
-			break;
-		case NETRON:
-			netpos (row, col);
-			break;
-		case H19:
-			h19pos (row, col);
-			break;
-		case TRS80:
-			trspos (row, col);
-			break;
-		case VI200:  
-		case VI50:
-			vipos (row, col);
-			break;
-		case VI300:
-			ansipos (row, col);
-			break;
-		}
-#endif
-}
-
-
-/* setscreen --- initialize screen and associated descriptive variables */
-
-setscreen ()
-{
-	register int row, col;
-
-#ifndef HARD_TERMS
-	char *getenv ();
-
-#if defined (BSD) || !defined (S5R2)
-	setterm (getenv ("TERM"));
-#endif
-
-	t_init ();	/* put out the 'ti' and 'vs' capabilities */
-#else
-	switch (Term_type) {
-	case ADDS980: 
-	case FOX: 
-	case HAZ1510: 
-	case ADDS100:
-	case BEE150: 
-	case ADM3A: 
-	case IBM: 
-	case HP21: 
-	case H19:
-	case ADM31: 
-	case VI200: 
-	case VC4404: 
-	case ESPRIT: 
-	case TS1:
-	case TVI950: 
-	case VI50: 
-	case VI300:
-		Nrows = 24;
-		Ncols = 80;
-		break;
-	case ANP:
-		Nrows = 24;
-		Ncols = 96;
-		break;
-	case SOL: 
-	case NETRON: 
-	case TRS80:
-		Nrows = 16;
-		Ncols = 64;
-		break;
-	case TVT:
-		Nrows = 16;
-		Ncols = 63;
-		break;
-	case GT40:
-		Nrows = 32;
-		Ncols = 73;
-		break;
-	case CG:
-		Nrows = 51;
-		Ncols = 85;
-		break;
-	case ISC8001:
-		Nrows = 48;
-		Ncols = 80;
-		break;
-	case BEE200: 
-	case SBEE:
-		Nrows = 25;
-		Ncols = 80;
-		break;
-	}
-#endif
-	clrscreen ();	/* clear physical screen, set cursor position */
-
-	Toprow = 0;
-	Botrow = Nrows - 3; /* 1 for 0-origin, 1 for status, 1 for cmd */
-	Cmdrow = Botrow + 1;
-	Topln = 1;
-	Sclen = -1;         /* make sure we assume nothing on the screen */
-
-	for (row = 0; row < Nrows; row++)	/* now clear virtual screen */
-		for (col = 0; col < Ncols; col++)
-			Screen_image[row][col] = ' ';
-
-	for (col = 0; col < Ncols; col++)	/* and clear out status line */
-		Msgalloc[col] = NOMSG;
-
-	Insert_mode = NO;
-}
-
-
-/* inslines --- insert 'n' lines on the screen at 'row' */
-
-inslines (row, n)
-int row, n;
-{
-	register int i;
-	int delay;
-
-	position_cursor (row, 0);
-#ifdef HARD_TERMS
-	if (Term_type == VI300)
-	{
-		char pseq[10];
-		register int pp = 0;
-		pseq[pp++] = '\033';
-		pseq[pp++] = '[';
-		if (n >= 10)
-			pseq[pp++] = '0' + n / 10;
-		pseq[pp++] = '0' + n % 10;
-		pseq[pp++] = 'L';
-		twrite (1, pseq, pp);
-		delay = 0;
-	}
-	else
-#endif
-		for (i = 0; i < n; i++)
-		{
-#ifndef HARD_TERMS
-			tputs (AL, n, outc);
-			tflush ();
-#else
-			switch (Term_type) {
-			case VI200:
-				twrite (1, "\033L", 2);
-				delay = 0;
-				break;
-			case VI50:
-			case H19:
-				twrite (1, "\033L", 2);
-				delay = 32;
-				break;
-			case ESPRIT:
-				twrite (1, "\033\032", 2);
-				delay = 32;
-				break;
-			case TS1:
-			case TVI950:
-				twrite (1, "\033E", 2);
-				delay = 0;
-				break;
-			case ADDS100:
-				twrite (1, "\033M", 2);
-				delay = 96;
-				break;
-			default:
-				error ("in inslines: shouldn't happen");
-			}
-
-			if (delay != 0)
-				senddelay (delay);
-#endif
-		}
-
-	for (i = Nrows - 1; i - n >= Currow; i--)
-		move_ (Screen_image[i - n], Screen_image[i], Ncols);
-
-	for (; i >= Currow; i--)
-		move_ (Blanks, Screen_image[i], Ncols);
-}
-
-
-/* dellines --- delete 'n' lines beginning at 'row' */
-
-dellines (row, n)
-int row, n;
-{
-	register int i;
-	int delay;
-
-	position_cursor (row, 0);
-#ifdef HARD_TERMS
-	if (Term_type == VI300)
-	{
-		char pseq[10];
-		register int pp = 0;
-		pseq[pp++] = '\033';
-		pseq[pp++] = '[';
-		if (n >= 10)
-			pseq[pp++] = '0' + n / 10;
-		pseq[pp++] = '0' + n % 10;
-		pseq[pp++] = 'M';
-		twrite (1, pseq, pp);
-		delay = 0;
-	}
-	else
-#endif
-		for (i = 0; i < n; i++)
-		{
-#ifndef HARD_TERMS
-			tputs (DL, n, outc);
-			tflush ();
-#else
-			switch (Term_type) {
-			case VI200:
-				twrite (1, "\033M", 2);
-				delay = 0;
-				break;
-			case VI50:
-				twrite (1, "\033M", 2);
-				delay = 32;
-				break;
-			case H19:
-				twrite (1, "\033M", 2);
-				delay = 32;
-				break;
-			case TS1:
-			case TVI950:
-				twrite (1, "\033R", 2);
-				delay = 0;
-				break;
-			case ESPRIT:
-				twrite (1, "\033\023", 2);
-				delay = 32;
-				break;
-			case ADDS100:
-				twrite (1, "\033l", 2);
-				delay = 96;
-				break;
-			default:
-				error ("in dellines: shouldn't happen");
-			}
-
-			if (delay != 0)
-				senddelay (delay);
-#endif
-		}
-
-	for (i = Currow; i + n < Nrows; i++)
-		move_ (Screen_image[i + n], Screen_image[i], Ncols);
-
-	for (; i < Nrows; i++)
-		move_ (Blanks, Screen_image[i], Ncols);
-}
-
-
-/* hwinsdel --- return 1 if the terminal has hardware insert/delete */
-
-int hwinsdel ()
-{
-	if (No_hardware == YES)
-		return (NO);
-
-#ifndef HARD_TERMS
-	return (AL != NULL && DL != NULL);
-#else
-	switch (Term_type) {
-	case VI300:
-	case VI200:
-	case VI50:
-	case ESPRIT:
-	case H19:
-	case TS1:
-	case TVI950:
-	case ADDS100:
-		return 1;
-	}
-	return 0;
-#endif
-}
-
-
-/* clear_to_eol --- clear screen to end-of-line */
-
-clear_to_eol (row, col)
-int row, col;
-{
-	register int c, flag; 
-#ifdef HARD_TERMS
-	register int hardware;
-
-	switch (Term_type) {
-	case BEE200:
-	case BEE150:
-	case FOX:
-	case SBEE:
-	case ADDS100:
-	case HP21:
-	case IBM:
-	case ANP:
-	case NETRON:
-	case H19:
-	case TS1:
-	case TRS80:
-	case ADM31:
-	case VI200:
-	case VI300:
-	case VI50:
-	case VC4404:
-	case ESPRIT:
-	case TVI950:
-		hardware = YES;
-		break;
-	default:
-		hardware = NO;
-		if (Term_type == ADDS980 && row < Nrows - 1)
-			hardware = YES;
-		if (Term_type == TVT && row > 0)
-			hardware = YES;
-	}
-#endif
-
-	flag = NO;
-
-	for (c = col; c < Ncols; c++)
-		if (Screen_image[row][c] != ' ')
-		{
-			Screen_image[row][c] = ' ';
-#ifndef HARD_TERMS
-			if (CE != NULL)		/* there is hardware */
-#else
-			if (hardware == YES)
-#endif
-				flag = YES;
-			else
+			if (cols && rows)
 			{
-				position_cursor (row, c);
-				send (' ');
+				Ncols = cols;
+				Nrows = rows;
 			}
 		}
+	}
+	else
+		return;
 
-	if (flag == YES)
-	{
-		position_cursor (row, col);
-#ifndef HARD_TERMS
-		tputs (CE, 1, outc);
-#else
-		switch (Term_type) {
-		case BEE200: 
-		case BEE150:
-		case SBEE:
-		case ADDS100:
-		case HP21:
-		case H19:
-		case VC4404:
-		case TS1:
-		case TVI950:
-		case VI50:
-			twrite (1, "\033K", 2);
-			break;
-		case FOX:
-		case IBM:
-			twrite (1, "\033I", 2);
-			break;
-		case ADDS980:
-			twrite (1, "\n", 1);
-			Currow++;
-			Curcol = 0;
-			break;
-		case ANP:
-			twrite (1, "\033L", 2);
-			break;
-		case NETRON:
-			twrite (1, "\005", 1);
-			break;
-		case TRS80:
-			twrite (1, "\036", 1);
-			break;
-		case ADM31:
-			twrite (1, "\033T", 2);
-			break;
-		case VI200:
-			twrite (1, "\033x", 2);
-			break;
-		case VI300:
-			twrite (1, "\033[K", 3);
-			break;
-		case ESPRIT:
-			twrite (1, "\033\017", 2);
-			break;
-		case TVT:
-			twrite (1, "\013\012", 2);
-			break;
-		} /* end switch */
+	move_ (Screen_image[oldstatus], savestatus, MAXCOLS);
+	clrscreen ();
+	Toprow = 0;
+	Botrow = Nrows - 3;
+	Cmdrow = Botrow + 1;
+	Sclen = -1;
+
+	for (row = 0; row < Nrows; row++)
+		move_ (Blanks, Screen_image[row], MAXCOLS);
+		/* clear screen */
+
+	First_affected = Topln;
+	adjust_window (Curln, Curln);
+	updscreen ();	/* reload from buffer */
+	loadstr (savestatus, Nrows - 1, 0, Ncols);
+	remark ("window size change");
+	tflush ();
 #endif
-	} /* end if (flag == YES) */
-} /* end clear_to_eol */
+}
 
-
-#ifdef HARD_TERMS
+#else
 
 /* begin terminal dependant routines */
 
@@ -1064,7 +562,7 @@ register int row, col;
 static anppos (row, col)
 int row, col;
 {
-	register char coord;
+	char coord;
 
 	if (row == Currow)      /* if close, just sneak right or left */
 	{
@@ -1880,4 +1378,691 @@ int col;
 		Curcol--;
 	}
 }
+
+
+/* senddelay --- send NULs to delay n milliseconds */
+
+senddelay (n)
+int n;
+{
+	register int q;
+
+	q = (long) n * Tspeed / 1000l;
+	while (q > 0)
+	{
+		twrite (1, "\0\0\0\0\0\0\0\0\0\0", q > 10 ? 10 : q);
+		q -= 10;
+	}
+}
+
+
+/* decode_mnemonic --- decode a terminal type mnemonic */
+
+static int decode_mnemonic (str)
+char str[];
+{
+	int i;
+	int strbsr ();
+
+	static struct {
+		char *s;
+		int t;
+	} stab[] = {
+		"950",          TVI950,
+		"adm31",        ADM31,  
+		"adm3a",        ADM3A,  
+		"anp",          ANP,    
+		"b150",         BEE150,   
+		"b200",         BEE200,   
+		"cg",           CG,     
+		"consul",       ADDS980,
+		"esprit",       ESPRIT,
+		"fox",          FOX,    
+		"gt40",         GT40,   
+		"h19",          H19,    
+		"haz",          HAZ1510,
+		"hp21",         HP21,   
+		"hz1510",       HAZ1510,
+		"ibm",          IBM,    
+		"isc",          ISC8001,
+		"netron",       NETRON, 
+		"regent",       ADDS100,
+		"regent40",     ADDS100,	/* kludge */
+		"sbee",         SBEE,   
+		"sol",          SOL,    
+		"trs80",        TRS80,  
+		"ts1",          TS1,
+		"tvt",          TVT,    
+		"vc4404",       VC4404,
+		"vi200",        VI200,
+		"vi300",	VI300,
+		"vi50",         VI50,
+	};
+
+	i = strbsr ((char *)stab, sizeof (stab), sizeof (stab[0]), str);
+	if (i == EOF)
+		return (ERR);
+	else
+		return (stab[i].t);
+}
 #endif
+
+/* terminal handling functions used throughout the editor */
+
+/* send --- send a printable character, predict cursor position */
+
+send (chr)
+char chr;
+{
+	if (Currow == Nrows - 1 && Curcol == Ncols - 1)
+		return;         /* anything in corner causes scroll... */
+
+#ifndef HARD_TERMS
+	outc (chr);
+#else
+	twrite (1, &chr, 1);
+#endif
+
+	if (Curcol == Ncols - 1)
+	{
+#ifndef HARD_TERMS
+		if (AM)		/* terminal wraps when hits last column */
+#else
+		if (Term_type != TVT && Term_type != NETRON
+		    && Term_type != ESPRIT && Term_type != VI300)
+#endif
+		{
+			Curcol = 0;
+			Currow++;
+		}
+	}
+	else		/* cursor not at extreme right */
+		Curcol++;
+}
+
+/* clrscreen --- clear entire screen */
+
+clrscreen ()
+{
+	Curcol = Currow = 0;
+	/* clearing screen homes cursor to upper left corner */
+	/* on all terminals */
+
+#ifndef HARD_TERMS
+	tputs (CL, 1, outc);
+#else
+	switch (Term_type) {
+	case ADDS980:
+	case ADDS100:
+	case GT40:
+	case CG:
+	case ISC8001:
+	case ANP:
+	case NETRON:
+		twrite (1, "\014", 1);
+		break;
+	case FOX:
+		twrite (1, "\033K", 2);		/* clear display and all tabs */
+		break;
+	case TVT:
+		twrite (1, "\014\017", 2);	/* home, erase to end of screen */
+		break;
+	case BEE150:
+	case BEE200:
+	case SBEE:
+	case SOL:
+	case H19:
+		twrite (1, "\033E", 2);
+		break;
+	case HAZ1510:
+	case ESPRIT:
+		twrite (1, "\033\034", 2);
+		break;
+	case ADM3A:
+	case VC4404:
+	case TVI950:
+		twrite (1, "\032", 1);
+		break;
+	case TS1:
+		twrite (1, "\033*", 2);
+		break;
+	case ADM31:
+		twrite (1, "\033+", 2);
+		break;
+	case IBM:
+		twrite (1, "\033L", 2);
+		break;
+	case HP21:
+		twrite (1, "\033H\033J", 4);	/* home cursor, erase to end of screen */
+		break;
+	case TRS80:
+		twrite (1, "\034\037", 2);
+		break;
+	case VI200:
+		twrite (1, "\033v", 2);
+		break;
+	case VI300:
+		twrite (1, "\033[H\033[J", 6);
+		/* home cursor, clear screen */
+		break;
+	case VI50:
+		twrite (1, "\033v", 2);
+		senddelay (30);
+		break;
+	}
+
+	senddelay (20);
+#endif
+}
+
+
+/* position_cursor --- position terminal's cursor to (row, col) */
+
+position_cursor (row, col)
+int row, col;
+{
+	if (row < Nrows && row >= 0		/* within vertical range? */
+	    && col < Ncols && col >= 0		/* within horizontal range? */
+	    && (row != Currow || col != Curcol))/* not already there? */
+#ifndef HARD_TERMS
+	{
+		if (row == Currow && abs (Curcol - col) <= 4)
+		{
+			/* short motion in current line */
+			if (Curcol < col)
+				for (; Curcol != col; Curcol++)
+					twrite (1, &Screen_image[Currow][Curcol], 1);
+			else
+				for (; Curcol != col; Curcol--)
+					twrite (1, "\b", 1);
+		}
+		else
+		{
+#if defined (USG) && defined(S5R2)
+			tputs (tparm (cursor_address, row, col), 1, outc);
+#else
+			tputs (tgoto (CM, col, row), 1, outc);
+#endif
+			Currow = row;
+			Curcol = col;
+		}
+	}
+#else
+		switch (Term_type) {
+		case ADDS980:
+			addspos (row, col);
+			break;
+		case ADDS100:
+			regentpos (row, col);
+			break;
+		case HP21:
+			hp21pos (row, col);
+			break;
+		case FOX:
+			pepos (row, col);
+			break;
+		case TVT:
+			tvtpos (row, col);
+			break;
+		case GT40:
+			gt40pos (row, col);
+			break;
+		case BEE150:
+		case BEE200:
+		case SBEE:
+		case SOL:
+			beepos (row, col);
+			break;
+		case VC4404:
+			vcpos (row, col);
+			break;
+		case HAZ1510:
+			hazpos (row, col);
+			break;
+		case ESPRIT:
+			espritpos (row, col);
+			break;
+		case CG:
+			cgpos (row, col);
+			break;
+		case ISC8001:
+			iscpos (row, col);
+			break;
+		case ADM3A:
+		case ADM31:
+		case TS1:
+		case TVI950:
+			admpos (row, col);
+			break;
+		case IBM:
+			ibmpos (row, col);
+			break;
+		case ANP:
+			anppos (row, col);
+			break;
+		case NETRON:
+			netpos (row, col);
+			break;
+		case H19:
+			h19pos (row, col);
+			break;
+		case TRS80:
+			trspos (row, col);
+			break;
+		case VI200:  
+		case VI50:
+			vipos (row, col);
+			break;
+		case VI300:
+			ansipos (row, col);
+			break;
+		}
+#endif
+}
+
+
+/* setscreen --- initialize screen and associated descriptive variables */
+
+setscreen ()
+{
+	register int row, col;
+
+#ifndef HARD_TERMS
+	t_init ();	/* put out the 'ti' and 'vs' capabilities */
+#endif
+	clrscreen ();	/* clear physical screen, set cursor position */
+
+	Toprow = 0;
+	Botrow = Nrows - 3; /* 1 for 0-origin, 1 for status, 1 for cmd */
+	Cmdrow = Botrow + 1;
+	Topln = 1;
+	Sclen = -1;         /* make sure we assume nothing on the screen */
+
+	for (row = 0; row < Nrows; row++)	/* now clear virtual screen */
+		for (col = 0; col < Ncols; col++)
+			Screen_image[row][col] = ' ';
+
+	for (col = 0; col < Ncols; col++)	/* and clear out status line */
+		Msgalloc[col] = NOMSG;
+
+	Insert_mode = NO;
+}
+
+
+/* inslines --- insert 'n' lines on the screen at 'row' */
+
+inslines (row, n)
+int row, n;
+{
+	register int i;
+	int delay;
+
+	position_cursor (row, 0);
+#ifdef HARD_TERMS
+	if (Term_type == VI300)
+	{
+		char pseq[10];
+		register int pp = 0;
+		pseq[pp++] = '\033';
+		pseq[pp++] = '[';
+		if (n >= 10)
+			pseq[pp++] = '0' + n / 10;
+		pseq[pp++] = '0' + n % 10;
+		pseq[pp++] = 'L';
+		twrite (1, pseq, pp);
+		delay = 0;
+	}
+	else
+#endif
+		for (i = 0; i < n; i++)
+		{
+#ifndef HARD_TERMS
+			tputs (AL, n, outc);
+			tflush ();
+#else
+			switch (Term_type) {
+			case VI200:
+				twrite (1, "\033L", 2);
+				delay = 0;
+				break;
+			case VI50:
+			case H19:
+				twrite (1, "\033L", 2);
+				delay = 32;
+				break;
+			case ESPRIT:
+				twrite (1, "\033\032", 2);
+				delay = 32;
+				break;
+			case TS1:
+			case TVI950:
+				twrite (1, "\033E", 2);
+				delay = 0;
+				break;
+			case ADDS100:
+				twrite (1, "\033M", 2);
+				delay = 96;
+				break;
+			default:
+				error (YES, "in inslines: shouldn't happen");
+			}
+
+			if (delay != 0)
+				senddelay (delay);
+#endif
+		}
+
+	for (i = Nrows - 1; i - n >= Currow; i--)
+		move_ (Screen_image[i - n], Screen_image[i], Ncols);
+
+	for (; i >= Currow; i--)
+		move_ (Blanks, Screen_image[i], Ncols);
+}
+
+
+/* dellines --- delete 'n' lines beginning at 'row' */
+
+dellines (row, n)
+int row, n;
+{
+	register int i;
+	int delay;
+
+	position_cursor (row, 0);
+#ifdef HARD_TERMS
+	if (Term_type == VI300)
+	{
+		char pseq[10];
+		register int pp = 0;
+		pseq[pp++] = '\033';
+		pseq[pp++] = '[';
+		if (n >= 10)
+			pseq[pp++] = '0' + n / 10;
+		pseq[pp++] = '0' + n % 10;
+		pseq[pp++] = 'M';
+		twrite (1, pseq, pp);
+		delay = 0;
+	}
+	else
+#endif
+		for (i = 0; i < n; i++)
+		{
+#ifndef HARD_TERMS
+			tputs (DL, n, outc);
+			tflush ();
+#else
+			switch (Term_type) {
+			case VI200:
+				twrite (1, "\033M", 2);
+				delay = 0;
+				break;
+			case VI50:
+				twrite (1, "\033M", 2);
+				delay = 32;
+				break;
+			case H19:
+				twrite (1, "\033M", 2);
+				delay = 32;
+				break;
+			case TS1:
+			case TVI950:
+				twrite (1, "\033R", 2);
+				delay = 0;
+				break;
+			case ESPRIT:
+				twrite (1, "\033\023", 2);
+				delay = 32;
+				break;
+			case ADDS100:
+				twrite (1, "\033l", 2);
+				delay = 96;
+				break;
+			default:
+				error (YES, "in dellines: shouldn't happen");
+			}
+
+			if (delay != 0)
+				senddelay (delay);
+#endif
+		}
+
+	for (i = Currow; i + n < Nrows; i++)
+		move_ (Screen_image[i + n], Screen_image[i], Ncols);
+
+	for (; i < Nrows; i++)
+		move_ (Blanks, Screen_image[i], Ncols);
+}
+
+
+/* hwinsdel --- return 1 if the terminal has hardware insert/delete */
+
+int hwinsdel ()
+{
+	if (No_hardware == YES)
+		return (NO);
+
+#ifndef HARD_TERMS
+	return (AL != NULL && DL != NULL);
+#else
+	switch (Term_type) {
+	case VI300:
+	case VI200:
+	case VI50:
+	case ESPRIT:
+	case H19:
+	case TS1:
+	case TVI950:
+	case ADDS100:
+		return 1;
+	}
+	return 0;
+#endif
+}
+
+
+/* clear_to_eol --- clear screen to end-of-line */
+
+clear_to_eol (row, col)
+int row, col;
+{
+	register int c, flag; 
+	register int hardware = NO;
+
+#ifdef HARD_TERMS
+	switch (Term_type) {
+	case BEE200:
+	case BEE150:
+	case FOX:
+	case SBEE:
+	case ADDS100:
+	case HP21:
+	case IBM:
+	case ANP:
+	case NETRON:
+	case H19:
+	case TS1:
+	case TRS80:
+	case ADM31:
+	case VI200:
+	case VI300:
+	case VI50:
+	case VC4404:
+	case ESPRIT:
+	case TVI950:
+		hardware = YES;
+		break;
+	default:
+		hardware = (Term_type == ADDS980 && row < Nrows - 1)
+				|| (Term_type == TVT && row > 0);
+	}
+#else
+	hardware = (CE != NULL);
+#endif
+
+	flag = NO;
+
+	for (c = col; c < Ncols; c++)
+		if (Screen_image[row][c] != ' ')
+		{
+			Screen_image[row][c] = ' ';
+			if (hardware)
+				flag = YES;
+			else
+			{
+				position_cursor (row, c);
+				send (' ');
+			}
+		}
+
+	if (flag == YES)
+	{
+		position_cursor (row, col);
+#ifndef HARD_TERMS
+		tputs (CE, 1, outc);
+#else
+		switch (Term_type) {
+		case BEE200: 
+		case BEE150:
+		case SBEE:
+		case ADDS100:
+		case HP21:
+		case H19:
+		case VC4404:
+		case TS1:
+		case TVI950:
+		case VI50:
+			twrite (1, "\033K", 2);
+			break;
+		case FOX:
+		case IBM:
+			twrite (1, "\033I", 2);
+			break;
+		case ADDS980:
+			twrite (1, "\n", 1);
+			Currow++;
+			Curcol = 0;
+			break;
+		case ANP:
+			twrite (1, "\033L", 2);
+			break;
+		case NETRON:
+			twrite (1, "\005", 1);
+			break;
+		case TRS80:
+			twrite (1, "\036", 1);
+			break;
+		case ADM31:
+			twrite (1, "\033T", 2);
+			break;
+		case VI200:
+			twrite (1, "\033x", 2);
+			break;
+		case VI300:
+			twrite (1, "\033[K", 3);
+			break;
+		case ESPRIT:
+			twrite (1, "\033\017", 2);
+			break;
+		case TVT:
+			twrite (1, "\013\012", 2);
+			break;
+		} /* end switch */
+#endif
+	} /* end if (flag == YES) */
+}
+
+/* set_term -- initialize terminal parameters and actual capabilities */
+
+set_term (type)
+char *type; 
+{
+	if (type == NULL)
+		error (NO, "se: terminal type not available");
+
+	if (type[0] == EOS)
+		error (NO, "in set_term: can't happen.");
+
+	Ncols = Nrows = -1;
+
+#ifdef HARD_TERMS
+	if ((Term_type = decode_mnemonic (type)) == ERR)
+		error (NO, "se: could not find terminal in internal database");
+
+	switch (Term_type) {
+	case ADDS980: 
+	case FOX: 
+	case HAZ1510: 
+	case ADDS100:
+	case BEE150: 
+	case ADM3A: 
+	case IBM: 
+	case HP21: 
+	case H19:
+	case ADM31: 
+	case VI200: 
+	case VC4404: 
+	case ESPRIT: 
+	case TS1:
+	case TVI950: 
+	case VI50: 
+	case VI300:
+		Nrows = 24;
+		Ncols = 80;
+		break;
+	case ANP:
+		Nrows = 24;
+		Ncols = 96;
+		break;
+	case SOL: 
+	case NETRON: 
+	case TRS80:
+		Nrows = 16;
+		Ncols = 64;
+		break;
+	case TVT:
+		Nrows = 16;
+		Ncols = 63;
+		break;
+	case GT40:
+		Nrows = 32;
+		Ncols = 73;
+		break;
+	case CG:
+		Nrows = 51;
+		Ncols = 85;
+		break;
+	case ISC8001:
+		Nrows = 48;
+		Ncols = 80;
+		break;
+	case BEE200: 
+	case SBEE:
+		Nrows = 25;
+		Ncols = 80;
+		break;
+	}
+#else
+	if (setcaps (type) == ERR)
+		error (NO, "se: could not find terminal in system database");
+
+
+	PC = pcstr ? pcstr[0] : EOS;
+
+	if (*tgoto (CM, 0, 0) == 'O')	/* OOPS returned.. */
+		error (NO, "se: terminal does not have cursor motion.");
+
+	/*
+	 * first, get it from the library. then check the
+	 * windowing system, if there is one.
+	 */
+	winsize ();
+#endif
+
+	if (Nrows == -1)
+		error (NO, "se: could not determine number of rows");
+
+	if (Ncols == -1)
+		error (NO, "se: could not determine number of columns");
+
+	return OK;
+}

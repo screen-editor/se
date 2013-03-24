@@ -1,3 +1,18 @@
+#ifndef lint
+static char RCSid[] = "$Header: changetty.c,v 1.2 86/07/11 15:23:06 osadr Exp $";
+#endif
+
+/*
+ * $Log:	changetty.c,v $
+ * Revision 1.2  86/07/11  15:23:06  osadr
+ * Removed Georgia Tech specific code.
+ * 
+ * Revision 1.1  86/05/06  13:31:06  osadr
+ * Initial revision
+ * 
+ * 
+ */
+
 /*
 ** changetty.c
 **
@@ -184,12 +199,7 @@ TTYINFO *buf;		/* buffer containing TTYINFO to be modified */
 	buf->c_lflag |= ISIG|NOFLSH;	/* keep these bits */
 	buf->c_lflag &= ~(ICANON|XCASE|ECHO|ECHOE|ECHOK|ECHONL);
 #else
-#ifdef GITVAX
-	static struct tchars newtchars = {DLE, -1, -1, -1, EOT, -1};
-	/* allows control-s and -q to be control charactes that se sees */
-#else
 	static struct tchars newtchars = {DLE, -1, DC1, DC3, EOT, -1};
-#endif
 	static struct ltchars newltchars = {-1, -1, -1, -1, -1, -1};
 
 	buf->sgttyb.sg_flags |= (CBREAK);    /* keep these bits */

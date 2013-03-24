@@ -1,3 +1,23 @@
+#ifndef lint
+static char RCSid[] = "$Header: edit.c,v 1.3 86/07/11 15:11:34 osadr Exp $";
+#endif
+
+/*
+ * $Log:	edit.c,v $
+ * Revision 1.3  86/07/11  15:11:34  osadr
+ * Removed Georgia Tech specific code.
+ * 
+ * Revision 1.2  86/05/27  17:44:56  osadr
+ * Removed flexnames dependancy; PREVLINE[2] --> PREVLN[2].
+ * Improved the sysname() routine, particularly to use the nodename
+ * member of the utsname structure under System V.
+ * 
+ * Revision 1.1  86/05/06  13:37:16  osadr
+ * Initial revision
+ * 
+ * 
+ */
+
 /*
 ** edit.c
 **
@@ -22,9 +42,11 @@ char *argv[];
 
 	watch ();       /* display time of day */
 
-	gatech ();	/* check if running at Gatech. do magic stuff if yes */
+#ifdef LOG_USAGE
+	log ();		/* log who used the program */
+#endif
 
-	serc ();	/* execute commands in $HOME/.serc file, if possible */
+	serc ();	/* execute commands in ./.serc or $HOME/.serc */
 
 	status = OK;
 
@@ -197,7 +219,7 @@ register int *i, *pnum, *status;
 		*pnum = Topln - Toprow + lin[*i] - Rel_a;
 	else if (lin[*i] == CURLINE)
 		*pnum = Curln;
-	else if (lin[*i] == PREVLINE || lin[*i] == PREVLINE2)
+	else if (lin[*i] == PREVLN || lin[*i] == PREVLN2)
 		*pnum = Curln - 1;
 	else if (lin[*i] == LASTLINE)
 		*pnum = Lastln;
@@ -332,11 +354,6 @@ int *i, *status;
 	int defalt (), match (), optpat (), getkn ();
 	register LINEDESC *k;
 	LINEDESC *gettxt (), *getind ();
-#ifndef OLD_SCRATCH
-#ifndef OLD_GLOB
-	char start_line = Unix_mode ? '^' : '%';
-#endif
-#endif
 
 	*status = OK;
 	usepat = EOF;
@@ -348,7 +365,7 @@ int *i, *status;
 		/* cases in order to save time */
 		(lin[*i] == GLOBAL || lin[*i] == UCGLOBAL)
 		&& (lin[*i + 1] == lin[*i + 3])
-		&& (lin[*i + 2] == start_line || lin[*i + 2] == '$')
+		&& (lin[*i + 2] == '^' || lin[*i + 2] == '$')
 		&& (lin[*i + 4] == MOVECOM || lin[*i + 4] == UCMOVECOM)
 		&& (lin[*i + 5] == '0' && lin[*i + 6] == '\n')   )
 	{
@@ -700,7 +717,6 @@ int *i, *gflag;
 {
 	static char Subs[MAXPAT] = "";	/* saved replacement pattern */
 	int j, maksub ();
-	char saved_sub = Unix_mode ? '%' : '&';
 	/* saved replacement pattern char */
 
 
@@ -709,7 +725,7 @@ int *i, *gflag;
 	if (lin[*i] == EOS)	/* missing the middle delimeter */
 		return (ERR);
 
-	if (lin[*i + 1] == saved_sub && (lin[*i + 2] == lin[*i]
+	if (lin[*i + 1] == '%' && (lin[*i + 2] == lin[*i]
 					|| lin[*i + 2] == '\n'))
 	{
 	/*
@@ -1023,7 +1039,6 @@ int *k, size;
 	int i, j;
 	int l;
 	int addset ();
-	char saved_sub = Unix_mode ? '%' : '&';
 
 	Errcode = EBADLIST;
 
@@ -1034,7 +1049,7 @@ int *k, size;
 	if (array[*k] == EOS)
 		return (ERR);
 
-	if (array[*k + 1] == saved_sub && (array[*k + 2] == array[*k]
+	if (array[*k + 1] == '%' && (array[*k + 2] == array[*k]
 					   || array[*k + 2] == '\n'))
 	{
 		strcpy (set, Tset);
@@ -1252,57 +1267,7 @@ char str[];
 	return (ret);
 }
 
-/* gatech --- see if se is running at Ga. Tech. */
-
-/*
-** if se is running at gatech, for the sake of naive users,
-** come up in SWT compatibility mode.  Personally, I would
-** rather not do this, but, the sophisticated users can use
-** a .serc file to turn on unix compatibility.  If not at
-** gatech, default behaviour is Unix compatibility.....
-**
-** set the global flag, so that we can do some neat stuff in do_shell()
-*/
-
-static gatech ()
-{
-	int len;
-	int i;
-	extern char *sysname ();	/* will tell us where we are */
-
-	/* add system names here as Gatech gets more UNIX machines */
-	/* the names MUST be in sorted order */
-	/* also include the stupid gt-* names */
-	static char *stab[] = {
-		"cirrus",
-		"gatech",
-		"gt-cirrus",
-		"gt-nimbus",
-		"gt-stratus",
-		"nimbus",
-		"stratus"
-		};
-
-	i = strbsr ((char *) stab, sizeof (stab), sizeof (stab[0]), sysname());
-
-	if (i != EOF)
-	{
-		len = 0;
-		doopt ("ops\n", &len);	/* turn on SWT compatibility */
-					/* will put 'SWT' in status line */
-		At_gtics = YES;
-#ifdef LOG_USAGE
-		log ();		/* log se usage statistics */
-#endif
-	}
-	else
-	{
-		mesg ("UNIX", MODE_MSG);
-		At_gtics = NO;
-	}
-}
-
-/* serc --- read in $HOME/.serc and execute the commands in it, if possible. */
+/* serc --- read in ./.serc or $HOME/.serc and execute the commands in it. */
 
 /*
  * note that se's special control characters are NOT processed,
@@ -1320,7 +1285,8 @@ static serc ()
 
 	strcpy (file, expand_env ("$HOME/.serc"));
 
-	if ((fp = fopen (file, "r")) == NULL)
+	if ((fp = fopen ("./.serc", "r")) == NULL ||
+			(fp = fopen (file, "r")) == NULL)
 		return;
 	
 	while (fgets (lin, sizeof lin, fp) != NULL && status != EOF /*??*/)
@@ -1350,7 +1316,7 @@ static serc ()
 
 #ifdef LOG_USAGE
 
-/* log -- log se usage, iff at Georgia Tech */
+/* log -- log se usage */
 
 
 static log ()
@@ -1367,9 +1333,6 @@ static log ()
 #else
 	char *cuserid ();
 #endif
-
-	if (! At_gtics)
-		return;
 
 	/* get the login name */
 #ifdef BSD
@@ -1411,12 +1374,13 @@ char *sysname ()
 	char c;
 	static char buf[MAXLINE] = "";
 	FILE *fp;
+	static char unknown[] = "unknown";
 
 #ifdef USG	/* System V */
 	static struct utsname whoarewe;
 
 	uname (& whoarewe);
-	return (whoarewe.sysname);
+	return (whoarewe.nodename);
 #else
 #ifdef BSD4_2	/* Berkeley 4.2 */
 	if (buf[0] != EOS)
@@ -1425,7 +1389,7 @@ char *sysname ()
 	j = sizeof (buf);
 	k = gethostname (buf, & j);
 	if (k != 0)
-		return ("unknown");
+		return (unknown);
 	else
 		return (buf);
 #else		/* Berkeley 4.1 */
@@ -1433,7 +1397,7 @@ char *sysname ()
 		return (buf);
 
 	if ((fp = fopen ("/usr/include/whoami.h", "r")) == NULL)
-		return ("unknown");
+		return (unknown);
 	else
 	{
 		auto char *cp;
@@ -1444,14 +1408,14 @@ char *sysname ()
 		while ((c = getc (fp)) != '"' && c != EOF)
 			;
 		if (c == EOF)
-			cp = "unknown";
+			cp = unknown;
 		else
 		{
 			for (i = 0; (c = getc (fp)) != '"' && c != EOF; i++)
 				buf[i] = c;
 			buf[i] = EOS;
 			if (c == EOF && i == 0)
-				cp = "unknown";
+				cp = unknown;
 			else
 				cp = buf;
 		}

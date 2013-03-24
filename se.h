@@ -1,3 +1,22 @@
+/*
+ * $Header: se.h,v 1.3 86/07/11 15:09:54 osadr Exp $
+ */
+
+/*
+ * $Log:	se.h,v $
+ * Revision 1.3  86/07/11  15:09:54  osadr
+ * Removed Many Georgia Tech specific things.
+ * 
+ * Revision 1.2  86/05/27  17:44:15  osadr
+ * Removed flexnames dependancy on PREVLINE and PREVLINE2, changed to
+ * PREVLN and PREVLN2.
+ * 
+ * Revision 1.1  86/05/06  13:36:23  osadr
+ * Initial revision
+ * 
+ * 
+ */
+
 /* se.h	--- definitions	for the	screen editor */
 
 #include <stdio.h>
@@ -73,6 +92,7 @@ typedef	struct ldesc {		/* line	descriptor */
 #define ANYWAY		'!'
 #define APPENDCOM	'a'
 #define UCAPPENDCOM	'A'
+#define BACKSCAN	'?'
 #define BACKSEARCH	'<'
 #define CHANGE		'c'
 #define UCCHANGE	'C'
@@ -84,6 +104,7 @@ typedef	struct ldesc {		/* line	descriptor */
 #define UCDELCOM	'D'
 #define ENTER		'e'
 #define UCENTER		'E'
+#define ESCAPE		'\\'
 #define EXCLUDE		'x'
 #define UCEXCLUDE	'X'
 #define GLOBAL		'g'
@@ -104,13 +125,14 @@ typedef	struct ldesc {		/* line	descriptor */
 #define UCMOVECOM	'M'
 #define NAMECOM		'n'
 #define UCNAMECOM	'N'
+#define NOTINCCL	'^'
 #define OPTCOM		'o'
 #define UCOPTCOM	'O'
 #define PAGECOM		':'
 #define OVERLAYCOM	'v'
 #define UCOVERLAYCOM	'V'
-#define PREVLINE	'^'
-#define PREVLINE2	'-'
+#define PREVLN		'^'
+#define PREVLN2		'-'
 #define PRINT		'p'
 #define UCPRINT		'P'
 #define PRINTCUR	'='
@@ -131,6 +153,7 @@ typedef	struct ldesc {		/* line	descriptor */
 #define UCUNDOCOM	'U'
 #define WRITECOM	'w'
 #define UCWRITECOM	'W'
+#define XMARK		'~'
 #define MISCCOM		'z'
 #define UCMISCCOM	'Z'
 #define SHELLCOM	'!'
@@ -231,11 +254,7 @@ typedef	struct ldesc {		/* line	descriptor */
 #define CURSOR_RIGHT		CTRL_G	/* right one column */
 #define TAB_RIGHT		CTRL_I	/* right one tab stop */
 #define SKIP_RIGHT		CTRL_O	/* go to end of	line */
-#ifdef GITVAX
-#define SCAN_RIGHT		CTRL_S	/* scan	right for char */
-#else
 #define SCAN_RIGHT		CTRL_J	/* scan	right for char */
-#endif
 #define G_RIGHT			CTRL_R	/* erase over cursor */
 #define G_TAB_RIGHT		RS	/* erase to next tab */
 #define KILL_RIGHT		CTRL_T	/* erase to end	of line	*/
@@ -258,11 +277,7 @@ typedef	struct ldesc {		/* line	descriptor */
 #define TOGGLE_INSERT_MODE	CTRL_A	/* toggle insert mode flag */
 #define SHIFT_CASE		CTRL_Z	/* toggle case mapping flag */
 #define KILL_ALL		DEL	/* erase entire	line */
-#ifdef GITVAX
-#define FIX_SCREEN		CTRL_Q	/* clear and restore screen */
-#else
 #define FIX_SCREEN		GS	/* clear and restore screen */
-#endif
 
 /* Function for moving around the buffer, either style line handling: */
 #ifdef OLD_SCRATCH

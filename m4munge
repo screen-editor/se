@@ -1,5 +1,17 @@
 #! /bin/sh
 # m4munge --- take what the 'where' command produces, and change it for m4
+# 
+# $Header: m4munge,v 1.2 86/07/11 15:13:56 osadr Exp $
+# 
+# $Log:	m4munge,v $
+# Revision 1.2  86/07/11  15:13:56  osadr
+# Removed Georgia Tech specific items.
+# 
+# Revision 1.1  86/05/06  13:35:02  osadr
+# Initial revision
+# 
+# 
+# 
 
 for i in $*
 do
@@ -10,8 +22,6 @@ do
 	-UBSD)		echo 'define(BSD,NO)'		;;
 	-DBSD4_2)	echo 'define(BSD4_2,YES)'	;;
 	-UBSD4_2)	echo 'define(BSD4_2,NO)'	;;
-	-DGITVAX)	echo 'define(GITVAX,YES)'	;;
-	-UGITVAX)	echo 'define(GITVAX,NO)'	;;
 	-DS5R2)		echo 'define(S5R2,YES)'		;;
 	-US5R2)		echo 'define(S5R2,NO)'		;;
 	-DHARD_TERMS)	echo 'define(HARD_TERMS,YES)'	;;

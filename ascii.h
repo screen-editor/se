@@ -1,4 +1,16 @@
 /*
+ * $Header: ascii.h,v 1.1 86/05/06 13:35:19 osadr Exp $
+ */
+
+/*
+ * $Log:	ascii.h,v $
+ * Revision 1.1  86/05/06  13:35:19  osadr
+ * Initial revision
+ * 
+ * 
+ */
+
+/*
 ** ascii.h
 **
 ** definitions of ASCII mnemonics and synonyms.
