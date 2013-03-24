@@ -1,0 +1,17 @@
+This file lists potential improvements for future versions of se.
+
+Documentation:
+
+	- tutorial (like vimtutor or `C-h t` in emacs)
+	- texinfo manual
+
+Port to the following operating systems:
+
+	- FreeDOS 
+		(this is a high cost, low reward target, but it might be
+		an interesting platform to support).
+
+Other Improvements:
+
+	- Better usage() output with useful explainations.
+	- add a test suite (should be easy since we have scriptse already).

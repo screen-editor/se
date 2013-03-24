@@ -1,0 +1,13 @@
+2013-03-06  Thomas Cort  <tcort@se-editor.org>
+
+ * Version 3.0 released.
+ * Convert the build system to automake/autoconf.
+ * Modernize the K&R style function prototypes. Resolve compiler warnings.
+ * Use safer versions of string functions  (snprintf, strncpy, etc).
+ * Rename some functions to avoid naming conflicts (delete, index, etc).
+ * Port to Linux, BSD, GNU, Haiku, Minix, OpenSolaris, and others.
+ * Add support for termios, make termio the fallback.
+ * Drop HARD_TERMS, OLD_SCRATCH, and OLD_GLOB options.
+ * Remove hardcoded paths, get them from autoconf now.
+ * Use syslog for optional usage logging instead of a file in /usr/tmp.
+ * Add a sample .serc file.

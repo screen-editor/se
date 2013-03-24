@@ -1,0 +1,67 @@
+.\"
+.\" scriptse.1 man page
+.\"
+.\" This file is in the public domain.
+.\" 
+.TH SCRIPTSE 1 local
+.SH NAME
+scriptse \- make scripts for se
+.SH SYNOPSIS
+.B scriptse
+[
+.B \-d
+]
+< script_file |
+.B se
+[ & ]
+.SH DESCRIPTION
+.I Scriptse
+reads standard input, and writes standard output.
+It is a simple filter which turns newlines ('\en') into carriage
+returns ('\er') for
+.IR se (1).
+This allows
+.I se
+to be run from a prepared script.
+.I Se
+can then be fired off into the background, if you wish.
+.PP
+After each carriage return,
+.I scriptse
+adds an ASCII DEL character ('\e177').
+This is so that command lines which fail will be erased,
+and the next command can then be executed.
+If it did not, command lines would get concatenated together, and they
+would simply continue to fail.
+Ultimately, the editor would run out of input buffer and start to
+contiunuously ring the bell on the terminal.
+With the DEL character, each command line is executed on its own.
+.PP
+.I Scriptse
+takes one option, \-d.
+If this option is used,
+.I scriptse
+will
+.I not
+add the ASCII DEL after each carriage return.
+This is useful for program which want to turn newlines into carraige
+returns.
+.PP
+If you do use a script, either sit back and watch it run, or redirect
+the output into a file (or
+.BR /dev/null ,
+if you are confident).
+.SH SEE ALSO
+.IR se (1).
+.SH CAVEATS
+.PP
+It is rather difficult to interrupt
+.I se
+when it is running, so editor scripts should write their
+changed buffer to a new file, in case something goes wrong.
+.SH BUGS
+.PP
+Does no checking for any of
+.IR se 's
+control characters.
+If you put control characters into a script, you are taking your chances.

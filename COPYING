@@ -1,0 +1,6 @@
+The se source code and associated files are in the public domain.
+
+There are a few output files from autoconf/automake (configure, Makefile, etc)
+which contain copyright notices. Those notices give unlimited permission to
+copy and/or distribute the files, with or without modifications, as long as
+the notices are preserved.

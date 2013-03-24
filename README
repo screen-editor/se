@@ -1,129 +1,16 @@
-# 
-# $Header: README,v 1.3 86/07/17 17:52:23 arnold Exp $
-# 
-# $Log:	README,v $
-# Revision 1.3  86/07/17  17:52:23  arnold
-# Fixed some spelling mistakes.
-# 
-# Revision 1.2  86/07/17  17:19:06  arnold
-# Removed GT specific stuff, added discussion of window sensitivities.
-# 
-# Revision 1.1  86/05/06  13:34:09  osadr
-# Initial revision
-# 
-# 
-# 
-README:
+			 ___  ___ 
+			/ __|/ _ \
+			\__ \  __/
+			|___/\___|
 
-This directory contains the source files for the Unix version of the Georgia
-Tech Screen Editor "Se".  It has three subdirectories which contain things
-that se needs. Here is a rundown of the various files.
+			http://se-editor.org/
 
-Files containing documentation are:
+This is the source code for the text editor, se ('Screen Editor').
+se is a screen oriented version of the classic UNIX text editor ed.
+The editor implements many of the commands of ed, but instead of
+being line oriented, se is screen oriented.
 
-README		-- this file.
-se.m4		-- nroff manual page for se (has to be munged to create se.1).
-scriptse.1	-- nroff manual page for scriptse.
-
-The header files are:
-
-ascii.h		-- definition of ASCII mnemonics and control characters.
-extern.h	-- external data definitions for the screen editor.
-se.h		-- global #define's for the screen editor.
-constdefs.h	-- global constants, also used by files in subdirectories.
-
-The C source files are:
-
-main.c		-- main program and declaration of globals, initialization.
-edit.c		-- main command loop to get and execute commands, file handling.
-docmd1.c	-- command decoder and functions for most commands.
-docmd2.c	-- functions for the rest of the commands.
-misc.c		-- miscellanious functions.
-scratch.c	-- scratch file manipulating functions.
-screen.c	-- routines to keep track of the screen contents.
-term.c		-- routines for changing the terminal.
-
-The subdirectories are:
-
-libchangetty	-- routines to change the terminal driver back and forth.
-pat		-- pattern matching routines.
-se_h		-- contains help scripts for all commands in se.
-
-Miscellanious files:
-
-where		-- shell file to determine System V (R 1 or 2), 4.1, or 4.2 BSD.
-m4munge		-- manipulate output of where for m4 for se man page
-makefile	-- the makefile for make(1).
-print2		-- inode used by make for printing only changed stuff.
-
-scriptse.c	-- quick and dirty C program to make scripts for se.
-scriptse.1	-- manual page for same.
-
-Executable files:
-
-se		-- executable version of the screen editor.
-scriptse	-- the executable version of the script maker.
-
-
-Conditional Compilation flags:
-
-	The flag HARD_TERMS, if added to the CFLAGS macro in the makefile,
-will remove the terminal-independent code which uses termlib, and put back
-the original, terminal-types-hardwired-into-the-program code.  The only
-reason to do this is if se has to run on a system without the termlib package.
-Using termlib, se is considerably smaller, as well as more flexible.
-
-	The flag OLD_SCRATCH, if added to the CFLAGS macro in the makefile,
-will cause se to use the original, linked-list method for keeping track of
-lines in the buffer.  This method is faster for rearranging lines, but
-considerably slower for simply looking up lines.  Currently, se uses the
-method given in Software Tools in Pascal, which keeps the lines in order in
-an array.  It is slower at rearranging, but as fast as possible for finding
-lines in the buffer.  This version also takes less data and code space.
-
-	The flag OLD_GLOB, if added to the CFLAGS macro in the makefile,
-will keep se from special casing commands whose effect is to reverse the
-order of the lines in the buffer.  The special casing code can save an
-*incredible* amount of time for this pathological case, so it is best to leave
-things alone.  This only applies to the Software Tools in Pascal style
-line handling.
-
-	The flag LOG_USAGE, if added to the CFLAGS macro in the makefile,
-will cause se to write usage "statistics" to a log file, consisting of the
-login name and time and date when an individual used se. The logfile path
-name in the log() routine in edit.c should be changed to use a system
-accounting file somewhere.  It currently creates a file in /usr/tmp.
-
-	The 'where' command creates a file called 'flags', which the makefile
-cats inside ``s.  These define and/or undefine the flags USG for System V,
-S5R2 if for Release 2, BSD for 4.1 and 4.2, and BSD4_2 for 4.2 specific code.
-
-Miscellanious:
-
-	Code which is dependent on the Berkeley job control stuff is also
-conditionally compiled in, so that on systems without it, it won't get in
-the way.
-
-	Code has been added which should allow se to come up under USG Unix
-5.0 (System V).  If S5R2 is defined, se will use the terminfo package.
-Otherwise, it assumes Release 1, and that the BSD termlib package has
-been ported and is available.
-
-	There is code in term.c to test if se is running on a system with
-windows or not. It currently understands the windows on an ATT Unix PC (or 3B1)
-and the windowing ioctl's in BRL Unix, which should be identical to those
-in 4.3 BSD.
-
-Comments:
-
-	It is a big piece of software. But, if you 1) read both Software Tools
-and Software Tools in Pascal (the chapters on editing and pattern matching, if
-you don't want to read all of the books), and 2) take your time, you should be
-able to understand, and eventually make changes to it, as necessary.
-
-Authors:
-
-	Se started out as the version of 'ed' that came with the book 'Software
+Se started out as the version of 'ed' that came with the book 'Software
 Tools', by Kernighan and Plauger, which was written in Ratfor. On the Pr1me
 computers at the School of Information and Computer Science at Georgia Tech,
 Dan Forsyth, Perry Flinn, and Alan Akin added all the enhancements suggested
@@ -131,13 +18,16 @@ in the exercises in the book, and some more of their own. Jack Waugh made
 extensive modifications to turn it into a screen editor; further work was done
 by Dan Forsyth. All of this was in an improved Georgia Tech version of Ratfor.
 
-	Later, Dan Forsyth, then (and now) at Medical Systems Development
-Corporation, converted the Ratfor version into C, for Berkeley Unix (4.1 BSD).
-At Georgia Tech, Arnold Robbins took the C version and added many new features
-and improvements, the most important of which was termcap support and System V
+Later, Dan Forsyth, then at Medical Systems Development Corporation,
+converted the Ratfor version into C, for Berkeley Unix (4.1 BSD). At Georgia
+Tech, Arnold Robbins took the C version and added many new features and
+improvements, the most important of which was termcap support and System V
 support. The existing help screens were edited and completed at that time, as
 well. This was completed in early 1985.
 
-	Arnold Robbins is now at ...!gatech!emory!arnold, and will make every
-reasonable attempt to answer any questions anyone may have about it, but in
-no way promises to support or enhance 'se'.
+In early 2013, Thomas Cort continued maintenance of se, modernizing
+the code base and build system to support current POSIX operating systems.
+Thomas' primary motivation is to preserve this bit of computing history.
+His goals are to squash any remaining bugs and make se as portable as
+possible. No major new features will be added. He can be reached at
+tcort@se-editor.org

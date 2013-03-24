@@ -1,0 +1,6 @@
+2013.03.06 - se 3.0 has been released. This release includes major portability
+		enhancements and build system changes. The old makefile based
+		build system has been replaced with a slick new autotools
+		configure script. This, combined with some code modernization,
+		allows se to build and run on a variety of platforms. See the
+		ChangeLog for details.

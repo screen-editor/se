@@ -1,0 +1,25 @@
+#
+# This file is in the public domain
+#
+#
+# This is a sample .serc file. Copy it to $HOME/.serc to use it or
+# create your own.
+#
+#
+# Each line beginning with a '#' character is treated as a comment and
+# ignored by se. Lines that contain options are interpreted by se.
+#
+#
+# The line below enables absolute line numbering.
+oa
+# If you don't want this feature, just comment out the line above
+# or remove it.
+#
+#
+# If you want to know more about a feature, use the help system
+# in se. For example, if you wanted help with 'oa', use the 'hoa'
+# command to get *h*elp for *oa*. You may also consult the man page se.1
+#
+#
+# That's all there is to it. Just add options to $HOME/.serc to enable them
+# when you start up se.
