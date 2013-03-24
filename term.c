@@ -1,9 +1,13 @@
 #ifndef lint
-static char RCSid[] = "$Header: term.c,v 1.7 86/11/12 11:37:30 arnold Exp $";
+static char RCSid[] = "$Header: term.c,v 1.8 87/02/03 14:32:32 arnold Exp $";
 #endif
 
 /*
  * $Log:	term.c,v $
+ * Revision 1.8  87/02/03  14:32:32  arnold
+ * Changes for non-windowing and USG systems; reorganization had
+ * caused these to break during the compile.
+ * 
  * Revision 1.7  86/11/12  11:37:30  arnold
  * Fixed winsize() to verify that cols and rows not 0 before assigning
  * them to Nrows and Ncols.
@@ -57,7 +61,7 @@ static char RCSid[] = "$Header: term.c,v 1.7 86/11/12 11:37:30 arnold Exp $";
 ** Routines that are only if HARD_TERMS is NOT defined. These contain:
 **	BSD/termlib routines
 **	System V/terminfo routines
-**	Routines idenpendant of BSD/System V
+**	Routines independant of BSD/System V
 ** Routines that are only if HARD_TERMS is defined.
 ** Routines that have regular and conditonal code mixed.
 */
@@ -151,6 +155,7 @@ char *term;
 		getdescrip ();		/* get terminal description */
 		Nrows = tgetnum ("li");
 		Ncols = tgetnum ("co");
+		PC = pcstr ? pcstr[0] : EOS;
 		break;
 
 	default:
@@ -175,6 +180,8 @@ typedef struct termio SGTTY;
 
 #include <term.h>	/* should be all we really need */
 
+extern char *tgoto();
+
 #define AM	auto_right_margin
 #define TI	enter_ca_mode
 #define TE	exit_ca_mode
@@ -184,6 +191,7 @@ typedef struct termio SGTTY;
 #define CE	clr_eol
 #define DL	delete_line
 #define AL	insert_line
+#define CM	cursor_address
 
 /* setcaps -- get the capabilities from the terminfo database */
 
@@ -229,6 +237,8 @@ t_exit ()
 
 #include <signal.h>
 
+#if defined(SIGWIND) || defined(SIGWINCH)
+
 #ifdef SIGWIND			/* UNIX PC */
 #include <sys/font.h>
 #include <sys/window.h>
@@ -268,7 +278,6 @@ static struct WINSTRUCT w;
 
 winsize ()
 {
-#if defined(SIGWIND) || defined(SIGWINCH)
 	static int first = 1;
 	static char savestatus[MAXCOLS];
 	int row, oldstatus = Nrows - 1;
@@ -328,8 +337,16 @@ winsize ()
 	loadstr (savestatus, Nrows - 1, 0, Ncols);
 	remark ("window size change");
 	tflush ();
-#endif
 }
+
+#else
+
+winsize ()	/* no windowing system, don't do anything */
+{
+	return;
+}
+
+#endif
 
 #else
 
@@ -2044,9 +2061,6 @@ char *type;
 #else
 	if (setcaps (type) == ERR)
 		error (NO, "se: could not find terminal in system database");
-
-
-	PC = pcstr ? pcstr[0] : EOS;
 
 	if (*tgoto (CM, 0, 0) == 'O')	/* OOPS returned.. */
 		error (NO, "se: terminal does not have cursor motion.");
