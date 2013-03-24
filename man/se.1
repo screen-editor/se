@@ -83,7 +83,12 @@ or failing that,
 if either file exists.
 It then processes the command line,
 obeying the options given there, and begins
-reading your file (if you specified one).  The screen it draws
+reading your file (if you specified one).
+The
+.B .serc
+file is only evaluated if the euid of se matches the owner for the file
+and no other users have permission to write to the file.
+The screen it draws
 looks something like this.
 (The parenthesized numerals are not part of the screen layout,
 but are there to aid in the following discussion.)
@@ -345,6 +350,10 @@ file is useful for setting up personalized options,
 without having to type them on the command line every time, and without
 using a special shell file in your bin (for
 .IR sh (1)).
+The
+.B .serc
+file is only evaluated if the euid of se matches the owner for the file
+and no other users have permission to write to the file.
 .PP
 Command line options are processed
 .I after

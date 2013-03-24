@@ -1,3 +1,11 @@
+2013-03-24  Thomas Cort  <tcort@se-editor.org>
+
+ * Version 3.0.1 released.
+ * Security Fix: be more careful with the handling of .serc files. Now the
+   euid of se must match the owner of the file and the file must not be
+   writable by any other users in order for se to execute it. Thank you 
+   to Matthias Kilian of the OpenBSD project for alerting me to this issue.
+
 2013-03-06  Thomas Cort  <tcort@se-editor.org>
 
  * Version 3.0 released.

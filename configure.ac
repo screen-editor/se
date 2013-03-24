@@ -6,7 +6,7 @@ dnl
 dnl Initialize autoconf and automake
 dnl
 
-AC_INIT([se], [3.0], [tcort@se-editor.org])
+AC_INIT([se], [3.0.1], [tcort@se-editor.org])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
 dnl

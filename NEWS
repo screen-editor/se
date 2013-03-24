@@ -1,3 +1,12 @@
+2013.03.24 - se 3.0.1 has been released. This is a security release. It is 
+		recommended that all users upgrade. The release fixes 
+		insecure handling of .serc files. The new behaviour is 
+		to ignore .serc files that aren't owned by the euid of 
+		the se process and .serc files that are writable by 
+		other users. No other changes are included in this 
+		release. Thank you to Matthias Kilian of the OpenBSD 
+		project for alerting me to this issue.
+
 2013.03.06 - se 3.0 has been released. This release includes major portability
 		enhancements and build system changes. The old makefile based
 		build system has been replaced with a slick new autotools

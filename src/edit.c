@@ -1221,6 +1221,44 @@ int settab (char str[])
 	return (ret);
 }
 
+
+/* serc_safe --- check if the file permissions and ownership are safe */
+
+/*
+ * err on the side of caution and only exec ~/.serc and ./serc files
+ * that we own and cannot be written by others.
+ */
+
+int serc_safe (char *path)
+{
+	int rc;
+	uid_t our_euid;
+	struct stat sbuf;
+
+	rc = stat (path, &sbuf);
+	if (rc != 0)
+	{
+		return NO;
+	}
+
+	our_euid = geteuid ();
+
+	/* don't exec .serc files that aren't ours */
+	if (sbuf.st_uid != our_euid)
+	{
+		return NO;
+	}
+
+	/* don't .serc files that others can write to */
+	if ((sbuf.st_mode & S_IWGRP) || (sbuf.st_mode & S_IWOTH))
+	{
+		return NO;
+	}
+
+	return YES;
+}
+
+
 /* serc --- read in ./.serc or $HOME/.serc and execute the commands in it. */
 
 /*
@@ -1235,15 +1273,26 @@ void serc (void)
 	char *homeserc;
 	FILE *fp;
 	int status = ENOERR;
-	int len, cursav;
+	int len, cursav, i;
+	char *serc_files[] = {file, "./.serc", NULL};
 
 	homeserc = expand_env ("$HOME/.serc");
 
 	memset (file, EOS, MAXLINE);
 	strncpy (file, homeserc, MAXLINE-1);
 
-	if ((fp = fopen ("./.serc", "r")) == NULL &&
-			(fp = fopen (file, "r")) == NULL)
+	fp = NULL;
+
+	for (i = 0; serc_files[i]; i++)
+	{
+		if ((serc_safe (serc_files[i]) == YES) &&
+			 ((fp = fopen (serc_files[i], "r")) != NULL))
+		{
+			break;
+		}
+	}
+
+	if (fp == NULL)
 	{
 		return;
 	}

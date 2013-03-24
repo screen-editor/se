@@ -23,3 +23,9 @@ oa
 #
 # That's all there is to it. Just add options to $HOME/.serc to enable them
 # when you start up se.
+#
+# Note: the euid of se must match the owner of the file and the file 
+# must not be writable by any other users in order for se to execute it.
+# You should run these commands on your .serc files:
+#  $ chown `whoami` .serc
+#  $ chmod 600 .serc
