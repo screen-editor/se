@@ -1,0 +1,11 @@
+
+          t    -- To command
+               default range           syntax
+                         .,.           from-here,to-here t after-here
+
+        Reproduce the block of lines identified by the range field of
+        the command and place them after the named line.
+
+
+        To return to the command directory, type "hcomdir."
+        See also:  "hm".

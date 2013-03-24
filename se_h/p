@@ -1,0 +1,14 @@
+          p    -- Print/Previous screen command
+
+               default range           syntax
+               see below               [range] p
+
+        "p"  prints  a  range of lines or the previous screen (when no
+        range is provided).  The line pointer is set to the last  line
+        printed  (a  new  screen  may  be printed).  When the previous
+        screen is printed, the first line on the  current  screen  be-
+        comes  the  line  pointer, usually the last line on the screen
+        (exception is when the first page is printed).
+
+        To return to the command directory, type "hcomdir."
+        See also "hspecl"

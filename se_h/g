@@ -1,0 +1,14 @@
+          g    -- Global command
+
+               default range           syntax
+                         1,$           g/pattern/command
+
+        "g"  is  used  to perform an editing command on all lines that
+        match the "pattern".   "pattern"  is  any  legal  pattern  and
+        command is an editor command.  The "x" command is the converse
+        of "g" and performs the command on all lines that do not match
+        the pattern.  The "/" may be any character.
+
+
+        To return to the command directory, type "hcomdir."
+        See also:  "hx" and "hpat".

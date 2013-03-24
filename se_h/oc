@@ -1,0 +1,16 @@
+        oc -- Option Case
+
+               default range             syntax
+                   1,$                     oc
+
+        The "c" (case) option toggles the same case mapping flag  that
+        is  toggled  by the CTRL-Z control character, but also changes
+        the marginal line letters to lower case (or back to upper), so
+        that typing a shifted letter will still refer to a  line,  and
+        typing an unshifted letter will do for a command letter.  This
+        is  useful for handling large amounts of upper case text, such
+        as Fortran programs.
+
+        For general information about the option command, type "ho".
+        See also "hoa".
+        Fortraners see also "hof".

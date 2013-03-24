@@ -1,0 +1,17 @@
+
+        ! --- shell escape
+
+        default range                            syntax
+                1,$                      ![<Unix command>]
+
+        The user's choice of shell is taken from the $SHELL environment vari-
+        able and used to execute <Unix command> if it is present.  Otherwise,
+        an  interactive shell is created. A leading ! is replaced by the pre-
+        vious  shell  command.  Thus !!  executes  the previous  command.  An
+        unescaped  % is replaced  by  the saved  file name. An expanded shell
+        command is echoed  before it is  executed. After an interactive shell
+        exits, the screen is immediately  redrawn. If a  command was run, the
+        results are left on the  screen,  and the user must  type a return to
+        redraw the editing window.
+
+        To return to the command directory, type "hcomdir".

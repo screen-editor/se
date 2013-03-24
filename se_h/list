@@ -1,0 +1,15 @@
+                            List (of line numbers)
+
+        A  line  number list consists of one or more LINE NUMBERs sep-
+        arated with commas or semicolons.  The last two  line  numbers
+        in  the  list  usually  specify  the  scope of a command.  For
+        example, "5,7d" means delete lines 5 through 7.  If  the  list
+        consists  of  only one line number, it is equivalant to a list
+        with that line number written twice with a  comma  separating.
+        The  sense of the semicolon is to set the CURRENT LINE POINTER
+        to the value of the line number before  the  semicolon  before
+        evaluating  the  line  number after it, whose value may depend
+        upon the value of the current line pointer.
+
+        For command syntax, type "hcomsyn".
+        For LINE NUMBER syntax and semantics, type "hln".

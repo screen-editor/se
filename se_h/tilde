@@ -1,0 +1,10 @@
+
+        ~ --- exclude on markname
+
+        default range                   syntax
+          1,$                             ~<m>command
+        
+        Similar to the "x" prefix, except that  "command" is performed
+        for all lines in the range that do not have the mark name <m>.
+
+        To return to the command directory, type "hcomdir".

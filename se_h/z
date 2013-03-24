@@ -1,0 +1,18 @@
+       z -- do special extended things
+
+        default range               syntax
+    lines must be given         line,line z <option> <stuff>
+
+       The z command command is used for doing special extended
+    things. Currently, the only option available is b, to  draw
+    a box into the buffer. It works as follows:
+
+         lin,lin zb<left>[,<right>][<char>]
+
+    The two <lin>s  specify where in the buffer to put the  box,
+    <left> and <right> tell which column to  which  column,  and
+    the <char> is the character to use to draw the  box.  As  an
+    example,
+         .,.+4zb10,50*
+    draws a box, OVER the text that is there. Try  it  on  some
+    BLANK lines.

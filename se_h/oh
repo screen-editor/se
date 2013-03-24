@@ -1,0 +1,17 @@
+
+        oh -- Option Hardware Insert/Delete
+
+              default range             syntax
+                 1,$                     oh
+
+        The   "h"   option   controls   the  use  of  hardware  line
+        insert/delete on terminals that have  that  capability.   By
+        default,  line  insert/delete will be used if available.  It
+        is occasionally useful to turn this option  off  when  using
+        the editor on a terminal which can't keep up, or if the com-
+        munications  lines may be scrambling the control characters.
+        Each successive "oh" merely  toggles  a  switch  within  the
+        editor.   An  explanatory  message  is  placed in the status
+        line.
+
+        For general information about the option command, type "ho".

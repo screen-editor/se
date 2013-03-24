@@ -1,0 +1,14 @@
+
+          x    -- Global exclude on pattern
+
+               default range           syntax
+                         1,$           x/pattern/command
+
+        "x"  is  used  to perform an editing command on all lines that
+        do not match the "pattern". "pattern" is any legal pattern and
+        command is an editor command.  The "g" command is the converse
+        of "x" and performs the command on all lines that do match the
+        pattern.  The "/" may be any character.
+
+        To return to the command directory, type "hcomdir."
+        See also:  "hg" and "hpat".

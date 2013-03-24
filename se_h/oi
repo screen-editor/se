@@ -1,0 +1,13 @@
+
+        oi -- Option Indent
+
+                default range           syntax
+                    1, $                  oi[a | <indent>]
+
+        "oi" selects the indent value for lines  inserted with "a" and
+        "i" commands (initially 1). "a" selects auto-indent which sets
+        the indent to the value  which equals the indent of the previ-
+        ous line.  If  neither  "a" nor  "<indent>" is  specified, the
+        current value of indent is displayed.
+
+        For general information about the option command, type "ho".

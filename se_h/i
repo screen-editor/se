@@ -1,0 +1,18 @@
+         i    -- Insert command
+
+              default range           syntax
+                          .           i
+
+        "i"  is  for  inserting new lines of text before a given line.
+        If no line number is  typed  before  the  "i",  text  will  be
+        inserted  before  the  current  line.   Lines  are continually
+        inserted before the original line, which has the  same  effect
+        as  append  does.  To signal the end of the inserted text, you
+        only need to type  a  "."   on  a  line  by  itself.   Control
+        characters  "f",  "v",  "l",  and "k" work differently for "i"
+        command than for "v". "i:" works as a one line insert, similar
+        to "a:".
+
+        To return to the command directory, type "hcomdir."
+        See also:  "hcc" (control characters) and  "hc"  (change)  and
+        "ha".

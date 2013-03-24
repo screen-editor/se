@@ -1,0 +1,18 @@
+
+                              Command Directory
+
+        The following are the full names of one-letter commands
+        Append            Change   Delete   Enter    File     Global
+        Help     Insert   Join     marK     Locate   Move     Name
+        Option   Page     Quit     Read     Substitute        To
+        Undelete oVerlay  Write    eXclude  translYterate
+
+        For info about one of these commands, type "h" followed by
+        whichever letter is capitalized in the command name above.
+
+        Other commands and their help commands are:
+            print value   hequal        global on mark   hquote
+            miscellany    hz            exclude on mark  htilde
+            shell escape  hshell        .serc file       hserc
+
+        There are still more commands; to see them type "hspecl".

@@ -1,0 +1,14 @@
+          c    -- Change command
+
+               default range           syntax
+                    .,.                  c
+
+        "c"  first  deletes  the range of lines determined by the line
+        numbers (default ".,."), then enters append mode so  that  you
+        can  type  lines to replace the deleted lines.  Append mode is
+        terminated with a dot on a line by itself, as with the  Append
+        command. "c:" works as a one line change (i.e. what  is  after
+        the colon replaces the current line).
+
+        To return to the command directory, type "hcomdir."
+        See also   "ha" and "hd"

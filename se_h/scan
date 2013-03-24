@@ -1,0 +1,15 @@
+                     For line number syntax, type "hln".
+                   For details about PATTERNs, type "hpat".
+
+        A line number term consisting of  a  PATTERN  between  slashes
+        causes  a  scan to begin with the line after the current line.
+        If the last line is encountered, the scan continues with  line
+        1.   The  current  line  is the last to be examined.  The line
+        referred to is the first line encountered  in  the  scan  that
+        contains  a  match  for  the  pattern.   If  the entire buffer
+        contains no match, then an error is flagged.  If  the  pattern
+        is  enclosed  in  question marks,  the  scan is in the reverse
+        direction and begins with the line  just  before  the  current
+        line,  and  wraps  around  to  the  last  line after line 1 is
+        examined.  ">" and "<" mark name searches proceed in the  same
+        wraparound fashion.

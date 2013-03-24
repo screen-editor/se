@@ -1,0 +1,19 @@
+#! /bin/sh
+# m4munge --- take what the 'where' command produces, and change it for m4
+
+for i in $*
+do
+	case $i in
+	-DUSG)		echo 'define(USG,YES)'		;;
+	-UUSG)		echo 'define(USG,NO)'		;;
+	-DBSD)		echo 'define(BSD,YES)'		;;
+	-UBSD)		echo 'define(BSD,NO)'		;;
+	-DBSD4_2)	echo 'define(BSD4_2,YES)'	;;
+	-UBSD4_2)	echo 'define(BSD4_2,NO)'	;;
+	-DGITVAX)	echo 'define(GITVAX,YES)'	;;
+	-UGITVAX)	echo 'define(GITVAX,NO)'	;;
+	-DS5R2)		echo 'define(S5R2,YES)'		;;
+	-US5R2)		echo 'define(S5R2,NO)'		;;
+	-DHARD_TERMS)	echo 'define(HARD_TERMS,YES)'	;;
+	esac
+done

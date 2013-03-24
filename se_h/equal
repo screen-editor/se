@@ -1,0 +1,12 @@
+         =    -- Display Line Number command
+
+              default range           syntax
+                   .                  =
+
+      "=" is for determining the number of the current line
+      that you are editing.
+
+
+
+       To return to the command directory, type "hcomdir."
+       See also:  "hoa"

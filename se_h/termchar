@@ -1,0 +1,11 @@
+                    Command Terminating Control Characters
+
+        The  Carriage Return character terminates a command, but first
+        erases any characters at and  to  the  right  of  the  cursor.
+        CTRL-V,  on  the other hand, skips the cursor to the right end
+        of the line, then terminates it.  The "Funny Return" character
+        CTRL-F serves different purposes depending on what routine  is
+        soliciting the command.
+
+        For more about CTRL-F, see "habt" and "hrpt".
+        The general control character directory is "hcc".

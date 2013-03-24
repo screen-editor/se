@@ -1,0 +1,12 @@
+                               Abort character                                
+
+        CTRL-F ("Funny Return") character  is  used  to  abort  a  "v"
+        command  before  all  the  specified lines have been modified.
+        Typing it causes the current line to be restored to its  state
+        of  before  the  "v" command was begun, and causes a return to
+        the editor's command level.
+
+
+        Type "hv" for a description of the "v" command.
+        Type "hrpt" for CTRL-F's meaning if in append or command mode.
+        Type "htermchar" for info about other termination characters.

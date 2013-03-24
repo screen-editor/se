@@ -1,0 +1,14 @@
+                    Character Insertion Control Characters
+
+        CTRL-C inserts a blank at the cursor position.
+        CTRL-X inserts blanks to the next tab stop at the cursor position.
+        CTRL-A toggles Insert Mode.
+
+        When Insert Mode is in effect, any printing character typed is
+        inserted into the line, with characters at and to the right of
+        the cursor moving over to make room.  When Insert Mode is  not
+        in effect, any printing character typed will replace (overlay)
+        the character at the cursor.
+
+
+        To return to the directory of control characters, type "hcc".

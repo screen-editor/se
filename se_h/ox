@@ -1,0 +1,16 @@
+            ox -- toggle tab compression/expansion
+
+            default range           syntax
+                .                       ox
+
+
+            "ox" turns compression of tabs on or off. If a file
+            has tabs in it, they will be  expanded  if compres-
+            sion is on. Otherwise they will be left alone,  and
+            will show up as the default unprintable character.
+
+            The message "XTABS" will be displayed in the status
+            line if tab compression is on.
+
+            Type "hdir" to go back to the general help directory.
+            Type "ho" for help on the option command.

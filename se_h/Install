@@ -1,0 +1,15 @@
+#! /bin/sh
+: Install -- put se help files into their proper directory.
+:	     This program is called from the makefile.
+
+INSTALL=$1
+shift
+umask 022
+
+for i in $*
+do
+	echo installing $i
+	detab < $i > $INSTALL/$i
+done
+
+: we really should do some error checking, but what the heck.

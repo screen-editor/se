@@ -1,0 +1,12 @@
+        ok -- Option OK
+
+        default range                    syntax
+          1,$                             ok
+
+        Typing  "ok"  simply tests the flag that indicates whether the
+        edit buffer has been saved since the last change was  made  to
+        it.   "Saved"  or  "Not saved" is accordingly displayed in the
+        remark field at the bottom of the screen.
+
+        To return to the option directory, type "ho".
+        See also "hq".

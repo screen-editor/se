@@ -1,0 +1,15 @@
+
+        oy --- option encrYption 
+
+        default range                                   syntax
+           1,$                                            oy[key]
+        
+        This option allows you to edit encrypted files. oy followed by a key
+        will cause e, r, and w, commands to encrypt  and decrypt files using
+        crypt(1).  oy will toggle the current  encryption setting.  If there
+        is  no current key, se will ask you for one. If encryption is turned
+        on, it will be  turned off.   Encryption in indicated by the message
+        "ENCRYPT" in the status line. The key is never shown on your screen.
+
+        Type "ho" for help on the option command.
+        Type "hdir" to go back to the general help directory.

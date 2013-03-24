@@ -1,0 +1,16 @@
+
+        of -- Option Fortran
+
+               default range             syntax
+                  1,$                      of
+
+        Typing  "of"  turns  on  a  package  of  options  considered
+        convenient for editing Fortran.  The warning column  is  set
+        to  72,  and tab spacing is set to 7 +3 so that tabbing once
+        gets you to column 7.   Tab  expansion  is  also  turned  on
+        (XTABS).   To  undo  "of" it is necessary to type "ot+3" and
+        "ox".
+
+        For general information about the option command, type "ho".
+        See also "oa".
+

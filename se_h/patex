@@ -1,0 +1,13 @@
+         PATTERN       MATCHES     DOESN'T MATCH
+
+        "test"         "testfoo"   "foobar"
+        "test$"        "footest"   "test "
+        "$"            anything
+        "ab*c"         "abbbbbbc"  "bbbbbbc"
+        "ab*c"         "ac cur"    "ab*c"
+        "^abc"         "abcac"     "bcabc"
+        "abc^"         "abc^d"     "ab*c"
+        "a[bcd]*e"     "abddceab"  "eeeaaa"
+        "a[bcd]*e"     "aaaeee"    "bcdbcde"
+
+        For general info about patterns, type "hpat".

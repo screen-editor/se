@@ -1,0 +1,11 @@
+          v    -- oVerlay command
+
+               default range           syntax
+                    .,.                   v
+
+        Inline editing mode is entered using this command.  The curser
+        is  positioned  at the column set by the "ov" command.  Inline
+        editing may now be performed using control characters.
+
+        To return to the command directory, type "hcomdir."
+        See also:  "hcc" and "hmotion".

@@ -1,0 +1,17 @@
+                                     Help
+
+        You are using 'se', the  Georgia  Tech screen editor which  is
+        based upon the editor described in the book SOFTWARE TOOLS, by
+        Brian W.  Kernighan  and  P.   J.   Plauger   (Addison-Wesley,
+        1976).   The  screen-oriented  modifications (and some others)
+        are by  Jack  Waugh and  Perry  Flinn.  Dan Forsyth translated
+        the Ratfor into C.  Arnold Robbins modified the editor to  use
+        the Berkeley termlib library, making the editor terminal inde-
+        pendant.  Most of this  'help' is  courtesy  of Bob  Gordon of
+        Prime  Research, as  amended by  Arnold Robbins.  The descrip-
+        tion before you now  is  invoked by the  "h" (help) command.
+
+        For a description of the 'help' command, type "hh".
+        Find out what the help command can tell you - type "hdir".
+
+

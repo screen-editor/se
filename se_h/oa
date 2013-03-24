@@ -1,0 +1,17 @@
+        oa -- Option Absolute
+
+               default range             syntax
+                   1,$                     oa
+
+        "oa" toggles the Absolute line numbers flag, which  determines
+        whether  the numbers in the left margin shall be absolute line
+        numbers, or the (usually capital) letters that refer to  lines
+        by  the  position  at  which  they  are being displayed on the
+        screen.  In any case, the current line is always shown as  "."
+        (with  the "->" arrow to make it easy to find), the first line
+        in the buffer is labeled "1", and  the  last,  "$"  (when  not
+        ".").   Lines  can  be  referred  to  by  letter ONLY when the
+        letters appear in the left margin.
+
+        For general information about the option command, type "ho".
+        See also "hln" for how lines can be referred to in commands.

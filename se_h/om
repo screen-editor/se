@@ -1,0 +1,18 @@
+
+        om -- Option Mail
+
+               default range             syntax
+                  1,$                     om
+
+        "om" is an option which allows the user control   over  whether
+        or  not he will  be  notified  about pending mail.  Typing "om"
+        simply toggles the switch controlling notification.
+            The default is for the editor to notify the  user about his
+        mail.  The  mail  box  which the editor uses is taken from  the
+        environment variable MAIL. If the mail box exists, but is empty
+        the user will not be notified.
+
+        To  read your mail, use a shell escape on whichever of the fol-
+        lowing programs is appropriate:
+
+                Mail     msg     mail

@@ -1,0 +1,15 @@
+        serc -- $HOME/.serc -- Se Initialization File
+        
+        The file $HOME/.serc, if it exists, is read when se starts up.
+        If a line begins with a '#', it is treated as a comment and is
+        ignored.  It is useful for  setting  personal options  without
+        the user having to type them in  on the command line  or use a
+        special shell file or alias. Here is a sample .serc file:
+
+            # turn on unix mode, tabs every 8 columns, auto indent
+            opu
+            ot+8
+            oia
+
+	Command line options ALWAYS override any options set by commands
+	in the .serc file.

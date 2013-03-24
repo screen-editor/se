@@ -1,0 +1,11 @@
+          y    -- translYterate command
+
+               default range           syntax
+                   .,.           y/from-range/to-range[/]
+
+        Characters   in   the  "from-range"  are  converted  to  their
+        corresponding characters in the "to-range".  The "/" may be an
+        character.  The trailing delimiter is optional.
+
+        To return to the command directory, type "hcomdir."
+        See also:  "hs".

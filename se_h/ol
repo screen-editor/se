@@ -1,0 +1,14 @@
+        ol -- Option Line
+
+               default range             syntax
+                 1,$                      ol[$ | . | # | BLANK]
+
+        The  "l"  option  is the Line number monitoring option. Typing
+        "l" followed by "$" constantly displays the last  line  number
+        in the file (current length of the file).  Typing "l" followed
+        by  "."   constantly  displays  the current line number.  This
+        usually make sense only in conjunction with the  "oa"  option,
+        that uses letters for line names.
+
+        For general information about the option command, type "ho".
+        See also:  "hoa" and "hequal".

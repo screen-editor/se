@@ -1,0 +1,17 @@
+        ot -- Option Tab
+
+        range                        syntax
+         1,$                ot[[[+]integer [+]integer]]
+
+
+        "ot+3" sets the spacing between tab stops.  The  default  value
+        when  'se'  comes  up  is 3.  Typing "ot" by itself causes the
+        current value of the parameter to be displayed.  As an example
+        of how tabs are spaced out, if ot+6 is in effect, tab stops are
+        at 7, 13, 19, etc.
+        Variable  tabs can be set by typing "ot 5 13 24 ..  ".  if you
+        do not prefer equally spaced ones.
+
+        See also "hof".
+        For general information about the option command, type "ho".
+        For more about the use of tab stops, type "hmotion".

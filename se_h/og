@@ -1,0 +1,16 @@
+
+        og -- Option Global
+
+               default range             syntax
+                  1,$                     og
+
+        The "g" option controls the behavior of the Substitute  command
+        when it  is under the control of a Global  command.  Initially,
+        if a substitute inside a global command fails, se will not con-
+        tinue with  the rest of the lines  which might succeed. If "og"
+        is given, then  the global substitute  will continue, and lines
+        which failed will not be affected. Succesive "og" commands will
+        toggle this behavior.  An explanatory message is placed in  the
+        status line.
+
+        For general information about the option command, type "ho".

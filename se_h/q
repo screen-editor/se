@@ -1,0 +1,14 @@
+          q   --  Quit command
+
+               default range           syntax
+                   n/a                    q
+
+        "q" is used to quit the screen editor  and  return  to  system
+        command  level.  If changes have been made to the buffer since
+        the last write ("w"), you will be asked if you really want  to
+        quit.   If so, just do another "q" command (RETURN is all that
+        required).
+
+
+        To return to the command directory, type "hcomdir."
+        See also:  "hok".

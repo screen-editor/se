@@ -1,0 +1,10 @@
+
+        ' --- global on markname
+
+        default range                   syntax
+          1,$                             '<m>command
+        
+        Similar to the "g" prefix, except that "command" is performed
+        for all lines in the range that have the mark name <m>.
+
+        To return to the command directory, type "hcomdir".

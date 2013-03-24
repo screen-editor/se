@@ -1,0 +1,12 @@
+          r    -- Read command
+
+               default range           syntax
+                      .           r [file name]
+        "r" is used to read a file into  the  buffer  at  (after)  the
+        named  place  (range field).  If no file name is provided, the
+        current  file name (as  identified by the "f" command) is used.
+        Se expand environment variables occuring in file names.
+
+
+        To return to the command directory, type "hcomdir."
+        See also:  "hf" and "he".

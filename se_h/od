@@ -1,0 +1,16 @@
+        od -- Option Delete
+
+               default range             syntax
+                  1,$                     od[<|>]
+
+        The "d" option is for Delete direction.  Typing "od<" fixes it
+        so  that  after  you  give  a "d" command, the line BEFORE the
+        group of lines deleted becomes the current line  (.).   Typing
+        "od>"  resets  the  normal behavior, in which the current line
+        pointer is always positioned AFTER the group of lines  deleted
+        by  the "d" command, if possible (Deleting the last line makes
+        the new last  line  the  current  line).   Typing  "od"  alone
+        queries  the  delete  direction flag, causing ">" or "<" to be
+        displayed.
+
+        For general information about the option command, type "ho".

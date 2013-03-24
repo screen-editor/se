@@ -1,0 +1,14 @@
+        d    -- Delete command
+
+               default range           syntax
+                         .,.           d
+
+        "d"  is  used  to  delete  lines of text from the buffer.  The
+        lines in the range specified  by  the  line  number  list  are
+        deleted.   The  positioning  of the current line pointer after
+        execution of the "d" command is controlled by the "d"  option;
+        see  "hod".   The  normal  behavior  is to make the first line
+        AFTER the lines deleted the new current line.
+
+        To return to the command directory, type "hcomdir."
+        See also "hod".

@@ -1,0 +1,9 @@
+                              Argument Handling
+
+        The syntax for 'se's invoking command is usually given as
+            se {-<option> | <pathname>}
+        It is suggested  that  you  set up a command  file  that  will
+        automatically invoke 'se' with the options that you like.
+
+        To see how the remaining arguments are treated, type "harg2".
+        To return to the general help directory, type "hdir".

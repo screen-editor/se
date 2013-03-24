@@ -1,0 +1,12 @@
+
+        oz -- option sleep (zzzz's)
+
+        default range           syntax
+          1,$                     oz
+
+        If you are running "sh", this option has absolutely no effect at
+        all.  If you are running the "csh", this option will suspend  se
+        in the background.  Se will issue  a warning  if  the buffer has
+        not been saved, when this is done.
+
+        For general information about the option command, type "ho".

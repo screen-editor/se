@@ -1,0 +1,15 @@
+          w    -- Write command
+
+               default range                syntax
+                         1,$        w[! | + | >] [file name]
+
+        "w"  writes  the  buffer  to a file.  If issued without a file
+        name the current file name is used.  If "f" was used to change
+        the file name or if a file name was given, a new file will  be
+        created and written unless the file already exits which causes
+        a  warning.   The warning may be bypassed using "w!".  Options
+        [+] or [>] mean to append to the file instead of writing  over
+        it. Se expands environment variables occuring in file names.
+
+        To return to the command directory, type "hcomdir."
+        See also:   "hf", "hok".

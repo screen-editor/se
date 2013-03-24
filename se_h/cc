@@ -1,0 +1,13 @@
+
+        Control characters can be used for correcting typing mistakes,
+        for correcting commands that have incurred an error message,
+        or for editing the edit buffer ("inline editing") via the "v"
+        command.  The novice should be told right away that hitting
+        the DEL or RUBOUT key is a way to erase an erroneous command.
+
+        General Help Directory. . . . . . . . . . . . . . hdir
+        Other Control Characters. . . . . . . . . . . . . hccmisc
+        Character Insertion Control Characters. . . . . . hcharins
+        Termination Control Characters. . . . . . . . . . htermchar
+        Character Deletion Control Characters . . . . . . hchardel
+        Cursor Motion Control Characters. . . . . . . . . hmotion

@@ -1,0 +1,16 @@
+          e    -- Enter command
+
+               default range           syntax
+                         n/a           e[! | x] [file name]
+
+        "e" prevents one from having to exit and reenter the editor to
+        edit  a  different file.  "e" empties the edit buffer, reads a
+        file, and resets the remembered file name.  If [file name]  is
+        omitted,  the  remembered  file  name is used.  [!] is used to
+        override a check made to prevent you from accidently losing  a
+        buffer that has not been saved (same as in "q"). [x]   is used
+        to turn tab expansion   on when reading the file in.  Se  will
+        expand environment variables that start with  $ in file names.
+
+        To return to the command directory, type "hcomdir."
+        See also:  "hq"

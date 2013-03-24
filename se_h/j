@@ -1,0 +1,15 @@
+
+        j -- Join command
+
+               default range           syntax
+                         ^,.           j[/string[/]]
+
+        "j"  is used to join the specified lines into a single line.
+        If "string" is present, it is inserted between each pair  of
+        lines  joined.  If not, a single blank is used.  "j/" is the
+        same "j//", i.e., no string at all will be inserted  between
+        the  joined  lines.   The  "/"  may  be  any character.  The
+        trailing delimiter is optional.
+
+        To return to the command directory, type "hcomdir."
+

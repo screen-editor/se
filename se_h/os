@@ -1,0 +1,15 @@
+
+        os --- option source
+
+        default range           syntax
+           1,$       s[as | c | d | data | f | h | n | nr | nroff | p | r | s]
+        
+        This option sets other options for case, tabs, etc.
+            as, s   -- assembler files   c          -- C files
+            d, data -- data files        f          -- fortran files
+            h       -- header files      n,nr,nroff -- nroff source files
+            p       -- pascal files      r          -- ratfor files
+        
+        See the manual page for details.
+
+        For general information about the options command, type "ho".

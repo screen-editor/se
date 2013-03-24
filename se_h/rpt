@@ -1,0 +1,10 @@
+        The CTRL-F ("Funny Return") key  can  be  used  for  repeating
+        lines while in Append Mode or in Command Mode.  Typing it will
+        cause   the   line  to  be  terminated  without  chopping  any
+        characters off, and will set a flag that will inhibit  erasure
+        of  the  command  after it is completed, so that the same line
+        may be easily re- entered.
+
+
+        Type "htermchar" for info about other termination characters.
+        Type "habt" to see what CTRL-F does in overlay mode.

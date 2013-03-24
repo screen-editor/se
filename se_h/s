@@ -1,0 +1,16 @@
+          s    -- Substitute command
+
+               default range           syntax
+                   .,.           s/change-this/to-this[/][g]
+
+        The pattern "change-this" is matched on each line  within  the
+        range  and the string "to-this" is substituted for it.  If [g]
+        is used, all occurrences  of  the  "change-this"  pattern  are
+        changed.   If  "change-this" is empty, the most recent pattern
+        from this command (e.g.  within the range field) or a previous
+        command is used.  If "to-this" is a '%', the previous replace-
+        ment pattern is used. The "/" may be any character. The trail-
+        ing delimiter is optional.
+
+        To return to the command directory, type "hcomdir."
+        See also:  "hln" and "hpat".

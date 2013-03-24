@@ -1,0 +1,16 @@
+        o-  -- Option - (dash)
+
+               default range             syntax
+                  1,$                     o-[line number]
+
+        The "-" option controls the placement on the screen of  a  row
+        of dashes, which normally is off the screen above the top line
+        or  hiding  behind  the  bottom line of the help display.  The
+        "window" through which you look at the edit buffer is the por-
+        tion of the screen BELOW the  row  of  dashes  but  above  the
+        command  line  (when  it exists) or status line at the bottom.
+        "o-" alone puts the row of dashes above  the  top  line;  "o-"
+        followed  by a SINGLE TERM line number puts it in place of the
+        line referred to on the screen, if possible.
+
+        For general information about the option command, type "ho".

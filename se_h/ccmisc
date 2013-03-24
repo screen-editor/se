@@ -1,0 +1,11 @@
+                       Miscellaneous Control Characters
+
+         CTRL-Z toggles an indicator that acts as a "shift lock",
+         controlling case mapping on alphabetics typed.
+
+         CTRL-Q signals the editor that you suspect that for some
+         reason the screen is garbaged.  The response is to clear and
+         restore the screen.
+
+
+         Type "hcc" to get back to the control character directory.

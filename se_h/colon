@@ -1,0 +1,12 @@
+         :    -- Page command
+
+              default range           syntax
+                    .                 :
+
+      ":" is for paging the active area one page (n-1 lines)
+      forward.
+
+
+       For paging backward, see "hp"
+       See also:  "hcc" (control characters) and "hc" (change).
+       To return to the command directory, type "hcomdir."

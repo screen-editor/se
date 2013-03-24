@@ -1,0 +1,12 @@
+          k    -- marK command
+
+               default range           syntax
+                         .,.           k<single-character-name>
+
+        "k" is used to mark lines with the given name.
+        If no character is provided, the current label(s) in the
+        range are removed.
+
+
+        To return to the command directory, type "hcomdir."
+        See also: "hln" and "hn".

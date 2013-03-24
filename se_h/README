@@ -1,0 +1,20 @@
+README:
+
+This directory contains the help files for the Georgia Tech Software Tools/UNIX
+screen editor Se.  The files with the _swt suffix contain information
+which is correct when the editor is in Software Tools compatibility mode.
+This is the default at Georgia Tech.  The files without the _swt suffix either
+contain information which is the same for both Unix and SWT modes, or for
+Unix mode, which is the default at any place other than Georgia Tech.
+
+The dohelp() routine checks what mode the editor is in, and reads in the
+appropriate file.
+
+The files should be installed in the directory /usr/lib/se_h for se in order
+for se to find them. File names must be in lower case, since dohelp() maps
+the file name into all lower case. (On pr1mes, case is not significant in
+file names, so the original ratfor version did not have to do this.)
+
+Arnold Robbins
+Georgia Tech
+2/84

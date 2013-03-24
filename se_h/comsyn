@@ -1,0 +1,14 @@
+                                Command Syntax
+
+        A command consists  of  an  optional  list  of  LINE  NUMBERS,
+        followed  by a COMMAND LETTER, possibly followed by parameters
+        allowed or required for a specific  command.   Preceeding  all
+        this,  there  can be a GLOBAL PREFIX preceeded optionally by a
+        list  of  line   numbers.   Hence   the   whole   syntax   is:
+
+        [[<list>]<global prefix>][<list>]<command letter>[<stuff>]
+
+        For general information about commands, type "hcom".
+        For information about specific commands, type "hcomdir".
+        For GLOBAL PREFIX syntax and semantics, type "hg".
+        For LINE NUMBER LIST syntax and semantics, type "hlist".

@@ -1,0 +1,12 @@
+                    Character Deletion Control Characters
+        Gobble one character
+          to left of cursor          CTRL-U
+          at cursor                  CTRL-R
+        Gobble all characters
+          to left of cursor          CTRL-Y
+          at and to right of cursor  CTRL-T
+          on entire line             DEL (a. k. a. RUBOUT)
+
+
+        "hdir" gets you back to the general help directory.
+        Type "hcc" to get back to the control character directory.

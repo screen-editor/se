@@ -1,0 +1,14 @@
+
+        olm -- Option Line Margin
+
+        default range                           syntax
+           1,$                                   olm[<col>]
+        
+        Sets the left margin to <col>  which must be a positive integer.
+        This shifts the entire screen to  the left; the characters  that
+        were in columns 1  through <col> - 1  will  not be visible.  You
+        may continue editing in the normal fashion. To reset your screen
+        to normal, enter the command "olm 1".  If <col> is omitted,  the
+        current left margin column is displayed in the status line.
+
+        For general information about the options command, type "ho".

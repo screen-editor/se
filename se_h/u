@@ -1,0 +1,18 @@
+     u    -- Undo command.
+
+           default range                 syntax
+                .                         u[d]
+
+        1.  "u" is used to undo modifications to  a  line  immediately
+        after  changes  are  made.  E.g.  if you substituted "pat" for
+        "hat" in a line, to reverse that operation immediately, simply
+        type "u" (RETURN).
+
+        2.  "ud" is used to restore a group of lines  that  have  been
+        delete  E.g.   if  "n,md"  deletes lines n thru m, then if you
+        position the curser to line n-1 and  issue  "ud"  the  deleted
+        lines  will  appear.   (Or you can set the od toggle to od< so
+        that the line pointer is automatically set to n-1.
+
+        To return to the command directory, type "hcomdir."
+        See also:  "hd" and "hod".

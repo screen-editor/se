@@ -1,0 +1,10 @@
+                                   Commands
+                                                                         
+        When  the "cmd>" prompt appears near the bottom of the screen,
+        a command may be typed.  Commands work for the most  part  the
+        same way as commands to 'ed', the Unix system text editor with
+        which you may be familiar.
+
+          To return to the general help directory, type "hdir".          
+          For information about specific commands, type "hcomdir".       
+          For details on command syntax, type "hcomsyn".                 

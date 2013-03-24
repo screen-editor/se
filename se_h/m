@@ -1,0 +1,12 @@
+          m    -- Move command
+
+               default range           syntax
+                         .,.           from-here,to-here m there
+
+        "m" is used to move lines form one place in the buffer to
+        another.
+
+
+
+        To return to the command directory, type "hcomdir."
+        See also   "ht"

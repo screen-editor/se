@@ -1,0 +1,13 @@
+        The "=" command displays the last  line  number  in  the  line
+        number  list  (default  ".")  as  a  number.  For example, "="
+        prints the line number of the current line, or "$=" prints the
+        line number of the last line (the number of lines).
+
+        The ":"  command, with no preceeding line numbers,  moves  the
+        window  so that the next screenful of text is visible.  With a
+        line number, it makes the window begin at the referenced line.
+        The top line in the window becomes the current line.
+
+        For general information about commands, type "hcom".
+        For a description of command syntax, type "hcomsyn".
+        To see a directory of the other commands, type "hcomdir".

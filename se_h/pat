@@ -1,0 +1,15 @@
+        A PATTERN is a string of characters that specifies  a  set  of
+        possible  strings  of  characters  that  are said to MATCH the
+        pattern.  Most characters in patterns  stand  for  themselves,
+        but   there   are   metacharacters:   "."   that  matches  any
+        character, "*" that along with the previous character, matches
+        any number of repetitions of  it  (including  none),  "^"  for
+        beginning  of  line,  "$"  for  end of line, and characters in
+        brackets "[]" to match any of  the  characters.   The  special
+        sense  of  metacharacters  and  of the delimiters in which the
+        pattern is enclosed can always be  turned  off  by  preceeding
+        them with the escape character "\".
+
+        See also "hs", "hg", "hx" for uses of patterns.
+        For the use of patterns in line numbers, type "hscan".
+        For examples of pattern matches, type "hpatex".

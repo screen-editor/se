@@ -1,0 +1,17 @@
+                                Line Numbers
+
+        A  LINE  NUMBER  refers  to  a line in the edit buffer.  The
+        lines are always numbered sequentially starting with  1.   A
+        line  number can be expressed as an integer, as "."  meaning
+        the CURRENT LINE, "^" or "-" meaning  the  line  before  the
+        current  line,  "$"  meaning  the  last  line,  as a PATTERN
+        enclosed in "/" slashes for a forward  scan,  as  a  pattern
+        enclosed  in  "?"   question marks for a backward scan, as a
+        MARK NAME preceeded by "<" for a backward search or  by  ">"
+        for  a forward search, or as any additive combination of the
+        above by joining them with operators "+",  "-",  or  nothing
+        (meaning "+").
+
+        Type "hlist" for line number list syntax.
+        For details on scans and searches, type "hscan".
+

@@ -1,0 +1,15 @@
+        o -- Option
+
+        The "o" (option) command allows any  of several variables  that
+        affect  the  editor's  behavior  to   be  set  or  tested.  The
+        behavior of the "o"  command depends upon what is  typed  after
+        the "o".
+
+        To  find out about  specific options, type "hoa", "hoc", "hod",
+        "hof", "hog", "hoh", "hoi", "hok", "hol", "holm", "hom", "hop",
+        "hos", "hot", "hou", "hov", "how", "hox", "hoy", "hoz", or "ho-".
+
+        To  see how to set options with the  command that invokes 'se',
+        type "hargs".
+
+        To return to the command directory, type "hcomdir".

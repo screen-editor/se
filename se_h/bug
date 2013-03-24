@@ -1,0 +1,10 @@
+
+            There is a limit (MAXLINE - 2) on the number of characters
+        in a line. Se's MAXLINE is currently 512, so this isn't too much
+        of a problem.
+            If a filename is absent when invoked, all of the
+        options are not processed.
+
+
+        To go all the way back to the general help display, type "h".    
+        To go back to the general help directory, type "hdir."           

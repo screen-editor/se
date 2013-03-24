@@ -1,0 +1,16 @@
+        f -- File command
+
+             default range              syntax
+                  n/a               f [file name]
+
+        "f"  is  used to print or reset the name of the current file
+        being edited.  f [file name] resets the name for the current
+        file.  This filename is used by the "w", "e", and  "r"  com-
+        mands  when  no  parameters are provided.  f does not change
+        the "ok" toggle.  f with no parameters prints out the remem-
+        bered name.  In file names, Se will  expand  any  enviroment
+        variables that start with a $.
+
+        To  return  to  the  command directory, type "hcomdir."  See
+        also:  "he", "hw", "hr", and "hok".
+

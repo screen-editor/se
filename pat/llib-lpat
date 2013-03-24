@@ -1,0 +1,106 @@
+/* llib-lpat --- lint library for pattern routines */
+
+/*LINTLIBRARY*/
+
+match (lin, pat)
+char lin[];
+char pat[];
+{
+	return 0;
+}          
+
+
+amatch(lin, from, pat, tagbeg, tagend)
+int from, tagbeg[], tagend[];
+char lin[], pat[];
+{
+	return 0;
+}
+
+
+static omatch (lin, adplin, ppat)
+char lin[], **adplin, *ppat;
+{
+	return 0;
+}
+
+
+static locate (c, ppat)
+char c, *ppat;
+{
+	return 0;
+}
+
+
+static patsiz (ppat)
+char *ppat;
+{
+	return 0;
+}
+
+
+makpat (arg, from, delim, pat)
+char arg[], delim, pat[];
+int from;
+{
+	return 0;
+}
+
+
+static getccl (arg, pasub, pat, pindex)
+char arg[], pat[];
+int *pasub, *pindex;
+{
+	return 0;
+}
+
+
+static stclos (pat, ppatsub, plastsub)
+char pat[];
+int *ppatsub, *plastsub;
+{
+}
+
+
+maksub (arg, from, delim, sub)
+char arg[], delim, sub[];
+int from;
+{
+	return 0;
+}
+
+
+catsub (lin, from, to, sub, new, k, maxnew)
+char lin[], new[], sub[];
+int from[], *k, maxnew, to[];
+{
+}
+
+
+filset (delim, array, pasub, set, pindex, maxset)
+char array[], delim, set[];
+int maxset, *pasub, *pindex;
+{
+}
+
+
+static dodash (valid, array, pasub, set, pindex, maxset)
+char array[], set[], valid[];
+int maxset, *pasub, *pindex;
+{
+}
+
+
+addset (c, set, pindex, maxsiz)
+int maxsiz, *pindex;
+char c, set[];
+{
+	return 0;
+}
+
+char esc (array, pindex)
+char array[];
+int *pindex;
+{
+	return 0;
+}

@@ -1,0 +1,14 @@
+                       Cursor Motion Control Characters
+
+        Moving the cursor one position:
+          left              CTRL-H
+          right             CTRL-G
+          up                CTRL-D
+          down              CTRL-K
+        Moving to the next tab stop:
+          left              CTRL-E
+          right             CTRL-I
+        Moving all the way to the left:                 CTRL-W
+        Moving to the current right end of the line:    CTRL-O
+
+        Type "hcc" for general information about control characters.

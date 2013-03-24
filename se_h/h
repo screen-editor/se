@@ -1,0 +1,12 @@
+          h    -- Help command
+
+               default range           syntax
+                         n/a           h[ null | parameter]
+
+        Typing  "h"  followed  by any character  string simply displays
+        the  contents of the se help script of that name at the top  of
+        the  screen  (provided  the  script  exists).  The  scripts are
+        files in the directory '/usr/local/lib/se_h'. If the scriptname
+        is omitted, "elp" is assumed.
+
+        To see a general directory of help scripts, type "hdir".

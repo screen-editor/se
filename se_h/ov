@@ -1,0 +1,14 @@
+        ov -- oVerlay Option
+
+               default range             syntax
+                  1,$                    ov[integer]
+
+        The "v" option is the  overlay  column  number.   Typing  "ov"
+        followed  by  a  space  and  a number sets the column that the
+        cursor will be positioned at when  issuing  the  "v"  command.
+        Typing "ov $" will position the cursor at the end of the line.
+        Typing "ov" by itself will display the current value.
+
+        See also hmotion.
+
+        For general information about the option command, type "ho".

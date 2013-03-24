@@ -1,0 +1,14 @@
+        ow -- Option Warning
+
+               default range              syntax
+                 1,$                      ow[integer]
+
+        The "w" option is the  Warning  column  number.   Typing  "ow"
+        followed by a number sets the warning column threshold; simply
+        typing  "ow"  causes  its current value to be displayed.  When
+        you are about to type into a column of equal or greater number
+        than the warning column, the number  of  the  column  you  are
+        about  to type into is displayed on the bottom line along with
+        the string "col  ".
+
+        For general information about the option command, type "ho".

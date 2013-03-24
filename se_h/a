@@ -1,0 +1,16 @@
+         a    -- Append command
+
+              default range           syntax
+                          .           a
+
+        "a" is for appending new lines of text after a given line.  If
+        no line number is typed before the "a", text will be  appended
+        after  the  current  line.  The last line appended becomes the
+        current line.  To signal the end of  the  appended  text,  you
+        type a "."  on a line by itself.  Control characters "f", "v",
+        "l",  and  "k"  work differently for "a" command than for "v".
+        "a:"  works as a one line append (i.e. anything following  the
+        colon is appended after the current line).
+
+        To return to the command directory, type "hcomdir."
+        See also:  "hcc" (control characters) and "hc" (change).

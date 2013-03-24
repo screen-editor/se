@@ -1,0 +1,16 @@
+                               Arguments (cont)
+
+        Once the terminal type  is  established,  the  remaining  arg-
+        uments  are  interpreted  thus:  if the argument begins with a
+        "-", the rest of it is interpreted as though it appeared after
+        the "o" in an option command.  For  example,  an  argument  of
+        "-w10"  acts  as  a command "ow10".  On the other hand, if the
+        argument does not begin with "-", it is interpreted as a  file
+        name  (path-  name).   The  named  file  is read into the edit
+        buffer, and its name becomes the  remembered  file  name.   If
+        more  than one file is named, the edit buffer will contain the
+        contents of all the files.  If  an  error is encountered while
+        interpreting arguments (file not found, illegal  option),  the
+        remainder will be ignored.
+
+        For invoking command syntax, type "hargs".

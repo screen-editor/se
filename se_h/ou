@@ -1,0 +1,17 @@
+        ou -- Option Unprintable
+
+               default range             syntax
+                 1,$                     ou[character]
+
+        The  "u"  option  is  for  monitoring  unprintable characters.
+        Typing "ou" by itself will return the current  character  used
+        to display unprintable characters.  If it is ' ' (blank), then
+        unprintable  characters  are  not  checked and may mess up the
+        display.  Typing "oux" where "x" is a printable character will
+        turn on  character  checking  and  display  "x"  everytime  an
+        unprintable  character is encountered.  Unprintable characters
+        are not disturbed in the file, but can be "edited" out.
+
+        See also hccmisc for refreshing the display.
+
+        For general information about the option command, type "ho".
