@@ -1,7 +1,10 @@
 .\" 
-.\" $Header: se.m4,v 1.6 86/11/12 11:34:49 arnold Exp $
+.\" $Header: se.m4,v 1.7 87/07/27 14:52:52 arnold Exp $
 .\" 
 .\" $Log:	se.m4,v $
+.\" Revision 1.7  87/07/27  14:52:52  arnold
+.\" Removed an inadvertant reference to UNIX and SWT modes.
+.\" 
 .\" Revision 1.6  86/11/12  11:34:49  arnold
 .\" Fixed use of `BSD'. Changed discussion of windows. ADR.
 .\" 
@@ -449,8 +452,6 @@ none h\^[stuff] Help
 This command provides access to on-line documentation on
 the screen editor.
 \*(lqStuff\*(rq may be used to select which information is displayed.
-The help command will display information which is correct
-for both UNIX and SWT modes.
 .TP
 (.)\^i\^[:text]  Insert
 If the command is immediately followed by a colon, then

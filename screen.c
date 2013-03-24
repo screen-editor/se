@@ -758,7 +758,11 @@ register int t;
 		}
 
 		load (' ', Nrows - 1, col);
+		if (t == REMARK_MSG)
+			brighton ();	/* reverse video or highlight - on */
 		loadstr (s, Nrows - 1, col + 1, 0);
+		if (t == REMARK_MSG)
+			brightoff ();	/* turn back off */
 		load (' ', Nrows - 1, col + need - 1);
 		last = col + need - 1;
 		if (last > Ncols - 1)

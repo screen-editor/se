@@ -96,6 +96,8 @@ static char *CE;	/* clear to end of line */
 static char *DL;	/* hardware delete line */
 static char *AL;	/* hardware add (insert) line */
 static char *CL;	/* clear screen */
+static char *STANDOUT;	/* standout on  (SO conflicts w/ASCII character name) */
+static char *SE;	/* standout end */
 
 extern char PC;		/* Pad character, usually '\0' */
 
@@ -126,6 +128,8 @@ static getdescrip ()
 			"dl",	& DL,
 			"al",	& AL,
 			"cl",	& CL,
+			"so",	& STANDOUT,
+			"se",	& SE,
 			"pc",	& pcstr,
 			NULL,	NULL
 			};
@@ -192,6 +196,8 @@ extern char *tgoto();
 #define DL	delete_line
 #define AL	insert_line
 #define CM	cursor_address
+#define STANDOUT	enter_standout_mode
+#define SE	exit_standout_mode
 
 /* setcaps -- get the capabilities from the terminfo database */
 
@@ -2079,4 +2085,24 @@ char *type;
 		error (NO, "se: could not determine number of columns");
 
 	return OK;
+}
+
+/* brighton --- turn on reverse video/standout mode */
+
+brighton ()
+{
+#ifndef HARD_TERMS
+	if (STANDOUT)
+		tputs (STANDOUT, 1, outc);
+#endif
+}
+
+/* brightoff --- turn off reverse video/standout mode */
+
+brightoff ()
+{
+#ifndef HARD_TERMS
+	if (SE)
+		tputs (SE, 1, outc);
+#endif
 }
