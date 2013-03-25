@@ -14,7 +14,7 @@
 ** at Lastln + 1, if there is room.
 **
 ** Deleted lines are kept at the end of the buffer. Limbo points to the first
-** line in the group of lines which were last deleted, or else Limbo == NOMORE.
+** line in the group of lines which were last deleted, or else Limbo == SE_NOMORE.
 **
 ** It is a very good idea to read the chapters on editing in BOTH editions of
 ** Software Tools, before trying to muck with this. It also helps to be a
@@ -50,18 +50,18 @@
 LINEDESC *alloc (LINEDESC **ptr)
 {
 	int limbo_index = Limbo - Buf;	/* use indices instead of pointers */
-		/* N.B.: this statement is meaningless if Limbo == NOMORE */
+		/* N.B.: this statement is meaningless if Limbo == SE_NOMORE */
 		/* but if so, we don't use limbo_index anyway */
 
-	if (Limbo == NOMORE)
+	if (Limbo == SE_NOMORE)
 		if (Lastln < (MAXBUF - 1) - 1)	/* dumb zero based indexing! */
 			*ptr = &Buf[Lastln + 1];
 		else
-			*ptr = NOMORE;
+			*ptr = SE_NOMORE;
 	else if (limbo_index - Lastln > 1)
 		*ptr = &Buf[Lastln + 1];
 	else
-		*ptr = NOMORE;
+		*ptr = SE_NOMORE;
 
 	return (*ptr);
 }
@@ -202,20 +202,20 @@ int inject (char lin[])
 	LINEDESC *k3;
 	LINEDESC *getind ();
 
-	for (i = 0; lin [i] != EOS; )
+	for (i = 0; lin [i] != SE_EOS; )
 	{
 		i = maklin (lin, i, &k3);       /* create a single line */
-		if (i == ERR)
+		if (i == SE_ERR)
 		{
 			Errcode = ECANTINJECT;
-			return (ERR);
+			return (SE_ERR);
 		}
 		Lastln++;		/* update Lastln */
 		blkmove (Lastln, Lastln, Curln);
 		svins (Curln, 1);
 		Curln++;		/* update Curln */
 	}
-	return (OK);
+	return (SE_OK);
 }
 
 
@@ -229,10 +229,10 @@ int maklin (char lin[], int i, LINEDESC **newind)
 	int l, n;
 	LINEDESC *ptr;
 
-	if (alloc (&ptr) == NOMORE)     /* get space for pointer block */
-		return (ERR);
+	if (alloc (&ptr) == SE_NOMORE)     /* get space for pointer block */
+		return (SE_ERR);
 
-	for (n = i; lin [n] != EOS; n++)	/* find end of line */
+	for (n = i; lin [n] != SE_EOS; n++)	/* find end of line */
 		if (lin [n] == '\n')
 		{
 			n++;
@@ -241,21 +241,21 @@ int maklin (char lin[], int i, LINEDESC **newind)
 
 	if (n - i >= MAXLINE )  /* can't handle more than MAXLINE chars/line */
 		n = i + MAXLINE - 1;
-	l = n - i + 1;          /* length of new line (including EOS) */
+	l = n - i + 1;          /* length of new line (including SE_EOS) */
 
 	move_ (&lin [i], text, l);      /* move new line into text */
-	text [l - 1] = EOS;             /* add EOS */
+	text [l - 1] = SE_EOS;             /* add SE_EOS */
 
 	ptr->Seekaddr = Scrend; /* will be added to end of scratch file */
-	ptr->Lineleng = l;      /* line length including EOS */
-	ptr->Globmark = NO;     /* not marked for Global command */
+	ptr->Lineleng = l;      /* line length including SE_EOS */
+	ptr->Globmark = SE_NO;     /* not marked for Global command */
 	ptr->Markname = DEFAULTNAME;    /* give it default mark name */
 
 	seekf ((long) Scrend * 8, Scr); /* go to end of scratch file */
 	writef (text, l, Scr);          /* write line on scratch file */
 	Scrend += (l + 7) / 8;          /* update end-of-file pointer */
 
-	Buffer_changed = YES;
+	Buffer_changed = SE_YES;
 
 	*newind = ptr;                  /* return index of new line */
 	return (n);                     /* return next char of interest in lin */
@@ -274,13 +274,13 @@ void makscr (int *fd, char str[], size_t strsize)
 	 * the user's home directory which is probably safer than /tmp
 	 */
 	expanded = expand_env ("$HOME/.scratch-XXXXXX");
-	memset (str, EOS, strsize);
+	memset (str, SE_EOS, strsize);
 	snprintf (str, strsize - 1, "%s", expanded);
 	*fd = mkstemp (str);
 
 	if (*fd == -1)
 	{
-		error (YES, "can't create scratch file");
+		error (SE_YES, "can't create scratch file");
 	}
 }
 
@@ -324,7 +324,7 @@ int readf (char buf[], int count, int fd)
 
 	ret = read (fd, buf, count);
 	if (ret != count)
-		error (YES, "Fatal scratch file read error");
+		error (SE_YES, "Fatal scratch file read error");
 
 	return (ret);
 }
@@ -338,8 +338,8 @@ int seekf (long pos, int fd)
 
 	ret = lseek (fd, pos, 0);               /* abs seek */
 	if (ret != pos)
-		error (YES, "Fatal scratch file seek error");
-	return (OK);
+		error (SE_YES, "Fatal scratch file seek error");
+	return (SE_OK);
 }
 
 
@@ -355,12 +355,12 @@ void mkbuf (void)
 
 	Curln = 0;
 	Lastln = -1;				/* alloc depends on this... */
-	Limbo = NOMORE;         		/* no lines in limbo */
+	Limbo = SE_NOMORE;         		/* no lines in limbo */
 	Limcnt = 0;
 	Lost_lines = 0;         		/* no garbage in scratch file yet */
 
 	maklin ("", 0, &p);     		/* create an empty line */
-	p->Markname = EOS;			/* give it an illegal mark name */
+	p->Markname = SE_EOS;			/* give it an illegal mark name */
 	Line0 = p;              		/* henceforth and forevermore */
 
 	Lastln = 0;
@@ -376,7 +376,7 @@ LINEDESC *sp_inject (char lin[], int len, LINEDESC *line)
 	LINEDESC *ptr;
 
 	ret = alloc (&ptr);
-	if (ptr == NOMORE)
+	if (ptr == SE_NOMORE)
 	{
 		Errcode = ECANTINJECT;
 		return (ret);
@@ -384,7 +384,7 @@ LINEDESC *sp_inject (char lin[], int len, LINEDESC *line)
 
 	ptr->Seekaddr = Scrend;
 	ptr->Lineleng = len + 1;
-	ptr->Globmark = NO;
+	ptr->Globmark = SE_NO;
 	ptr->Markname = DEFAULTNAME;
 
 	seekf ((long) Scrend * 8, Scr);
@@ -392,7 +392,7 @@ LINEDESC *sp_inject (char lin[], int len, LINEDESC *line)
 	Scrend += ((len + 1) + 7) / 8;          /* fudge for larger buffer */
 	Lastln++;
 
-	Buffer_changed = YES;
+	Buffer_changed = SE_YES;
 
 	/*
 	 * this part dependant on the fact that we set
@@ -414,7 +414,7 @@ int writef (char buf[], int count, int fd)
 
 	ret = write (fd, buf, count);
 	if (ret != count)
-		error (YES, "Fatal scratch file write error");
+		error (SE_YES, "Fatal scratch file write error");
 	return (ret);
 }
 

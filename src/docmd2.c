@@ -43,7 +43,7 @@ int append (int line, char str[])
 	else
 	{
 		Cmdrow = Toprow + (Curln - Topln) + 1;  /* 1 below Curln */
-		lin[0] = EOS;
+		lin[0] = SE_EOS;
 		if (Indent > 0 || line <= 0)
 			len = max (0, Indent - 1);
 		else /* do auto indent */
@@ -56,7 +56,7 @@ int append (int line, char str[])
 		}
 		dpos = len;     /* position for terminating '.' */
 
-		for (ret = NOSTATUS; ret == NOSTATUS; )
+		for (ret = SE_NOSTATUS; ret == SE_NOSTATUS; )
 		{
 			if (! hwinsdel())   /* do it the old, slow way */
 			{
@@ -94,12 +94,12 @@ int append (int line, char str[])
 			    || term == CURSOR_SAME);
 
 			dotseen = 0;
-			if (lin[0] == '.' && lin[1] == '\n' && lin[2] == EOS)
+			if (lin[0] == '.' && lin[1] == '\n' && lin[2] == SE_EOS)
 				dotseen = 1;
 			for (i = 0; i < dpos && lin[i] == ' '; i++)
 				;
 			if (i == dpos && lin[dpos] == '.' && lin[dpos + 1] == '\n'
-			    && lin[dpos+2] == EOS)
+			    && lin[dpos+2] == SE_EOS)
 				dotseen = 1;
 
 			if (dotseen)
@@ -109,10 +109,10 @@ int append (int line, char str[])
 					dellines (Cmdrow, 1);
 					inslines (Botrow, 1);
 				}
-				ret = OK;
+				ret = SE_OK;
 			}
-			else if (inject (lin) == ERR)
-				ret = ERR;
+			else if (inject (lin) == SE_ERR)
+				ret = SE_ERR;
 			else			/* inject occured */
 				prompt ("");	/* erase prompt */
 			Cmdrow++;
@@ -124,13 +124,13 @@ int append (int line, char str[])
 					for (len = 0; lin[len] == ' '; len++)
 						;
 				dpos = len;
-				lin[0] = EOS;
+				lin[0] = SE_EOS;
 			}
 		}
 		Cmdrow = Botrow + 1;
 		if (hwinsdel())			/* since we take control */
 		{				/* of the screen, we're sure */
-			Sctop = Topln;		/* it's still OK */
+			Sctop = Topln;		/* it's still SE_OK */
 
 			for (i = 0; i < Sclen; i++)
 				Scline[i] = Sctop + i <= Lastln ? i : -1;
@@ -153,21 +153,21 @@ int copy (int line3)
 	int ret;
 	LINEDESC *k;
 
-	ret = ERR;
+	ret = SE_ERR;
 
 	if (Line1 <= 0)
 		Errcode = EORANGE;
 	else
 	{
-		ret = OK;
+		ret = SE_OK;
 		Curln = line3;
 		k = getind (Line1);
 		for (i = Line1; i <= Line2; i++)
 		{
 			gtxt (k);
-			if (inject (Txt) == ERR || intrpt ())
+			if (inject (Txt) == SE_ERR || intrpt ())
 			{
-				ret = ERR;
+				ret = SE_ERR;
 				break;
 			}
 			if (Line1 < line3)
@@ -192,7 +192,7 @@ int se_delete (int from, int to, int *status)
 {
 	if (from <= 0)          /* can't delete line 0 */
 	{
-		*status = ERR;
+		*status = SE_ERR;
 		Errcode = EORANGE;
 	}
 	else
@@ -210,9 +210,9 @@ int se_delete (int from, int to, int *status)
 		/* point at first deleted */
 		Limbo = &Buf[MAXBUF - (to - from + 1)];
 
-		*status = OK;
+		*status = SE_OK;
 		svdel (from, to - from + 1);
-		Buffer_changed = YES;
+		Buffer_changed = SE_YES;
 	}
 
 	return (*status);
@@ -228,14 +228,14 @@ int join (char sub[])
 	int ret;
 	LINEDESC *k;
 
-	ret = OK;
+	ret = SE_OK;
 	if (Line1 <= 0)
 	{
 		Errcode = EORANGE;
-		return (ERR);
+		return (SE_ERR);
 	}
 
-	sublen = strlen (sub) + 1;      /* length of separator & EOS */
+	sublen = strlen (sub) + 1;      /* length of separator & SE_EOS */
 	line = Line1;
 	k = getind (line);
 	gtxt (k);
@@ -245,7 +245,7 @@ int join (char sub[])
 	for (line++; line <= Line2; line++)
 	{
 		if (intrpt ())
-			return (ERR);
+			return (SE_ERR);
 		if (new[l - 2] == '\n') /* zap the NEWLINE */
 			l--;
 		k = NEXTLINE(k);	/* get the next line */
@@ -253,7 +253,7 @@ int join (char sub[])
 		if (l + sublen - 1 + k -> Lineleng - 1 > MAXLINE)	/* won't fit */
 		{
 			Errcode = E2LONG;
-			return (ERR);
+			return (SE_ERR);
 		}
 		move_ (sub, &new[l - 1], sublen);	/* insert separator string */
 		l += sublen - 1;
@@ -262,7 +262,7 @@ int join (char sub[])
 	}
 	Curln = Line2;          /* all this will replace line1 through line2 */
 	ret = inject (new);	/* inject the new line */
-	if (ret == OK)
+	if (ret == SE_OK)
 		ret = se_delete (Line1, Line2, &ret);	/* delete old lines */
 	Curln++;
 
@@ -280,13 +280,13 @@ int move (int line3)
 	if (Line1 <= 0)
 	{
 		Errcode = EORANGE;
-		return (ERR);
+		return (SE_ERR);
 	}
 
 	if (Line1 <= line3 && line3 <= Line2)
 	{
 		Errcode = EINSIDEOUT;
-		return (ERR);
+		return (SE_ERR);
 	}
 
 	blkmove (Line1, Line2, line3);
@@ -298,10 +298,10 @@ int move (int line3)
 	else
 		Curln = line3 + (Line2 - Line1 + 1);
 
-	Buffer_changed = YES;
+	Buffer_changed = SE_YES;
 	First_affected = min (First_affected, min (Line1, line3));
 
-	return (OK);
+	return (SE_OK);
 }
 
 /* overlay --- let user edit lines directly */
@@ -313,12 +313,12 @@ void overlay (int *status)
 	int lng, vcol, lcurln, scurln;
 	LINEDESC *indx;
 
-	*status = OK;
+	*status = SE_OK;
 	if (Line1 == 0)
 	{
 		Curln = 0;
 		*status = inject (empty);
-		if (*status == ERR)
+		if (*status == SE_ERR)
 			return;
 		First_affected = 1;
 		Line1 = 1;
@@ -345,7 +345,7 @@ void overlay (int *status)
 				lng++;
 			}
 			Txt[lng - 1] = '\n';
-			Txt[lng] = EOS;
+			Txt[lng] = SE_EOS;
 			move_ (Txt, savtxt, lng + 1);	/* make a copy of the line */
 			getcmd (Txt, Firstcol, &vcol, &term);
 			if (term == FUNNY)
@@ -360,9 +360,9 @@ void overlay (int *status)
 				kname = indx -> Markname;
 				se_delete (Curln, Curln, status);
 				scurln = Curln;
-				if (*status == OK)
+				if (*status == SE_OK)
 					*status = inject (Txt);
-				if (*status == ERR)
+				if (*status == SE_ERR)
 				{
 					Cmdrow = Botrow + 1;
 					return;
@@ -412,14 +412,14 @@ int subst (char sub[], int gflag, int glob)
 	LINEDESC *inx;
 
 	if (Globals && glob)
-		ret = OK;
+		ret = SE_OK;
 	else
-		ret = ERR;
+		ret = SE_ERR;
 
 	if (Line1 <= 0)
 	{
 		Errcode = EORANGE;
-		return (ERR);
+		return (SE_ERR);
 	}
 
 	/* the following code has been removed for your protection
@@ -429,7 +429,7 @@ int subst (char sub[], int gflag, int glob)
 		if (se_index (Pat, '\n') != -1)    # never delete NEWLINE
 		{
 			Errcode = EBADPAT;
-			return (ERR);
+			return (SE_ERR);
 		}
 	*/
 
@@ -438,23 +438,23 @@ int subst (char sub[], int gflag, int glob)
 		if (intrpt ())
 			break;
 		j = 0;
-		subbed = NO;
+		subbed = SE_NO;
 		inx = se_gettxt (line);
 		lastm = -1;
-		for (k = 0; Txt[k] != EOS; )
+		for (k = 0; Txt[k] != SE_EOS; )
 		{
 			for (m = 1; m <= 9; m++)
 			{
 				tagbeg[m] = -1;
 				tagend[m] = -1;
 			}
-			if (gflag == YES || subbed == NO)
+			if (gflag == SE_YES || subbed == SE_NO)
 				m = amatch (Txt, k, Pat, &tagbeg[1], &tagend[1]);
 			else
 				m = -1;
 			if (m > -1 && lastm != m)       /* replace matched text */
 			{
-				subbed = YES;
+				subbed = SE_YES;
 				tagbeg[0] = k;
 				tagend[0] = m;
 				catsub (Txt, tagbeg, tagend, sub, new, &j, MAXLINE);
@@ -468,11 +468,11 @@ int subst (char sub[], int gflag, int glob)
 			else
 				k = m;	/* skip matched text */
 		}
-		if (subbed == YES)
+		if (subbed == SE_YES)
 		{
-			if (addset (EOS, new, &j, MAXLINE) == NO)
+			if (addset (SE_EOS, new, &j, MAXLINE) == SE_NO)
 			{
-				ret = ERR;
+				ret = SE_ERR;
 				Errcode = E2LONG;
 				break;
 			}
@@ -481,15 +481,15 @@ int subst (char sub[], int gflag, int glob)
 			ret = inject (new);
 			if (First_affected > Curln)
 				First_affected = Curln;
-			if (ret == ERR)
+			if (ret == SE_ERR)
 				break;
 			inx = getind (Curln);
 			inx -> Markname = kname;
-			ret = OK;
-			Buffer_changed = YES;
+			ret = SE_OK;
+			Buffer_changed = SE_YES;
 		}
-		else	/* subbed == NO */
-			Errcode = ENOMATCH;
+		else	/* subbed == SE_NO */
+			Errcode = ESE_NOMATCH;
 	}
 
 	return (ret);
@@ -507,12 +507,12 @@ void uniquely_name (char kname, int *status)
 
 	if (Line1 <= 0)
 	{
-		*status = ERR;
+		*status = SE_ERR;
 		Errcode = EORANGE;
 		return;
 	}
 
-	*status = OK;
+	*status = SE_OK;
 	line = 0;
 	k = Line0;
 
@@ -543,7 +543,7 @@ int draw_box (char lin[], int *i)
 	if (left <= 0 || left > MAXLINE)
 	{
 		Errcode = EBADCOL;
-		return (ERR);
+		return (SE_ERR);
 	}
 
 	if (lin[*i] == ',')
@@ -554,7 +554,7 @@ int draw_box (char lin[], int *i)
 		if (right <= 0 || right >= MAXLINE || left > right)
 		{
 			Errcode = EBADCOL;
-			return (ERR);
+			return (SE_ERR);
 		}
 	}
 	else
@@ -569,13 +569,13 @@ int draw_box (char lin[], int *i)
 	if (lin[*i] != '\n')
 	{
 		Errcode = EEGARB;
-		return (ERR);
+		return (SE_ERR);
 	}
 
 	if (Line1 <= 0)
 	{
 		Errcode = EORANGE;
-		return (ERR);
+		return (SE_ERR);
 	}
 
 	for (Curln = Line1; Curln <= Line2; Curln++)
@@ -594,7 +594,7 @@ int draw_box (char lin[], int *i)
 			col++;
 		}
 		text[col - 1] = '\n';
-		text[col] = EOS;
+		text[col] = SE_EOS;
 
 		if (Curln == Line1 || Curln == Line2)
 			for (col = left; col <= right; col++)
@@ -608,12 +608,12 @@ int draw_box (char lin[], int *i)
 		if (strcmp (text, Txt) != 0)
 		{
 			kname = k -> Markname;
-			if (se_delete (Curln, Curln, &junk) == ERR
-			    || inject (text) == ERR)
-				return (ERR);
+			if (se_delete (Curln, Curln, &junk) == SE_ERR
+			    || inject (text) == SE_ERR)
+				return (SE_ERR);
 			k = getind (Curln);
 			k -> Markname = kname;
-			Buffer_changed = YES;
+			Buffer_changed = SE_YES;
 		}
 	}
 
@@ -623,7 +623,7 @@ int draw_box (char lin[], int *i)
 	adjust_window (Curln, Curln);
 	updscreen ();
 
-	return (OK);
+	return (SE_OK);
 }
 
 
@@ -671,7 +671,7 @@ int doshell (char lin[], int *pi)
 	char new_command[MAXLINE];
 	int j, k;
 	static char sav_com[MAXLINE] = "";
-	int expanded = NO;
+	int expanded = SE_NO;
 
 	if (Nlines == 0)        /* use normal 'ed' behavior */
 	{
@@ -714,30 +714,30 @@ int doshell (char lin[], int *pi)
 			}
 		}
 
-		auto_redraw = (lin[*pi] == '\n') ? YES : NO;
+		auto_redraw = (lin[*pi] == '\n') ? SE_YES : SE_NO;
 
 		/* build command, checking for leading !, and % anywhere */
 		if (lin[*pi] == '!')
 		{
-			if (sav_com[0] != EOS)
+			if (sav_com[0] != SE_EOS)
 			{
-				for (j = 0; sav_com[j] != EOS; j++)
+				for (j = 0; sav_com[j] != SE_EOS; j++)
 					new_command[j] = sav_com[j];
 				if (new_command[j-1] == '\n')
 					j--;
 				(*pi)++;
-				expanded = YES;
+				expanded = SE_YES;
 			}
 			else
 			{
-				Errcode = ENOCMD;
-				return (ERR);
+				Errcode = ESE_NOCMD;
+				return (SE_ERR);
 			}
 		}
 		else
 			j = 0;
 
-		for (i = *pi; lin[i] != EOS; i++)
+		for (i = *pi; lin[i] != SE_EOS; i++)
 		{
 			if (lin[i] == ESCAPE)
 			{
@@ -751,9 +751,9 @@ int doshell (char lin[], int *pi)
 			}
 			else if (lin[i] == '%')
 			{
-				for (k = 0; Savfil[k] != EOS; k++)
+				for (k = 0; Savfil[k] != SE_EOS; k++)
 					new_command[j++] = Savfil[k];
-				expanded = YES;
+				expanded = SE_YES;
 			}
 			else
 				new_command[j++] = lin[i];
@@ -761,9 +761,9 @@ int doshell (char lin[], int *pi)
 
 		if (new_command[j-1] == '\n')
 			j--;
-		new_command[j] = EOS;
+		new_command[j] = SE_EOS;
 
-		memset (sav_com, EOS, MAXLINE);
+		memset (sav_com, SE_EOS, MAXLINE);
 		strncpy (sav_com, new_command, MAXLINE-1);	/* save it */
 
 		ttynormal ();
@@ -772,7 +772,7 @@ int doshell (char lin[], int *pi)
 		if (rc == -1)
 		{
 			Errcode = ESTUPID;
-			return ERR;
+			return SE_ERR;
 		}
 
 		forkstatus = fork();
@@ -781,7 +781,7 @@ int doshell (char lin[], int *pi)
 			ttyedit ();
 			t_init ();
 			Errcode = ECANTFORK;
-			return ERR;
+			return SE_ERR;
 		}
 
 		if (forkstatus == 0)    /* we're in the child process */
@@ -801,7 +801,7 @@ int doshell (char lin[], int *pi)
 			if (auto_redraw)	/* no params; run a shell */
 			{
 				execl (path, name, NULL);
-				_exit (RETERR);   /* exec failed, notify parent */
+				_exit (RETSE_ERR);   /* exec failed, notify parent */
 			}
 			else
 			{
@@ -810,7 +810,7 @@ int doshell (char lin[], int *pi)
 					printf ("%s\n", new_command);
 				}
 				execl (path, name, "-c", new_command, NULL);
-				_exit (RETERR);
+				_exit (RETSE_ERR);
 			}
 		}
 
@@ -826,7 +826,7 @@ int doshell (char lin[], int *pi)
 		if (rc == -1)
 		{
 			Errcode = ESTUPID;
-			return ERR;
+			return SE_ERR;
 		}
 
 		Currow = Nrows - 1;
@@ -835,8 +835,8 @@ int doshell (char lin[], int *pi)
 		{
 			ttyedit ();
 			t_init ();
-			Errcode = ENOSHELL;
-			return ERR;
+			Errcode = ESE_NOSHELL;
+			return SE_ERR;
 		}
 
 		/* a la vi: */
@@ -853,12 +853,12 @@ int doshell (char lin[], int *pi)
 		t_init ();
 		restore_screen ();
 
-		return OK;
+		return SE_OK;
 	}
 	else
 	{
 		remark ("Not implemented yet");
 	}
 
-	return OK;
+	return SE_OK;
 }

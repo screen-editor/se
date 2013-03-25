@@ -48,30 +48,30 @@ void edit (int argc, char *argv[])
 
 	serc ();	/* execute commands in ./.serc or $HOME/.serc */
 
-	status = OK;
+	status = SE_OK;
 
-	while (status == OK && Argno < argc)
+	while (status == SE_OK && Argno < argc)
 	{
-		memset (lin, EOS, MAXLINE);
+		memset (lin, SE_EOS, MAXLINE);
 		strncpy (lin, argv[Argno], MAXLINE-1);
 		loadstr (lin, Argno, POOPCOL, Ncols);
 		if (lin[0] == '-')
 		{
 			len = strlen (lin) + 1;
 			lin[len - 1] = '\n';
-			lin[len] = EOS;
+			lin[len] = SE_EOS;
 			len = 0;
 			status = doopt (lin, &len);
 		}
 		else
 		{
 			dfltsopt (lin);
-			status = doread (Lastln, lin, NO);
+			status = doread (Lastln, lin, SE_NO);
 		}
 		Argno++;
 	}
 
-	if (status == ERR)
+	if (status == SE_ERR)
 	{
 		if (Errcode == EHANGUP)
 			hangup ();
@@ -80,13 +80,13 @@ void edit (int argc, char *argv[])
 	else
 		Curln = min (1, Lastln);
 
-	Buffer_changed = NO;
+	Buffer_changed = SE_NO;
 	First_affected = 1;     /* maintained by updscreen & commands */
 	updscreen ();
 
-	if (status != ERR)	/* leave offending file name or option */
+	if (status != SE_ERR)	/* leave offending file name or option */
 	{
-		lin[0] = EOS;
+		lin[0] = SE_EOS;
 	}
 	cursor = 0;
 
@@ -132,14 +132,14 @@ void edit (int argc, char *argv[])
 		Errcode = EEGARB;	/* default error code for garbage at end */
 
 		len = 0;
-		if (getlst (lin, &len, &status) == OK)
+		if (getlst (lin, &len, &status) == SE_OK)
 		{
-			if (ckglob (lin, &len, &status) == OK)
+			if (ckglob (lin, &len, &status) == SE_OK)
 				doglob (lin, &len, &cursav, &status);
-			else if (status != ERR)
-				docmd (lin, len, NO, &status);
+			else if (status != SE_ERR)
+				docmd (lin, len, SE_NO, &status);
 		}
-		if (status == ERR)
+		if (status == SE_ERR)
 		{
 			if (Errcode == EHANGUP)
 				hangup ();
@@ -149,7 +149,7 @@ void edit (int argc, char *argv[])
 		else if (term != FUNNY)
 		{
 			cursor = 0;
-			lin[0] = EOS;
+			lin[0] = SE_EOS;
 		}
 
 		adjust_window (Curln, Curln);
@@ -172,7 +172,7 @@ int getlst (char lin[], int *i, int *status)
 	int num;
 
 	Line2 = 0;
-	for (Nlines = 0; getone (lin, i, &num, status) == OK; )
+	for (Nlines = 0; getone (lin, i, &num, status) == SE_OK; )
 	{
 		Line1 = Line2;
 		Line2 = num;
@@ -192,12 +192,12 @@ int getlst (char lin[], int *i, int *status)
 
 	if (Line1 > Line2)
 	{
-		*status = ERR;
+		*status = SE_ERR;
 		Errcode = EBACKWARD;
 	}
 
-	if (*status != ERR)
-		*status = OK;
+	if (*status != SE_ERR)
+		*status = SE_OK;
 
 	return (*status);
 }
@@ -210,9 +210,9 @@ int getnum (char lin[], int *i, int *pnum, int *status)
 	int j, ret;
 	int k;
 
-	ret = OK;
+	ret = SE_OK;
 	SKIPBL (lin, *i);
-	if (lin[*i] >= Rel_a && lin[*i] <= Rel_z && Absnos == NO)
+	if (lin[*i] >= Rel_a && lin[*i] <= Rel_z && Absnos == SE_NO)
 		*pnum = Topln - Toprow + lin[*i] - Rel_a;
 	else if (lin[*i] == CURLINE)
 		*pnum = Curln;
@@ -222,35 +222,35 @@ int getnum (char lin[], int *i, int *pnum, int *status)
 		*pnum = Lastln;
 	else if (lin[*i] == SCAN || lin[*i] == BACKSCAN)
 	{
-		int missing_delim = YES;
+		int missing_delim = SE_YES;
 
 		/* see if trailing delim supplied, since command can follow pattern */
-		for (k = *i + 1; lin[k] != EOS; k++)
+		for (k = *i + 1; lin[k] != SE_EOS; k++)
 			if (lin[k] == ESCAPE)
 				k++;	/* skip esc, loop will skip escaped char */
 			else if (lin[k] == lin[*i])
 			{
-				missing_delim = NO;
+				missing_delim = SE_NO;
 				break;
 			}
 			/* else
 				continue */
 
-		if (missing_delim == YES)
+		if (missing_delim == SE_YES)
 		{
-			for (; lin[k] != EOS; k++)
+			for (; lin[k] != SE_EOS; k++)
 				;
 			k--;		/* k now at newline */
 
 			/* supply trailing delim */
 			lin[k] = lin[*i];
 			lin[++k] = '\n';
-			lin[++k] = EOS;
+			lin[++k] = SE_EOS;
 			Peekc = SKIP_RIGHT;
 		}
 
-		if (optpat (lin, i) == ERR)
-			ret = ERR;
+		if (optpat (lin, i) == SE_ERR)
+			ret = SE_ERR;
 		else if (lin[*i] == SCAN)
 			ret = ptscan (FORWARD, pnum);
 		else 
@@ -260,8 +260,8 @@ int getnum (char lin[], int *i, int *pnum, int *status)
 	{
 		j = *i;
 		(*i)++;
-		if (getkn (lin, i, &Savknm, Savknm) == ERR)
-			ret = ERR;
+		if (getkn (lin, i, &Savknm, Savknm) == SE_ERR)
+			ret = SE_ERR;
 		else if (lin[j] == SEARCH)
 			ret = knscan (FORWARD, pnum);
 		else
@@ -278,7 +278,7 @@ int getnum (char lin[], int *i, int *pnum, int *status)
 	else
 		ret = EOF;
 
-	if (ret == OK)
+	if (ret == SE_OK)
 		(*i)++;
 	*status = ret;
 	return (ret);
@@ -295,18 +295,18 @@ int getone (char lin[], int *i, int *num, int *status)
 	ret = EOF;	/* assume we won't find anything for now */
 	*num = 0;
 
-	if (getnum (lin, i, num, status) == OK)		/* first term */
+	if (getnum (lin, i, num, status) == SE_OK)		/* first term */
 	{
-		ret = OK;	/* to indicate we've seen something */
+		ret = SE_OK;	/* to indicate we've seen something */
 		do {			/* + or - terms */
-			porm = EOS;
+			porm = SE_EOS;
 			SKIPBL (lin, *i);
 			if (lin[*i] == '-' || lin[*i] == '+')
 			{
 				porm = lin[*i];
 				(*i)++;
 			}
-			if (getnum (lin, i, &pnum, status) == OK)
+			if (getnum (lin, i, &pnum, status) == SE_OK)
 			{
 				if (porm == '-')
 				{
@@ -317,21 +317,21 @@ int getone (char lin[], int *i, int *num, int *status)
 					*num += pnum;
 				}
 			}
-			if (*status == EOF && porm != EOS)	/* trailing + or - */
+			if (*status == EOF && porm != SE_EOS)	/* trailing + or - */
 			{
-				*status = ERR;
+				*status = SE_ERR;
 			}
-		} while (*status == OK);
+		} while (*status == SE_OK);
 	}
 
 	if (*num < 0 || *num > Lastln)	/* make sure number is in range */
 	{
-		*status = ERR;
+		*status = SE_ERR;
 		Errcode = EORANGE;
 	}
 
-	if (*status == ERR)
-		ret = ERR;
+	if (*status == SE_ERR)
+		ret = SE_ERR;
 	else
 		*status = ret;
 
@@ -339,7 +339,7 @@ int getone (char lin[], int *i, int *num, int *status)
 }
 
 
-static int special_casing = NO;
+static int special_casing = SE_NO;
 
 /* ckglob --- if global prefix, mark lines to be affected */
 
@@ -349,7 +349,7 @@ int ckglob (char lin[], int *i, int *status)
 	int usepat, usemark;
 	LINEDESC *k;
 
-	*status = OK;
+	*status = SE_OK;
 	usepat = EOF;
 	usemark = EOF;
 
@@ -361,52 +361,52 @@ int ckglob (char lin[], int *i, int *status)
 		&& (lin[*i + 4] == MOVECOM || lin[*i + 4] == UCMOVECOM)
 		&& (lin[*i + 5] == '0' && lin[*i + 6] == '\n')   )
 	{
-		special_casing = YES;
+		special_casing = SE_YES;
 		remark ("GLOB");
-		return (OK);
+		return (SE_OK);
 	}
 
 	if (lin[*i] == GMARK || lin[*i] == XMARK)	/* global markname prefix? */
 	{
 		if (lin[*i] == GMARK)	/* tag lines with the specified markname */
-			usemark = YES;
+			usemark = SE_YES;
 		else			/* tag lines without the specified markname */
-			usemark = NO;
+			usemark = SE_NO;
 		(*i)++;
 		*status = getkn (lin, i, &Savknm, Savknm);
 	}
 
-	if (*status == OK)	/* check for a pattern prefix too */
+	if (*status == SE_OK)	/* check for a pattern prefix too */
 	{
 		if (lin[*i] == GLOBAL || lin[*i] == UCGLOBAL)
-			usepat = YES;
+			usepat = SE_YES;
 
 		if (lin[*i] == EXCLUDE || lin[*i] == UCEXCLUDE)
-			usepat = NO;
+			usepat = SE_NO;
 
 		if (usepat != EOF)
 		{
 			(*i)++;
-			if (optpat (lin, i) == ERR)
-				*status = ERR;
+			if (optpat (lin, i) == SE_ERR)
+				*status = SE_ERR;
 			else
 				(*i)++;
 		}
 	}
 
-	if (*status == OK && usepat == EOF && usemark == EOF)
+	if (*status == SE_OK && usepat == EOF && usemark == EOF)
 		*status = EOF;
-	else if (*status == OK)
+	else if (*status == SE_OK)
 		defalt (1, Lastln);
 
-	if (*status == OK)	/* no errors so far, safe to proceed */
+	if (*status == SE_OK)	/* no errors so far, safe to proceed */
 	{
 		remark ("GLOB");
 
 		k = Line0;      /* unmark all lines preceeding range */
 		for (line = 0; line < Line1; line++)
 		{
-			k -> Globmark = NO;
+			k -> Globmark = SE_NO;
 			k = NEXTLINE(k);
 		}
 
@@ -414,21 +414,21 @@ int ckglob (char lin[], int *i, int *status)
 		{
 			if (intrpt ())
 			{
-				*status = ERR;
+				*status = SE_ERR;
 				return (*status);
 			}
-			tmp = NO;
+			tmp = SE_NO;
 			if (((usemark == EOF
-			    || usemark == YES) && k -> Markname == Savknm)
-			    || (usemark == NO && k -> Markname != Savknm))
+			    || usemark == SE_YES) && k -> Markname == Savknm)
+			    || (usemark == SE_NO && k -> Markname != Savknm))
 			{
 				if (usepat == EOF)	/* no global pattern to look for */
-					tmp = YES;
+					tmp = SE_YES;
 				else	/* there is also a pattern to look for */
 				{
 					gtxt (k);
 					if (match (Txt, Pat) == usepat)
-						tmp = YES;
+						tmp = SE_YES;
 				}
 			}
 
@@ -440,7 +440,7 @@ int ckglob (char lin[], int *i, int *status)
 		/* mark remaining lines */
 		for (; line <= Lastln; line++)
 		{
-			k -> Globmark = NO;
+			k -> Globmark = SE_NO;
 			k = NEXTLINE (k);
 		}
 
@@ -466,16 +466,16 @@ int doglob (char lin[], int *i, int *cursav, int *status)
 		/* not on the screen too long anyway */
 		reverse (1, Lastln);
 		Curln = Lastln;
-		special_casing = NO;
-		Buffer_changed = YES;
+		special_casing = SE_NO;
+		Buffer_changed = SE_YES;
 		First_affected = min (1, First_affected);
 		remark ("");
 		adjust_window (Curln, Curln);
 		updscreen ();
-		return (OK);
+		return (SE_OK);
 	}
 
-	*status = OK;
+	*status = SE_OK;
 	istart = *i;
 	k = Line0;
 	line = 0;
@@ -483,20 +483,20 @@ int doglob (char lin[], int *i, int *cursav, int *status)
 	do {
 		line++;
 		k = NEXTLINE(k);
-		if (k -> Globmark == YES)	/* line is marked */
+		if (k -> Globmark == SE_YES)	/* line is marked */
 		{
-			k -> Globmark = NO;	/* unmark the line */
+			k -> Globmark = SE_NO;	/* unmark the line */
 			Curln = line;
 			*cursav = Curln;	/* remember where we are */
 			*i = istart;
-			if (getlst (lin, i, status) == OK)
-				docmd (lin, *i, YES, status);
+			if (getlst (lin, i, status) == SE_OK)
+				docmd (lin, *i, SE_YES, status);
 			line = 0;		/* lines may have been moved */
 			k = Line0;
 		}
 		if (intrpt ())
-			*status = ERR;
-	} while (line <= Lastln && *status == OK);
+			*status = SE_ERR;
+	} while (line <= Lastln && *status == SE_OK);
 
 	return (*status);
 }
@@ -510,13 +510,13 @@ int ckchar (char ch, char altch, char lin[], int *i, int *flag, int *status)
 	if (lin[*i] == ch || lin[*i] == altch)
 	{
 		(*i)++;
-		*flag = YES;
+		*flag = SE_YES;
 	}
 	else
-		*flag = NO;
+		*flag = SE_NO;
 
-	*status = OK;
-	return (OK);
+	*status = SE_OK;
+	return (SE_OK);
 }
 
 
@@ -528,15 +528,15 @@ int ckp (char lin[], int i, int *pflag, int *status)
 	if (lin[i] == PRINT || lin[i] == UCPRINT)
 	{
 		i++;
-		*pflag = YES;
+		*pflag = SE_YES;
 	}
 	else
-		*pflag = NO;
+		*pflag = SE_NO;
 
 	if (lin[i] == '\n')
-		*status = OK;
+		*status = SE_OK;
 	else
-		*status = ERR;
+		*status = SE_ERR;
 
 	return (*status);
 }
@@ -549,9 +549,9 @@ int ckupd (char lin[], int *i, char cmd, int *status)
 	int flag;
 
 	*status = ckchar (ANYWAY, ANYWAY, lin, i, &flag, status);
-	if (flag == NO && Buffer_changed == YES && Probation != cmd)
+	if (flag == SE_NO && Buffer_changed == SE_YES && Probation != cmd)
 	{
-		*status = ERR;
+		*status = SE_ERR;
 		Errcode = ESTUPID;
 		Probation = cmd;        /* if same command is repeated, */
 	}                       /* we'll keep quiet */
@@ -581,7 +581,7 @@ int getfn (char lin[], int i, char filename[], size_t filenamesize)
 {
 	int j, k, ret;
 
-	ret = ERR;
+	ret = SE_ERR;
 	if (lin[i + 1] == ' ')
 	{
 		j = i + 2;      /* get new file name */
@@ -590,23 +590,23 @@ int getfn (char lin[], int i, char filename[], size_t filenamesize)
 		{
 			filename[k] = lin[j];
 		}
-		filename[k] = EOS;
+		filename[k] = SE_EOS;
 		if (k > 0)
 		{
-			ret = OK;
+			ret = SE_OK;
 		}
 	}
-	else if (lin[i + 1] == '\n' && Savfil[0] != EOS)
+	else if (lin[i + 1] == '\n' && Savfil[0] != SE_EOS)
 	{
-		memset (filename, EOS, filenamesize-1);
+		memset (filename, SE_EOS, filenamesize-1);
 		strncpy (filename, Savfil, filenamesize);	/* or old name */
-		ret = OK;
+		ret = SE_OK;
 	}
 	else
 	{
 		if (lin[i + 1] == '\n')
 		{
-			Errcode = ENOFN;
+			Errcode = ESE_NOFN;
 		}
 		else
 		{
@@ -614,9 +614,9 @@ int getfn (char lin[], int i, char filename[], size_t filenamesize)
 		}
 	}
 
-	if (ret == OK && Savfil[1] == EOS)
+	if (ret == SE_OK && Savfil[1] == SE_EOS)
 	{
-		memset (Savfil, EOS, MAXLINE);
+		memset (Savfil, SE_EOS, MAXLINE);
 		strncpy (Savfil, filename, MAXLINE-1);		/* save if no old one */
 		mesg (Savfil, FILE_MSG);
 	}
@@ -630,7 +630,7 @@ int getfn (char lin[], int i, char filename[], size_t filenamesize)
 int getkn (char lin[], int *i, char *kname, char dfltnm)
 {
 
-	if (lin[*i] == '\n' || lin[*i] == EOS)
+	if (lin[*i] == '\n' || lin[*i] == SE_EOS)
 	{
 		*kname = dfltnm;
 		return (EOF);
@@ -638,7 +638,7 @@ int getkn (char lin[], int *i, char *kname, char dfltnm)
 
 	*kname = lin[*i];
 	(*i)++;
-	return (OK);
+	return (SE_OK);
 }
 
 
@@ -651,36 +651,36 @@ int getrange (char array[], int *k, char set[], int size, int *allbut)
 	Errcode = EBADLIST;	/* preset error code */
 
 	i = *k + 1;
-	if (array[i] == NOTINCCL)	/* check for negated character class */
+	if (array[i] == SE_NOTINCCL)	/* check for negated character class */
 	{
-		*allbut = YES;
+		*allbut = SE_YES;
 		i++;
 	}
 	else
-		*allbut = NO;
+		*allbut = SE_NO;
 
 	j = 0;
 	filset (array[*k], array, &i, set, &j, size);
 	if (array[i] != array[*k])
 	{
-		set[0] = EOS;
-		return (ERR);
+		set[0] = SE_EOS;
+		return (SE_ERR);
 	}
-	if (set[0] == EOS)
+	if (set[0] == SE_EOS)
 	{
-		Errcode = ENOLIST;
-		return (ERR);
+		Errcode = ESE_NOLIST;
+		return (SE_ERR);
 	}
-	if (j > 0 && addset (EOS, set, &j, size) == NO)
+	if (j > 0 && addset (SE_EOS, set, &j, size) == SE_NO)
 	{
-		set[0] = EOS;
-		return (ERR);
+		set[0] = SE_EOS;
+		return (SE_ERR);
 	}
 
 	*k = i;
 	Errcode = EEGARB;
 
-	return (OK);
+	return (SE_OK);
 }
 
 
@@ -695,8 +695,8 @@ int getrhs (char lin[], int *i, char sub[], size_t subsize, int *gflag)
 
 	Errcode = EBADSUB;
 
-	if (lin[*i] == EOS)	/* missing the middle delimeter */
-		return (ERR);
+	if (lin[*i] == SE_EOS)	/* missing the middle delimeter */
+		return (SE_ERR);
 
 	if (lin[*i + 1] == '%' && (lin[*i + 2] == lin[*i]
 					|| lin[*i + 2] == '\n'))
@@ -705,13 +705,13 @@ int getrhs (char lin[], int *i, char sub[], size_t subsize, int *gflag)
 	 * s//%/ --- should mean do the same thing as I did last time, even
 	 * s//&/ --- if I deleted something. So we comment out these lines.
 	 *
-		if (Subs[0] == EOS)
+		if (Subs[0] == SE_EOS)
 		{
-			Errcode = ENOSUB;
-			return (ERR);
+			Errcode = ESE_NOSUB;
+			return (SE_ERR);
 		}
 	 */
-		memset (sub, EOS, subsize);
+		memset (sub, SE_EOS, subsize);
 		strncpy (sub, Subs, subsize-1);
 		*i += 2;
 		if (lin[*i] == '\n')
@@ -719,7 +719,7 @@ int getrhs (char lin[], int *i, char sub[], size_t subsize, int *gflag)
 			/* fix it up for pattern matching routines */
 			lin[*i] = lin[*i - 2];
 			lin[*i + 1] = '\n';
-			lin[*i + 2] = EOS;
+			lin[*i + 2] = SE_EOS;
 			Peekc = SKIP_RIGHT;
 		}
 	}
@@ -731,14 +731,14 @@ int getrhs (char lin[], int *i, char sub[], size_t subsize, int *gflag)
 			/* pattern was empty */
 			lin[*i + 1] = lin[*i];	/* supply missing delimiter */
 			lin[*i + 2] = '\n';
-			lin[*i + 3] = EOS;
+			lin[*i + 3] = SE_EOS;
 			Peekc = SKIP_RIGHT;
-			/* return (ERR);     this is the original action */
+			/* return (SE_ERR);     this is the original action */
 		}
 		else
 		{
 			/* stuff in pattern, check end of line */
-			for (j = *i; lin[j] != EOS; j++)
+			for (j = *i; lin[j] != SE_EOS; j++)
 				;
 			j -= 2;		/* j now points to char before '\n' */
 
@@ -758,7 +758,7 @@ int getrhs (char lin[], int *i, char sub[], size_t subsize, int *gflag)
 						j +=  2;	/* j at \n */
 						lin[j] = lin[*i];
 						lin[++j] = '\n';
-						lin[++j] = EOS;
+						lin[++j] = SE_EOS;
 						Peekc = SKIP_RIGHT;
 					}
 				}
@@ -773,7 +773,7 @@ int getrhs (char lin[], int *i, char sub[], size_t subsize, int *gflag)
 					j += 2;
 					lin[j] = lin[*i];
 					lin[++j] = '\n';
-					lin[++j] = EOS;
+					lin[++j] = SE_EOS;
 					Peekc = SKIP_RIGHT;
 				}
 			}
@@ -791,7 +791,7 @@ int getrhs (char lin[], int *i, char sub[], size_t subsize, int *gflag)
 					j +=  2;	/* j at \n */
 					lin[j] = lin[*i];
 					lin[++j] = '\n';
-					lin[++j] = EOS;
+					lin[++j] = SE_EOS;
 					Peekc = SKIP_RIGHT;
 				}
 			}
@@ -804,7 +804,7 @@ int getrhs (char lin[], int *i, char sub[], size_t subsize, int *gflag)
 				j++;		/* j at \n */
 				lin[j] = lin[*i];
 				lin[++j] = '\n';
-				lin[++j] = EOS;
+				lin[++j] = SE_EOS;
 				Peekc = SKIP_RIGHT;
 			}
 			/* else
@@ -812,28 +812,28 @@ int getrhs (char lin[], int *i, char sub[], size_t subsize, int *gflag)
 				leave well enough alone */
 		}
 
-		if ((*i = maksub (lin, *i + 1, lin[*i], sub)) == ERR)
+		if ((*i = maksub (lin, *i + 1, lin[*i], sub)) == SE_ERR)
 		{
-			return (ERR);
+			return (SE_ERR);
 		}
 
-		memset (Subs, EOS, MAXPAT);
+		memset (Subs, SE_EOS, MAXPAT);
 		strncpy (Subs, sub, MAXPAT-1);	/* save pattern for later */
 	}
 
 	if (lin[*i + 1] == GLOBAL || lin[*i + 1] == UCGLOBAL)
 	{
 		(*i)++;
-		*gflag = YES;
+		*gflag = SE_YES;
 	}
 	else
 	{
-		*gflag = NO;
+		*gflag = SE_NO;
 	}
 
 	Errcode = EEGARB;	/* the default */
 
-	return (OK);
+	return (SE_OK);
 
 }
 
@@ -841,7 +841,7 @@ int getrhs (char lin[], int *i, char sub[], size_t subsize, int *gflag)
 /* getstr --- get string from lin at i, copy to dst, bump i */
 
 /*
-** NOTE: this routine only called for doing the join command.
+** SE_NOTE: this routine only called for doing the join command.
 ** therefore, don't do anything else with it.
 */
 
@@ -861,13 +861,13 @@ int getstr (char lin[], int *i, char dst[], int maxdst)
 		lin[++j] = ' ';		/* join with a single blank */
 		lin[++j] = '/';
 		lin[++j] = '\n';
-		lin[++j] = EOS;
+		lin[++j] = SE_EOS;
 		j = *i;
 		delim = lin[j];
 		Peekc = SKIP_RIGHT;
 		/* now fall thru */
 
-		/* return (ERR);	 old way */
+		/* return (SE_ERR);	 old way */
 	}
 	else if ((delim == 'p' || delim == 'P') && lin[j + 1] == '\n')	/* jp */
 	{
@@ -876,7 +876,7 @@ int getstr (char lin[], int *i, char dst[], int maxdst)
 		lin[++j] = '/';
 		lin[++j] = delim;	/* 'p' or 'P' */
 		lin[++j] = '\n';
-		lin[++j] = EOS;
+		lin[++j] = SE_EOS;
 		j = *i;
 		delim = lin[j];
 		Peekc = SKIP_RIGHT;
@@ -885,10 +885,10 @@ int getstr (char lin[], int *i, char dst[], int maxdst)
 
 	if (lin[j + 1] == '\n')		/* command was 'j/' */
 	{
-		dst[0] = EOS;
-		Errcode = ENOERR;
-		return (OK);
-		/* return (ERR);	old way */
+		dst[0] = SE_EOS;
+		Errcode = ESE_NOSE_ERR;
+		return (SE_OK);
+		/* return (SE_ERR);	old way */
 	}
 
 	/*
@@ -914,7 +914,7 @@ int getstr (char lin[], int *i, char dst[], int maxdst)
 			k += 2;
 			lin[k] = delim;
 			lin[++k] = '\n';
-			lin[++k] = EOS;
+			lin[++k] = SE_EOS;
 			Peekc = SKIP_RIGHT;
 		}
 	}
@@ -924,7 +924,7 @@ int getstr (char lin[], int *i, char dst[], int maxdst)
 		k++;
 		lin[k] = delim;
 		lin[++k] = '\n';
-		lin[++k] = EOS;
+		lin[++k] = SE_EOS;
 		Peekc = SKIP_RIGHT;
 	}
 	/* else
@@ -935,7 +935,7 @@ int getstr (char lin[], int *i, char dst[], int maxdst)
 
 	for (k = j + 1; lin[k] != delim; k++)	/* find end */
 	{
-		if (lin[k] == '\n' || lin[k] == EOS)
+		if (lin[k] == '\n' || lin[k] == SE_EOS)
 		{
 			if (delim == ' ')
 			{
@@ -943,26 +943,26 @@ int getstr (char lin[], int *i, char dst[], int maxdst)
 			}
 			else
 			{
-				return (ERR);
+				return (SE_ERR);
 			}
 		}
 		esc (lin, &k);
 	}
 	if (k - j > maxdst)
 	{
-		return (ERR);
+		return (SE_ERR);
 	}
 
 	for (d = 0, j++; j < k; d++, j++)
 	{
 		dst[d] = esc (lin, &j);
 	}
-	dst[d] = EOS;
+	dst[d] = SE_EOS;
 
 	*i = j;
 	Errcode = EEGARB;	/* the default */
 
-	return (OK);
+	return (SE_OK);
 }
 
 
@@ -974,7 +974,7 @@ int getwrd (char line[], int *i, char word[], int size)
 
 	SKIPBL (line, *i);
 	j = 0;
-	while (line[*i] != ' ' && line[*i] != '\n' && line[*i] != EOS)
+	while (line[*i] != ' ' && line[*i] != '\n' && line[*i] != SE_EOS)
 	{
 		if (j < size - 1)
 		{
@@ -983,7 +983,7 @@ int getwrd (char line[], int *i, char word[], int size)
 		}
 		(*i)++;
 	}
-	word[j] = EOS;
+	word[j] = SE_EOS;
 
 	return (j);
 }
@@ -1000,12 +1000,12 @@ int knscan (int way, int *num)
 	do {
 		bump (num, &k, way);
 		if (k -> Markname == Savknm)
-			return (OK);
+			return (SE_OK);
 	} while (*num != Curln && ! intrpt ());
 
 	if (Errcode == EEGARB)
-		Errcode = EKNOTFND;
-	return (ERR);
+		Errcode = EKSE_NOTFND;
+	return (SE_ERR);
 
 }
 
@@ -1024,13 +1024,13 @@ int makset (char array[], int *k, char set[], size_t size)
 	 * try to allow missing delimiter for translit command.
 	 */
 
-	if (array[*k] == EOS)
-		return (ERR);
+	if (array[*k] == SE_EOS)
+		return (SE_ERR);
 
 	if (array[*k + 1] == '%' && (array[*k + 2] == array[*k]
 					   || array[*k + 2] == '\n'))
 	{
-		memset (set, EOS, size);
+		memset (set, SE_EOS, size);
 		strncpy (set, Tset, size-1);
 		*k += 2;
 		if (array[*k] == '\n')
@@ -1038,14 +1038,14 @@ int makset (char array[], int *k, char set[], size_t size)
 			/* fix it up for rest of the routines */
 			array[*k] = array[*k - 2];
 			array[*k+ 1] = '\n';
-			array[*k+ 2] = EOS;
+			array[*k+ 2] = SE_EOS;
 		}
 		Peekc = SKIP_RIGHT;
 	}
 	else
 	{
 
-		for (l = *k; array[l] != EOS; l++)
+		for (l = *k; array[l] != SE_EOS; l++)
 			;
 		l -= 2;		/* l now points to char before '\n' */
 
@@ -1053,7 +1053,7 @@ int makset (char array[], int *k, char set[], size_t size)
 		{
 			array[*k + 1] = array[*k];	/* add delimiter */
 			array[*k + 2] = '\n';
-			array[*k + 3] = EOS;
+			array[*k + 3] = SE_EOS;
 			Peekc = SKIP_RIGHT;
 		}
 		else if (array[l] == 'p' || array[l] == 'P')
@@ -1069,7 +1069,7 @@ int makset (char array[], int *k, char set[], size_t size)
 				l += 2;
 				array[l] = array[*k];
 				array[++l] = '\n';
-				array[++l] = EOS;
+				array[++l] = SE_EOS;
 				Peekc = SKIP_RIGHT;
 			}
 		}
@@ -1082,7 +1082,7 @@ int makset (char array[], int *k, char set[], size_t size)
 			l++;		/* l now at \n */
 			array[l] = array[*k];
 			array[++l] = '\n';
-			array[++l] = EOS;
+			array[++l] = SE_EOS;
 			Peekc = SKIP_RIGHT;
 		}
 		/* else
@@ -1094,12 +1094,12 @@ int makset (char array[], int *k, char set[], size_t size)
 		filset (array[*k], array, &i, set, &j, size);
 
 		if (array[i] != array[*k])
-			return (ERR);
+			return (SE_ERR);
 
-		if (addset (EOS, set, &j, size) == NO)
-			return (ERR);
+		if (addset (SE_EOS, set, &j, size) == SE_NO)
+			return (SE_ERR);
 
-		memset (Tset, EOS, MAXPAT);
+		memset (Tset, SE_EOS, MAXPAT);
 		strncpy (Tset, set, MAXPAT-1);	/* save for later */
 		*k = i;
 
@@ -1107,7 +1107,7 @@ int makset (char array[], int *k, char set[], size_t size)
 
 	Errcode = EEGARB;
 
-	return (OK);
+	return (SE_OK);
 }
 
 
@@ -1115,27 +1115,27 @@ int makset (char array[], int *k, char set[], size_t size)
 
 int optpat (char lin[], int *i)
 {
-	if (lin[*i] == EOS)
-		*i = ERR;
-	else if (lin[*i + 1] == EOS)
-		*i = ERR;
+	if (lin[*i] == SE_EOS)
+		*i = SE_ERR;
+	else if (lin[*i + 1] == SE_EOS)
+		*i = SE_ERR;
 	else if (lin[*i + 1] == lin[*i])	/* repeated delimiter */
 		(*i)++;		/* leave existing pattern alone */
 	else
 		*i = makpat (lin, *i + 1, lin[*i], Pat);
 
-	if (Pat [0] == EOS)
+	if (Pat [0] == SE_EOS)
 	{
-		Errcode = ENOPAT;
-		return (ERR);
+		Errcode = ESE_NOPAT;
+		return (SE_ERR);
 	}
-	if (*i == ERR)
+	if (*i == SE_ERR)
 	{
-		Pat[0] = EOS;
+		Pat[0] = SE_EOS;
 		Errcode = EBADPAT;
-		return (ERR);
+		return (SE_ERR);
 	}
-	return (OK);
+	return (SE_OK);
 }
 
 
@@ -1150,14 +1150,14 @@ int ptscan (int way, int *num)
 	do {
 		bump (num, &k, way);
 		gtxt (k);
-		if (match (Txt, Pat) == YES)
-			return (OK);
+		if (match (Txt, Pat) == SE_YES)
+			return (SE_OK);
 	} while (*num != Curln && ! intrpt ());
 
 	if (Errcode == EEGARB)
-		Errcode = EPNOTFND;
+		Errcode = EPSE_NOTFND;
 
-	return (ERR);
+	return (SE_ERR);
 }
 
 
@@ -1169,72 +1169,72 @@ int settab (char str[])
 	int ctoi ();
 
 	for (i = 0; i < MAXLINE; i++)   /* clear all tab stops */
-		Tabstops[i] = NO;
+		Tabstops[i] = SE_NO;
 
-	ret = OK;
+	ret = SE_OK;
 	maxstop = 0;
 	last = 1;
 
 	i = 0;
 	SKIPBL (str, i);
-	while (str[i] != EOS && str[i] != '\n')
+	while (str[i] != SE_EOS && str[i] != '\n')
 	{
 		if (str[i] == '+')      /* increment */
 		{
 			i++;
-			inc = YES;
+			inc = SE_YES;
 		}
 		else
-			inc = NO;
+			inc = SE_NO;
 
 		n = ctoi (str, &i);
 
 		if (n <= 0 || n >= MAXLINE)
 		{
-			ret = ERR;
-			Errcode = ENONSENSE;
+			ret = SE_ERR;
+			Errcode = ESE_NONSENSE;
 			break;
 		}
 
 		if (str[i] != ' ' && str[i] != '+' &&
-		    str[i] != '\n' && str[i] != EOS)
+		    str[i] != '\n' && str[i] != SE_EOS)
 		{
-			ret = ERR;
+			ret = SE_ERR;
 			Errcode = EBADTABS;
 			break;
 		}
 
-		if (inc == YES)
+		if (inc == SE_YES)
 		{
 			for (j = last + n; j < MAXLINE; j += n)
 			{
-				Tabstops[j - 1] = YES;
+				Tabstops[j - 1] = SE_YES;
 				maxstop = max (j, maxstop);
 			}
 		}
 		else
 		{
-			Tabstops[n - 1] = YES;
+			Tabstops[n - 1] = SE_YES;
 			last = n;
 			maxstop = max (n, maxstop);
 		}
 		SKIPBL (str, i);
 	}       /* while ... */
 
-	if (ret == ERR)
+	if (ret == SE_ERR)
 		maxstop = 0;
 
 	if (maxstop == 0)       /* no tab stops specified, use defaults */
 	{
 		for (i = 4; i < MAXLINE - 1; i += 4)
-			Tabstops[i] = YES;
+			Tabstops[i] = SE_YES;
 		maxstop = i - 4 + 1;
 	}
 
-	Tabstops[0] = YES;      /* always set to YES */
+	Tabstops[0] = SE_YES;      /* always set to SE_YES */
 
 	for (i = maxstop; i < MAXLINE; i++)
-		Tabstops[i] = YES;
+		Tabstops[i] = SE_YES;
 
 	return (ret);
 }
@@ -1256,7 +1256,7 @@ int serc_safe (char *path)
 	rc = stat (path, &sbuf);
 	if (rc != 0)
 	{
-		return NO;
+		return SE_NO;
 	}
 
 	our_euid = geteuid ();
@@ -1264,24 +1264,24 @@ int serc_safe (char *path)
 	/* don't exec .serc files that aren't ours */
 	if (sbuf.st_uid != our_euid)
 	{
-		return NO;
+		return SE_NO;
 	}
 
 	/* don't .serc files that others can write to */
 	if ((sbuf.st_mode & S_IWGRP) || (sbuf.st_mode & S_IWOTH))
 	{
-		return NO;
+		return SE_NO;
 	}
 
-	return YES;
+	return SE_YES;
 }
 
 
 /* serc --- read in ./.serc or $HOME/.serc and execute the commands in it. */
 
 /*
- * note that se's special control characters are NOT processed,
- * and therefore should NOT be used in one's .serc file.
+ * note that se's special control characters are SE_NOT processed,
+ * and therefore should SE_NOT be used in one's .serc file.
  */
 
 void serc (void)
@@ -1290,7 +1290,7 @@ void serc (void)
 	char lin[MAXLINE];
 	char *homeserc;
 	FILE *fp;
-	int status = ENOERR;
+	int status = ESE_NOSE_ERR;
 	int len, cursav, i;
 	char *serc_files[3];
 
@@ -1300,14 +1300,14 @@ void serc (void)
 
 	homeserc = expand_env ("$HOME/.serc");
 
-	memset (file, EOS, MAXLINE);
+	memset (file, SE_EOS, MAXLINE);
 	strncpy (file, homeserc, MAXLINE-1);
 
 	fp = NULL;
 
 	for (i = 0; serc_files[i]; i++)
 	{
-		if ((serc_safe (serc_files[i]) == YES) &&
+		if ((serc_safe (serc_files[i]) == SE_YES) &&
 			 ((fp = fopen (serc_files[i], "r")) != NULL))
 		{
 			break;
@@ -1329,19 +1329,19 @@ void serc (void)
 		/* most of this code stolen from edit() */
 		len = 0;
 		cursav = Curln;
-		if (getlst (lin, &len, &status) == OK)
+		if (getlst (lin, &len, &status) == SE_OK)
 		{
-			if (ckglob (lin, &len, &status) == OK)
+			if (ckglob (lin, &len, &status) == SE_OK)
 			{
 				doglob (lin, &len, &cursav, &status);
 			}
-			else if (status != ERR)
+			else if (status != SE_ERR)
 			{
-				docmd (lin, len, NO, &status);
+				docmd (lin, len, SE_NO, &status);
 			}
 		}
 
-		if (status == ERR)
+		if (status == SE_ERR)
 		{
 			if (Errcode == EHANGUP)
 			{
@@ -1364,14 +1364,14 @@ void log_usage (void)
 	long clock;
 
 	/* get the login name */
-	memset (logname, EOS, MAXLINE);
+	memset (logname, SE_EOS, MAXLINE);
 	strncpy (logname, getlogin (), MAXLINE-1);
 
 	time (&clock);
 
-	memset (tod, EOS, 26);
+	memset (tod, SE_EOS, 26);
 	strncpy (tod, ctime (&clock), 26-1);	/* see the manual on ctime(3C)  */
-	tod[24] = EOS;				/* delete the '\n' at the end */
+	tod[24] = SE_EOS;				/* delete the '\n' at the end */
 
 	openlog (PACKAGE, 0, LOG_USER);
 	syslog (LOG_INFO, "%s was invoked by %s on %s.", PACKAGE, logname, tod);

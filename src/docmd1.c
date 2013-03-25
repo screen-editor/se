@@ -39,7 +39,7 @@ int docmd (char lin[], int i, int glob, int *status)
 	char kname;
 	int gflag, line3, pflag, flag, fflag, junk, allbut, tflag;
 
-	*status = ERR;
+	*status = SE_ERR;
 	if (intrpt ())  /* catch a pending interrupt */
 	{
 		return (*status);
@@ -66,7 +66,7 @@ int docmd (char lin[], int i, int glob, int *status)
 		{
 			defalt (Curln, Curln);
 			saynum (Line2);
-			*status = OK;
+			*status = SE_OK;
 		}
 		break;
 
@@ -100,7 +100,7 @@ int docmd (char lin[], int i, int glob, int *status)
 				warn_deleted (Line1, Line2);
 			}
 			*status = append (Line2, &lin[i + 1]);
-			if (*status != ERR)
+			if (*status != SE_ERR)
 			{
 				line3 = Curln;
 				se_delete (Line1, Line2, status);
@@ -112,10 +112,10 @@ int docmd (char lin[], int i, int glob, int *status)
 
 	case DELCOM:
 	case UCDELCOM:
-		if (ckp (lin, i + 1, &pflag, status) == OK)
+		if (ckp (lin, i + 1, &pflag, status) == SE_OK)
 		{
 			defalt (Curln, Curln);
-			if (se_delete (Line1, Line2, status) == OK
+			if (se_delete (Line1, Line2, status) == SE_OK
 			    && Ddir == FORWARD
 			    && nextln (Curln) != 0)
 			{
@@ -148,9 +148,9 @@ int docmd (char lin[], int i, int glob, int *status)
 		i++;
 		if (getone (lin, &i, &line3, status) == EOF)
 		{
-			*status = ERR;
+			*status = SE_ERR;
 		}
-		if (*status == OK && ckp (lin, i, &pflag, status) == OK)
+		if (*status == SE_OK && ckp (lin, i, &pflag, status) == SE_OK)
 		{
 			defalt (Curln, Curln);
 			*status = move (line3);
@@ -162,9 +162,9 @@ int docmd (char lin[], int i, int glob, int *status)
 		i++;
 		if (getone (lin, &i, &line3, status) == EOF)
 		{
-			*status = ERR;
+			*status = SE_ERR;
 		}
-		if (*status == OK && ckp (lin, i, &pflag, status) == OK)
+		if (*status == SE_OK && ckp (lin, i, &pflag, status) == SE_OK)
 		{
 			defalt (Curln, Curln);
 			*status = copy (line3);
@@ -182,7 +182,7 @@ int docmd (char lin[], int i, int glob, int *status)
 			lin[i+2] = '%';
 			lin[i+3] = '/';
 			lin[i+4] = '\n';
-			lin[i+5] = EOS;
+			lin[i+5] = SE_EOS;
 			Peekc = SKIP_RIGHT;
 		}
 		else
@@ -190,33 +190,33 @@ int docmd (char lin[], int i, int glob, int *status)
 			/* try to handle "s/stuff\n" */
 			int j, missing_delim;
 
-			missing_delim = YES;
+			missing_delim = SE_YES;
 			for (j = i + 1; lin[j] != '\n'; j++)
 				if (lin[j] == ESCAPE && lin[j+1] == lin[i])
 					j++;	/* skip esc, loop continues */
 				else if (lin[j] == lin[i])
 				{
-					missing_delim = NO;
+					missing_delim = SE_NO;
 					break;	/* for */
 				}
 
 			if (missing_delim)
 			{
-				for (; lin[j] != EOS; j++)
+				for (; lin[j] != SE_EOS; j++)
 					;
 				j--;		/* j now at newline */
 
 				lin[j] = lin[i];	/* delim */
 				lin[++j] = '\n';
-				lin[++j] = EOS;
+				lin[++j] = SE_EOS;
 				Peekc = SKIP_RIGHT;
 				/* rest of routines will continue to fix up */
 			}
 		}
 
-		if (optpat (lin, &i) == OK
-		    && getrhs (lin, &i, sub, MAXPAT, &gflag) == OK
-		    && ckp (lin, i + 1, &pflag, status) == OK)
+		if (optpat (lin, &i) == SE_OK
+		    && getrhs (lin, &i, sub, MAXPAT, &gflag) == SE_OK
+		    && ckp (lin, i + 1, &pflag, status) == SE_OK)
 		{
 			defalt (Curln, Curln);
 			*status = subst (sub, gflag, glob);
@@ -234,7 +234,7 @@ int docmd (char lin[], int i, int glob, int *status)
 			lin[i+2] = '%';
 			lin[i+3] = '/';
 			lin[i+4] = '\n';
-			lin[i+5] = EOS;
+			lin[i+5] = SE_EOS;
 			Peekc = SKIP_RIGHT;
 		}
 		else
@@ -242,33 +242,33 @@ int docmd (char lin[], int i, int glob, int *status)
 			/* try to handle "y/stuff\n" */
 			int j, missing_delim;
 
-			missing_delim = YES;
+			missing_delim = SE_YES;
 			for (j = i + 1; lin[j] != '\n'; j++)
 				if (lin[j] == ESCAPE && lin[j+1] == lin[i])
 					j++;	/* skip esc, loop continues */
 				else if (lin[j] == lin[i])
 				{
-					missing_delim = NO;
+					missing_delim = SE_NO;
 					break;	/* for */
 				}
 
 			if (missing_delim)
 			{
-				for (; lin[j] != EOS; j++)
+				for (; lin[j] != SE_EOS; j++)
 					;
 				j--;		/* j now at newline */
 
 				lin[j] = lin[i];	/* delim */
 				lin[++j] = '\n';
-				lin[++j] = EOS;
+				lin[++j] = SE_EOS;
 				Peekc = SKIP_RIGHT;
 				/* rest of routines will continue to fix up */
 			}
 		}
 
-		if (getrange (lin, &i, Tlpat, MAXPAT, &allbut) == OK
-		    && makset (lin, &i, sub, MAXPAT) == OK
-		    && ckp (lin, i + 1, &pflag, status) == OK)
+		if (getrange (lin, &i, Tlpat, MAXPAT, &allbut) == SE_OK
+		    && makset (lin, &i, sub, MAXPAT) == SE_OK
+		    && ckp (lin, i + 1, &pflag, status) == SE_OK)
 		{
 			defalt (Curln, Curln);
 			*status = dotlit (sub, allbut);
@@ -278,8 +278,8 @@ int docmd (char lin[], int i, int glob, int *status)
 	case JOINCOM:
 	case UCJOINCOM:
 		i++;
-		if (getstr (lin, &i, sub, MAXPAT) == OK
-		    && ckp (lin, i + 1, &pflag, status) == OK)
+		if (getstr (lin, &i, sub, MAXPAT) == SE_OK
+		    && ckp (lin, i + 1, &pflag, status) == SE_OK)
 		{
 			defalt (prevln (Curln), Curln);
 			*status = join (sub);
@@ -290,8 +290,8 @@ int docmd (char lin[], int i, int glob, int *status)
 	case UCUNDOCOM:
 		i++;
 		defalt (Curln, Curln);
-		if (ckchar (UCDELCOM, DELCOM, lin, &i, &flag, status) == OK
-		    && ckp (lin, i, &pflag, status) == OK)
+		if (ckchar (UCDELCOM, DELCOM, lin, &i, &flag, status) == SE_OK
+		    && ckp (lin, i, &pflag, status) == SE_OK)
 			*status = doundo (flag, status);
 		break;
 
@@ -302,13 +302,13 @@ int docmd (char lin[], int i, int glob, int *status)
 		{
 			Errcode = EBADLNR;
 		}
-		else if (ckupd (lin, &i, ENTER, status) == OK
-		    && ckchar ('x', 'X', lin, &i, &tflag, status) == OK)
+		else if (ckupd (lin, &i, ENTER, status) == SE_OK
+		    && ckchar ('x', 'X', lin, &i, &tflag, status) == SE_OK)
 		{
-			if (getfn (lin, i - 1, file, MAXLINE) == OK)
+			if (getfn (lin, i - 1, file, MAXLINE) == SE_OK)
 			{
 				expanded = expand_env (file);
-				memset (Savfil, EOS, MAXLINE);
+				memset (Savfil, SE_EOS, MAXLINE);
 				strncpy (Savfil, expanded, MAXLINE-1);
 				mesg (Savfil, FILE_MSG);
 				clrbuf ();
@@ -317,11 +317,11 @@ int docmd (char lin[], int i, int glob, int *status)
 				*status = doread (0, file, tflag);
 				First_affected = 0;
 				Curln = min (1, Lastln);
-				Buffer_changed = NO;
+				Buffer_changed = SE_NO;
 			}
 			else
 			{
-				*status = ERR;
+				*status = SE_ERR;
 			}
 		}
 		break;
@@ -332,21 +332,21 @@ int docmd (char lin[], int i, int glob, int *status)
 		{
 			Errcode = EBADLNR;
 		}
-		else if (getfn (lin, i, file, MAXLINE) == OK)
+		else if (getfn (lin, i, file, MAXLINE) == SE_OK)
 		{
 			expanded = expand_env (file);
-			memset (Savfil, EOS, MAXLINE);
+			memset (Savfil, SE_EOS, MAXLINE);
 			strncpy (Savfil, expanded, MAXLINE-1);
 			mesg (Savfil, FILE_MSG);
-			*status = OK;
+			*status = SE_OK;
 		}
 		break;
 
 	case READCOM:
 	case UCREADCOM:
 		i++;
-		if (ckchar ('x', 'X', lin, &i, &tflag, status) == OK)
-			if (getfn (lin, i - 1, file, MAXLINE) == OK)
+		if (ckchar ('x', 'X', lin, &i, &tflag, status) == SE_OK)
+			if (getfn (lin, i - 1, file, MAXLINE) == SE_OK)
 			{
 				defalt (Curln, Curln);
 				*status = doread (Line2, file, tflag);
@@ -356,13 +356,13 @@ int docmd (char lin[], int i, int glob, int *status)
 	case WRITECOM:
 	case UCWRITECOM:
 		i++;
-		flag = NO;
-		fflag = NO;
+		flag = SE_NO;
+		fflag = SE_NO;
 		junk = ckchar ('>', '+', lin, &i, &flag, &junk);
-		if (flag == NO)
+		if (flag == SE_NO)
 			junk = ckchar ('!', '!', lin, &i, &fflag, &junk);
 		junk = ckchar ('x', 'X', lin, &i, &tflag, &junk);
-		if (getfn (lin, i - 1, file, MAXLINE) == OK)
+		if (getfn (lin, i - 1, file, MAXLINE) == SE_OK)
 		{
 			defalt (1, Lastln);
 			*status = dowrit (Line1, Line2, file, flag, fflag, tflag);
@@ -387,14 +387,14 @@ int docmd (char lin[], int i, int glob, int *status)
 			Topln = Line2;
 			Curln = Line2;
 			First_affected = Line2;
-			*status = OK;
+			*status = SE_OK;
 		}
 		break;
 
 	case NAMECOM:
 	case UCNAMECOM:
 		i++;
-		if (getkn (lin, &i, &kname, DEFAULTNAME) != ERR
+		if (getkn (lin, &i, &kname, DEFAULTNAME) != SE_ERR
 		    && lin[i] == '\n')
 			uniquely_name (kname, status);
 		break;
@@ -402,7 +402,7 @@ int docmd (char lin[], int i, int glob, int *status)
 	case MARKCOM:
 	case UCMARKCOM:
 		i++;
-		if (getkn (lin, &i, &kname, DEFAULTNAME) != ERR
+		if (getkn (lin, &i, &kname, DEFAULTNAME) != SE_ERR
 		    && lin[i] == '\n')
 		{
 			defalt (Curln, Curln);
@@ -423,7 +423,7 @@ int docmd (char lin[], int i, int glob, int *status)
 			char *sysname ();
 
 			remark (sysname ());
-			*status = OK;
+			*status = SE_OK;
 		}
 		break;
 
@@ -446,7 +446,7 @@ int docmd (char lin[], int i, int glob, int *status)
 		{
 			Errcode = EBADLNR;
 		}
-		else if (ckupd (lin, &i, QUIT, status) == OK)
+		else if (ckupd (lin, &i, QUIT, status) == SE_OK)
 		{
 			if (lin[i] == '\n')
 			{
@@ -454,7 +454,7 @@ int docmd (char lin[], int i, int glob, int *status)
 			}
 			else
 			{
-				*status = ERR;
+				*status = SE_ERR;
 			}
 		}
 		break;
@@ -496,8 +496,8 @@ int docmd (char lin[], int i, int glob, int *status)
 		break;
 	}
 
-	if (*status == OK)
-		Probation = NO;
+	if (*status == SE_OK)
+		Probation = SE_NO;
 
 	return (*status);
 }
@@ -512,7 +512,7 @@ void dohelp (char lin[], int *i, int *status)
 	int j;
 	FILE *fp;
 
-	memset (filename, EOS, MAXLINE);
+	memset (filename, SE_EOS, MAXLINE);
 
 	SKIPBL (lin, *i);
 	if (lin[*i] == NEWLINE)
@@ -524,11 +524,11 @@ void dohelp (char lin[], int *i, int *status)
 		/* build filename from text after "h" */
 		snprintf (filename, MAXLINE-1, "%s/%s", helpdir, &lin[*i]);
 		j = strlen (filename);
-		filename[j-1] = EOS;	/* lop off newline */
+		filename[j-1] = SE_EOS;	/* lop off newline */
 	}
 
 	/* map to lower case */
-	for (j = 0; filename[j] != EOS; j++)
+	for (j = 0; filename[j] != SE_EOS; j++)
 	{
 		if (isupper (filename[j]))
 		{
@@ -536,15 +536,15 @@ void dohelp (char lin[], int *i, int *status)
 		}
 	}
 
-	*status = OK;
+	*status = SE_OK;
 	if ((fp = fopen (filename, "r")) == NULL)
 	{
-		*status = ERR;
-		Errcode = ENOHELP;
+		*status = SE_ERR;
+		Errcode = ESE_NOHELP;
 	}
 	else
 	{
-		/* status is OK */
+		/* status is SE_OK */
 		display_message (fp);	/* display the help script */
 		fclose (fp);
 	}
@@ -560,7 +560,7 @@ int doopt (char lin[], int *i)
 	int ret;
 
 	(*i)++;
-	ret = ERR;
+	ret = SE_ERR;
 
 	switch (lin[*i]) {
 
@@ -568,9 +568,9 @@ int doopt (char lin[], int *i)
 	case 'G':
 		if (lin[*i + 1] == '\n')
 		{
-			ret = OK;
+			ret = SE_OK;
 			Globals = ! Globals;	/* toggle */
-			if (Globals == YES)
+			if (Globals == SE_YES)
 				remark ("failed global substitutes continue");
 			else
 				remark ("failed global substitutes stop");
@@ -581,9 +581,9 @@ int doopt (char lin[], int *i)
 	case 'H':		/* do/don't use hardware insert/delete */
 		if (lin[*i + 1] == '\n')
 		{
-			ret = OK;
+			ret = SE_OK;
 			No_hardware = ! No_hardware;
-			if (No_hardware == YES)
+			if (No_hardware == SE_YES)
 				remark ("no line insert/delete");
 			else
 				remark ("line insert/delete");
@@ -594,8 +594,8 @@ int doopt (char lin[], int *i)
 	case 'K':
 		if (lin[*i + 1] == '\n')
 		{
-			ret = OK;
-			if (Buffer_changed == YES)
+			ret = SE_OK;
+			if (Buffer_changed == SE_YES)
 				remark ("not saved");
 			else
 				remark ("saved");
@@ -607,11 +607,11 @@ int doopt (char lin[], int *i)
 	case 'Z':
 		if (lin[*i + 1] == '\n')
 		{
-			ret = OK;
+			ret = SE_OK;
 
 			if (Catching_stops)
 			{
-				if (Buffer_changed == YES)
+				if (Buffer_changed == SE_YES)
 					fprintf (stderr, "WARNING: buffer not saved\r\n");
 				kill (getpid(), SIGTSTP);
 				/* stop_hdlr() will do all the work for us */
@@ -625,14 +625,14 @@ int doopt (char lin[], int *i)
 		if (lin[*i] == '\n')
 		{
 			remark (Tabstr);
-			ret = OK;
+			ret = SE_OK;
 		}
 		else
 		{
 			ret = settab (&lin[*i]);
 
-			memset (Tabstr, EOS, MAXLINE);
-			if (ret == OK)
+			memset (Tabstr, SE_EOS, MAXLINE);
+			if (ret == SE_OK)
 			{
 				strncpy (Tabstr, &lin[*i], MAXLINE-1);
 			}
@@ -648,7 +648,7 @@ int doopt (char lin[], int *i)
 		++(*i);
 		if (lin[*i] == '\n')
 		{
-			ret = OK;
+			ret = SE_OK;
 		}
 		else
 		{
@@ -657,16 +657,16 @@ int doopt (char lin[], int *i)
 			{
 				if (temp > 0 && temp < MAXLINE - 3)
 				{
-					ret = OK;
+					ret = SE_OK;
 					Warncol = temp;
 				}
 				else
 				{
-					Errcode = ENONSENSE;
+					Errcode = ESE_NONSENSE;
 				}
 			}
 		}
-		if (ret == OK)
+		if (ret == SE_OK)
 		{
 			saynum (Warncol);
 		}
@@ -683,9 +683,9 @@ int doopt (char lin[], int *i)
 				Toprow = 0;
 				First_affected = Topln;
 			}
-			ret = OK;
+			ret = SE_OK;
 		}
-		else if (stat != ERR && lin[*i] == '\n')
+		else if (stat != SE_ERR && lin[*i] == '\n')
 		{
 			if (Toprow + (line - Topln + 1) < Cmdrow)
 			{
@@ -697,7 +697,7 @@ int doopt (char lin[], int *i)
 					adjust_window (1, Lastln);
 				if (Curln < Topln)
 					Curln = min (Topln, Lastln);
-				ret = OK;
+				ret = SE_OK;
 			}
 			else
 			{
@@ -711,7 +711,7 @@ int doopt (char lin[], int *i)
 		if (lin[*i + 1] == '\n')
 		{
 			Absnos = ! Absnos;
-			ret = OK;
+			ret = SE_OK;
 		}
 		break;
 
@@ -719,7 +719,7 @@ int doopt (char lin[], int *i)
 	case 'C':
 		if (lin[*i + 1] == '\n')
 		{
-			ret = OK;
+			ret = SE_OK;
 			Invert_case = ! Invert_case;
 			if (Rel_a == 'A')
 			{
@@ -744,7 +744,7 @@ int doopt (char lin[], int *i)
 				remark (">");
 			else
 				remark ("<");
-			ret = OK;
+			ret = SE_OK;
 		}
 		else if (lin[*i + 2] != '\n')
 		{
@@ -752,12 +752,12 @@ int doopt (char lin[], int *i)
 		}
 		else if (lin[*i + 1] == '>')
 		{
-			ret = OK;
+			ret = SE_OK;
 			Ddir = FORWARD;
 		}
 		else if (lin[*i + 1] == '<')
 		{
-			ret = OK;
+			ret = SE_OK;
 			Ddir = BACKWARD;
 		}
 		else
@@ -779,14 +779,14 @@ int doopt (char lin[], int *i)
 			{
 				saynum (Overlay_col);
 			}
-			ret = OK;
+			ret = SE_OK;
 		}
 		else
 		{
 			if (lin[*i] == '$' && lin[*i + 1] == '\n')
 			{
 				Overlay_col = 0;
-				ret = OK;
+				ret = SE_OK;
 			}
 			else
 			{
@@ -794,11 +794,11 @@ int doopt (char lin[], int *i)
 				if (lin[*i] == '\n')
 				{
 					Overlay_col = temp;
-					ret = OK;
+					ret = SE_OK;
 				}
 				else
 				{
-					Errcode = ENONSENSE;
+					Errcode = ESE_NONSENSE;
 				}
 			}
 		}
@@ -808,21 +808,21 @@ int doopt (char lin[], int *i)
 	case 'U':
 		if (lin[*i + 1] == '\n')
 		{
-			ret = OK;
+			ret = SE_OK;
 			tempstr[0] = tempstr[2] = '"';
 			tempstr[1] = Unprintable;
-			tempstr[3] = EOS;
+			tempstr[3] = SE_EOS;
 			remark (tempstr);
 		}
 		else if (lin[*i + 2] == '\n')
 		{
 			if (lin[*i + 1] < ' ' || lin[*i + 1] >= DEL)
 			{
-				Errcode = ENONSENSE;
+				Errcode = ESE_NONSENSE;
 			}
 			else 
 			{
-				ret = OK;
+				ret = SE_OK;
 				if (Unprintable != lin[*i + 1])
 				{
 					Unprintable = lin[*i + 1];
@@ -836,15 +836,15 @@ int doopt (char lin[], int *i)
 	case 'L':
 		if (lin[*i+1] == '\n')
 		{
-			Nchoise = EOS;
-			ret = OK;
+			Nchoise = SE_EOS;
+			ret = SE_OK;
 		}
 		else if (lin[*i + 2] == '\n' &&
 		    (lin[*i + 1] == CURLINE || lin[*i + 1] == LASTLINE
 		    || lin[*i + 1] == TOPLINE))
 		{
 			Nchoise = lin[*i + 1];
-			ret = OK;
+			ret = SE_OK;
 		}
 		else if (lin[*i + 1] == 'm' || lin[*i + 1] == 'M')
 		{
@@ -853,7 +853,7 @@ int doopt (char lin[], int *i)
 			if (lin[*i + 1] == '\n')
 			{
 				saynum (Firstcol + 1);
-				ret = OK;
+				ret = SE_OK;
 			}
 			else 
 			{
@@ -865,11 +865,11 @@ int doopt (char lin[], int *i)
 					{
 						First_affected = Topln;
 						Firstcol = temp - 1;
-						ret = OK;
+						ret = SE_OK;
 					}
 					else
 					{
-						Errcode = ENONSENSE;
+						Errcode = ESE_NONSENSE;
 					}
 				}
 			}
@@ -893,11 +893,11 @@ int doopt (char lin[], int *i)
 	case 'I':
 		++(*i);
 		if (lin[*i] == '\n')
-			ret = OK;
+			ret = SE_OK;
 		else if ((lin[*i] == 'a' || lin[*i] == 'A') && lin[*i + 1] == '\n')
 		{
 			Indent = 0;
-			ret = OK;
+			ret = SE_OK;
 		}
 		else
 		{
@@ -906,16 +906,16 @@ int doopt (char lin[], int *i)
 			{
 				if (temp > 0 && temp < MAXLINE - 3)
 				{
-					ret = OK;
+					ret = SE_OK;
 					Indent = temp;
 				}
 				else
 				{
-					Errcode = ENONSENSE;
+					Errcode = ESE_NONSENSE;
 				}
 			}
 		}
-		if (ret == OK)
+		if (ret == SE_OK)
 		{
 			if (Indent > 0)
 			{
@@ -934,7 +934,7 @@ int doopt (char lin[], int *i)
 		{
 			Notify = ! Notify;	/* toggle notification */
 			remark (Notify ? "notify on" : "notify off");
-			ret = OK;
+			ret = SE_OK;
 		}
 		break;
 
@@ -942,7 +942,7 @@ int doopt (char lin[], int *i)
 	case 'X':	/* toggle tab compression */
 		if (lin[*i + 1] == '\n')
 		{
-			ret = OK;
+			ret = SE_OK;
 			Compress = ! Compress;
 			mesg (Compress ? "XTABS" : "", COMPRESS_MSG);
 		}
@@ -953,36 +953,36 @@ int doopt (char lin[], int *i)
 		if (lin[*i + 1] == '\n')
 		{
 		crypt_toggle:
-			ret = OK;
+			ret = SE_OK;
 			Crypting = ! Crypting;
 			if (Crypting )
 			{
 				do {
 					getkey ();
-					if (Key[0] == EOS)
+					if (Key[0] == SE_EOS)
 						remark ("Empty keys are not allowed.\n");
-				} while (Key[0] == EOS);
+				} while (Key[0] == SE_EOS);
 			}
 			else
 			{
-				Key[0] = EOS;
+				Key[0] = SE_EOS;
 			}
 		}
 		else
 		{
 			int j;
 
-			ret = OK;
+			ret = SE_OK;
 			(*i)++;		/* *i was the 'y' */
 			while (isspace (lin[*i]) && lin[*i] != '\n')
 				(*i)++;
-			if (lin[*i] != '\n' && lin[*i] != EOS)
+			if (lin[*i] != '\n' && lin[*i] != SE_EOS)
 			{
-				for (j = 0; lin[*i] != '\n' && lin[*i] != EOS;
+				for (j = 0; lin[*i] != '\n' && lin[*i] != SE_EOS;
 				    j++, (*i)++)
 					Key[j] = lin[*i];
-				Key[j] = EOS;
-				Crypting = YES;
+				Key[j] = SE_EOS;
+				Crypting = SE_YES;
 			}
 			else
 				goto crypt_toggle;
@@ -1010,7 +1010,7 @@ int domark (char kname)
 	if (Line1 <= 0)
 	{
 		Errcode = EORANGE;
-		ret = ERR;
+		ret = SE_ERR;
 	}
 	else
 	{
@@ -1018,11 +1018,11 @@ int domark (char kname)
 		for (line = Line1; line <= Line2; line++)
 		{
 			if (intrpt())
-				return (ERR);
+				return (SE_ERR);
 			k -> Markname = kname;
 			k = NEXTLINE(k);
 		}
-		ret = OK;
+		ret = SE_OK;
 	}
 	return (ret);
 }
@@ -1036,12 +1036,12 @@ int doprnt (int from, int to)
 	if (from <= 0)
 	{
 		Errcode = EORANGE;
-		return (ERR);
+		return (SE_ERR);
 	}
 
 	adjust_window (from, to);
 	Curln = to;
-	return (OK);
+	return (SE_OK);
 }
 
 
@@ -1057,9 +1057,9 @@ int doread (int line, char *file, int tflag)
 
 	file = expand_env (file);	/* expand $HOME, etc. */
 
-	if (Savfil[0] == EOS)
+	if (Savfil[0] == SE_EOS)
 	{
-		memset (Savfil, EOS, MAXLINE);
+		memset (Savfil, SE_EOS, MAXLINE);
 		strncpy (Savfil, file, MAXLINE-1);
 		mesg (Savfil, FILE_MSG);
 	}
@@ -1071,29 +1071,29 @@ int doread (int line, char *file, int tflag)
 
 	if (fd == NULL)
 	{
-		ret = ERR;
+		ret = SE_ERR;
 		Errcode = ECANTREAD;
 	}
 	else
 	{
 		First_affected = min (First_affected, line + 1);
 		ptr = getind (line);
-		ret = OK;
+		ret = SE_OK;
 		Curln = line;
 		remark ("reading");
 		for (count = 0; fgets (lin1, MAXLINE, fd) != NULL; count++)
 		{
 			if (intrpt ())
 			{
-				ret = ERR;
+				ret = SE_ERR;
 				break;
 			}
-			if (Compress == NO && tflag == NO)
+			if (Compress == SE_NO && tflag == SE_NO)
 				ptr = sp_inject (lin1, strlen (lin1), ptr);
 			else
 			{
 				len = 0;
-				for (i = 0; lin1[i] != EOS && len < MAXLINE - 1; i++)
+				for (i = 0; lin1[i] != SE_EOS && len < MAXLINE - 1; i++)
 				{
 					if (lin1[i] != '\t')
 					{
@@ -1108,17 +1108,17 @@ int doread (int line, char *file, int tflag)
 					}
 				}
 
-				lin2[len] = EOS;
+				lin2[len] = SE_EOS;
 				if (len >= MAXLINE)
 				{
-					ret = ERR;
+					ret = SE_ERR;
 					Errcode = ETRUNC;
 				}
 				ptr = sp_inject (lin2, len, ptr);
 			}
-			if (ptr == NOMORE)
+			if (ptr == SE_NOMORE)
 			{
-				ret = ERR;
+				ret = SE_ERR;
 				break;
 			}
 		}
@@ -1168,8 +1168,8 @@ int dosopt (char lin[])
 	i = strbsr ((char *)ltxt, sizeof (ltxt), sizeof (ltxt[0]), lang);
 	if (i == EOF)
 	{
-		Errcode = ENOLANG;
-		return (ERR);
+		Errcode = ESE_NOLANG;
+		return (SE_ERR);
 	}
 
 	/*
@@ -1179,41 +1179,41 @@ int dosopt (char lin[])
 
 	Rel_a = 'A';
 	Rel_z = 'Z';
-	Invert_case = NO;
-	Compress = NO;
+	Invert_case = SE_NO;
+	Compress = SE_NO;
 
 	switch (ltxt[i].val) {
 	case 1:
 		Warncol = 74;
-		memset (Tabstr, EOS, MAXLINE);
+		memset (Tabstr, SE_EOS, MAXLINE);
 		strncpy (Tabstr, "+4", MAXLINE-1);
 		break;
 
 	case 2:
 		Warncol = 72;
-		memset (Tabstr, EOS, MAXLINE);
+		memset (Tabstr, SE_EOS, MAXLINE);
 		strncpy (Tabstr, "17+8", MAXLINE-1);
-		Compress = YES;		/* except this one */
+		Compress = SE_YES;		/* except this one */
 		break;
 
 	case 3:
 		Warncol = 74;
-		memset (Tabstr, EOS, MAXLINE);
+		memset (Tabstr, SE_EOS, MAXLINE);
 		strncpy (Tabstr, "+8", MAXLINE-1);
 		break;
 
 	case 4:
 		Warncol = 72;
-		memset (Tabstr, EOS, MAXLINE);
+		memset (Tabstr, SE_EOS, MAXLINE);
 		strncpy (Tabstr, "7+3", MAXLINE-1);
 		break;
 	}
 
 	settab (Tabstr);
-	mesg (Invert_case == YES ? "CASE" : "", CASE_MSG);
-	mesg (Compress == YES ? "XTABS" : "", COMPRESS_MSG);
+	mesg (Invert_case == SE_YES ? "CASE" : "", CASE_MSG);
+	mesg (Compress == SE_YES ? "XTABS" : "", COMPRESS_MSG);
 
-	return (OK);
+	return (SE_OK);
 }
 
 
@@ -1227,7 +1227,7 @@ int dotlit (char sub[], int allbut)
 	int ret;
 	LINEDESC *inx;
 
-	ret = ERR;
+	ret = SE_ERR;
 	if (Line1 <= 0)
 	{
 		Errcode = EORANGE;
@@ -1238,33 +1238,33 @@ int dotlit (char sub[], int allbut)
 		First_affected = Line1;
 
 	lastsub = strlen (sub) - 1;
-	if ((strlen (Tlpat)  - 1) > lastsub || allbut == YES)
-		collap = YES;
+	if ((strlen (Tlpat)  - 1) > lastsub || allbut == SE_YES)
+		collap = SE_YES;
 	else
-		collap = NO;
+		collap = SE_NO;
 
 	for (line = Line1; line <= Line2; line++)
 	{
 		if (intrpt ())	/* check for interrupts */
-			return (ERR);
+			return (SE_ERR);
 
 		inx = se_gettxt (line);	/* get text of line into txt, return index */
 		j = 0;
-		for (i = 0; Txt[i] != EOS && Txt[i] != '\n'; i++)
+		for (i = 0; Txt[i] != SE_EOS && Txt[i] != '\n'; i++)
 		{
 			x = xindex (Tlpat, Txt[i], allbut, lastsub);
-			if (collap == YES && x >= lastsub && lastsub >= 0)	/* collapse */
+			if (collap == SE_YES && x >= lastsub && lastsub >= 0)	/* collapse */
 			{
 				new[j] = sub[lastsub];
 				j++;
-				for (i++; Txt[i] != EOS && Txt[i] != '\n'; i++)
+				for (i++; Txt[i] != SE_EOS && Txt[i] != '\n'; i++)
 				{
 					x = xindex (Tlpat, Txt[i], allbut, lastsub);
 					if (x < lastsub)
 						break;
 				}
 			}
-			if (Txt[i] == EOS || Txt[i] == '\n')
+			if (Txt[i] == SE_EOS || Txt[i] == '\n')
 				break;
 			if (x >= 0 && lastsub >= 0)	/* transliterate */
 			{
@@ -1285,17 +1285,17 @@ int dotlit (char sub[], int allbut)
 			new[j] = '\n';
 			j++;
 		}
-		new[j] = EOS;		/* add the EOS */
+		new[j] = SE_EOS;		/* add the SE_EOS */
 
 		kname = inx -> Markname;	/* save the markname */
 		se_delete (line, line, &status);
 		ret = inject (new);
-		if (ret == ERR)
+		if (ret == SE_ERR)
 			break;
 		inx = getind (Curln);
 		inx -> Markname = kname;	/* set markname */
-		ret = OK;
-		Buffer_changed = YES;
+		ret = SE_OK;
+		Buffer_changed = SE_YES;
 	}
 
 	return (ret);
@@ -1307,26 +1307,26 @@ int doundo (int dflg, int *status)
 {
 	int oldcnt;
 
-	*status = ERR;
-	if (dflg == NO && Line1 <= 0)
+	*status = SE_ERR;
+	if (dflg == SE_NO && Line1 <= 0)
 		Errcode = EORANGE;
-	else if (Limbo == NOMORE)
-		Errcode = ENOLIMBO;
+	else if (Limbo == SE_NOMORE)
+		Errcode = ESE_NOLIMBO;
 	else if (Line1 > Line2)
 		Errcode = EBACKWARD;
 	else if (Line2 > Lastln)
 		Errcode = ELINE2;
 	else
 	{
-		*status = OK;
+		*status = SE_OK;
 		Curln = Line2;
 		blkmove (Limbo - Buf, MAXBUF - 1, Line2);
 		svins (Line2, Limcnt);
 		oldcnt = Limcnt;
 		Limcnt = 0;
-		Limbo = NOMORE;
+		Limbo = SE_NOMORE;
 		Lastln += oldcnt;
-		if (dflg == NO)
+		if (dflg == SE_NO)
 			se_delete (Line1, Line2, status);
 		Curln += oldcnt;
 		if (First_affected > Line1)
@@ -1345,7 +1345,7 @@ int dowrit (int from, int to, char *file, int aflag, int fflag, int tflag)
 	char tabs[MAXLINE];
 	LINEDESC *k;
 
-	ret = ERR;
+	ret = SE_ERR;
 	if (from <= 0)
 		Errcode = EORANGE;
 
@@ -1353,14 +1353,14 @@ int dowrit (int from, int to, char *file, int aflag, int fflag, int tflag)
 	{
 		file = expand_env (file);	/* expand $HOME, etc. */
 
-		if (aflag == YES)
+		if (aflag == SE_YES)
 		{
 			if (Crypting)
 				fd = crypt_open (file, "a");
 			else
 				fd = fopen (file, "a");
 		}
-		else if (strcmp (file, Savfil) == 0 || fflag == YES
+		else if (strcmp (file, Savfil) == 0 || fflag == SE_YES
 		    || Probation == WRITECOM || access (file, 0) == -1)
 		{
 			if (Crypting)
@@ -1378,15 +1378,15 @@ int dowrit (int from, int to, char *file, int aflag, int fflag, int tflag)
 			Errcode = ECANTWRITE;
 		else
 		{
-			ret = OK;
+			ret = SE_OK;
 			remark ("writing");
 			k = getind (from);
 			for (line = from; line <= to; line++)
 			{
 				if (intrpt ())
-					return (ERR);
+					return (SE_ERR);
 				gtxt (k);
-				if (Compress == NO && tflag == NO)
+				if (Compress == SE_NO && tflag == SE_NO)
 					fputs (Txt, fd);
 				else
 				{
@@ -1394,7 +1394,7 @@ int dowrit (int from, int to, char *file, int aflag, int fflag, int tflag)
 						;
 					for (j = 0; j < i / 8; j++)
 						tabs[j] = '\t';
-					tabs[j] = EOS;
+					tabs[j] = SE_EOS;
 					fputs (tabs, fd);
 					fputs (&Txt[j * 8], fd);
 				}
@@ -1407,7 +1407,7 @@ int dowrit (int from, int to, char *file, int aflag, int fflag, int tflag)
 			sync ();	/* just in case the system crashes */
 			saynum (line - from);
 			if (from == 1 && line - 1 == Lastln)
-				Buffer_changed = NO;
+				Buffer_changed = SE_NO;
 		}
 	}
 	return (ret);
@@ -1424,7 +1424,7 @@ char *expand_env (char *file)
 
 
 	i = j = k = 0;
-	while (file[i] != EOS)
+	while (file[i] != SE_EOS)
 	{
 		if (file[i] == ESCAPE)
 		{
@@ -1446,15 +1446,15 @@ char *expand_env (char *file)
 		{
 			i++;	/* skip $ */
 			k = 0;
-			while (file[i] != '/' && file[i] != EOS)
+			while (file[i] != '/' && file[i] != SE_EOS)
 			{
 				var[k++] = file[i++];	/* get var name */
 			}
-			var[k] = EOS;
+			var[k] = SE_EOS;
 
 			if ((val = getenv (var)) != NULL)
 			{
-				for (k = 0; val[k] != EOS; k++)
+				for (k = 0; val[k] != SE_EOS; k++)
 				{
 					buf[j++] = val[k];
 					/* copy val into file name */
@@ -1467,7 +1467,7 @@ char *expand_env (char *file)
 			}
 		}
 	}
-	buf[j] = EOS;
+	buf[j] = SE_EOS;
 
 	return (buf);
 }
@@ -1479,17 +1479,17 @@ FILE *crypt_open (char *file, char *mode)
 	char buf[MAXLINE];
 	FILE *fp;
 
-	memset (buf, EOS, MAXLINE);
+	memset (buf, SE_EOS, MAXLINE);
 
 	if (! Crypting)
 	{
 		return (NULL);
 	}
 
-	while (Key[0] == EOS)
+	while (Key[0] == SE_EOS)
 	{
 		getkey ();
-		if (Key[0] == EOS)
+		if (Key[0] == SE_EOS)
 		{
 			fprintf (stderr, "The key must be non-empty!\r\n");
 		}
@@ -1528,23 +1528,23 @@ void crypt_close (FILE *fp)
 
 void getkey (void)
 {
-	clrscreen ();		/* does NOT wipe out Screen_image */
+	clrscreen ();		/* does SE_NOT wipe out Screen_image */
 	tflush ();
 
 	ttynormal ();
 
 	do
 	{
-		memset (Key, EOS, KEYSIZE);
+		memset (Key, SE_EOS, KEYSIZE);
 		strncpy (Key, getpass ("Enter encryption key: "), KEYSIZE-1);
 		if (strcmp (Key, getpass ("Again: ")) != 0)
 		{
-			Key[0] = EOS;
+			Key[0] = SE_EOS;
 			fprintf (stderr, "didn't work. try again.\n");
 		}
 		/* else
 			all ok */
-	} while (Key[0] == EOS);
+	} while (Key[0] == SE_EOS);
 
 	ttyedit ();
 

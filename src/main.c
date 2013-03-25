@@ -64,27 +64,27 @@ int Lost_lines;		/* number of garbage lines in scratch file */
 
 
 /* Concerning miscellaneous variables */
-int Buffer_changed = NO;/* YES if buffer changed since last write */
-int Errcode = ENOERR;	/* cause of most recent error */
-int Saverrcode = ENOERR;/* cause of previous error */
-int Probation = NO;	/* YES if unsaved buffer can be destroyed */
+int Buffer_changed = SE_NO;/* SE_YES if buffer changed since last write */
+int Errcode = ESE_NOSE_ERR;	/* cause of most recent error */
+int Saverrcode = ESE_NOSE_ERR;/* cause of previous error */
+int Probation = SE_NO;	/* SE_YES if unsaved buffer can be destroyed */
 int Argno;		/* command line argument pointer */
 char Last_char_scanned = 0;	/* last char scanned w/ctl-[sl], init illegal  */
-char Peekc = EOS;	/* push a SKIP_RIGHT if adding delimiters */
-int Reading = NO;	/* are we doing terminal input? */
+char Peekc = SE_EOS;	/* push a SKIP_RIGHT if adding delimiters */
+int Reading = SE_NO;	/* are we doing terminal input? */
 
 
 /* Concerning options: */
 int Tabstops[MAXLINE];	/* array of tab stops */
 char Unprintable = ' ';	/* char to print for unprintable chars */
-int Absnos = NO;	/* use absolute numbers in margin */
-int Nchoise = EOS;	/* choice of line number for cont. display */
+int Absnos = SE_NO;	/* use absolute numbers in margin */
+int Nchoise = SE_EOS;	/* choice of line number for cont. display */
 int Overlay_col = 0;	/* initial cursor column for 'v' command */
 int Warncol;		/* where to turn on column warning, set in dosopt() */
 int Firstcol = 0;	/* leftmost column to display */
 int Indent = 1;		/* indent col; 0=same as previous line */
-int Notify = YES;	/* notify user if he has mail in mail file */
-int Globals = NO;	/* substitutes in a global don't fail */
+int Notify = SE_YES;	/* notify user if he has mail in mail file */
+int Globals = SE_NO;	/* substitutes in a global don't fail */
 int No_hardware;	/* never use hardware insert/delete */
 
 
@@ -118,7 +118,7 @@ int Hup_caught = 0;	/* caught a SIGHUP when phone line dropped */
 int Catching_stops;	/* catching or ignoring SIGTSTP's? */
 
 /* Concerning file encryption: */
-int Crypting = NO;	/* doing file encryption? */
+int Crypting = SE_NO;	/* doing file encryption? */
 char Key[KEYSIZE] = "";	/* saved encryption key */
 
 extern char *getenv ();
@@ -162,11 +162,11 @@ int main (int argc, char *argv[])
 	if (old_stop == SIG_IGN)	/* running bourne shell */
 	{
 		signal (SIGTSTP, SIG_IGN);	/* restore it */
-		Catching_stops = NO;
+		Catching_stops = SE_NO;
 	}
 	else
 	{
-		Catching_stops = YES;
+		Catching_stops = SE_YES;
 		/* running C-shell or BRL sh, catch Control-Z's */
 	}
 
@@ -212,7 +212,7 @@ void initialize (int argc, char *argv[])
 
 	Argno = 1;
 
-	if (set_term (getenv ("TERM")) == ERR)
+	if (set_term (getenv ("TERM")) == SE_ERR)
 		usage ();
 
 	/* Initialize the scratch file: */
@@ -226,8 +226,8 @@ void initialize (int argc, char *argv[])
 		Blanks[i] = ' ';
 	Blanks[i] = '\0';
 
-	if (dosopt ("") == ERR)
-		error (NO, "in initialize: can't happen");
+	if (dosopt ("") == SE_ERR)
+		error (SE_NO, "in initialize: can't happen");
 }
 
 /* intrpt --- see if there has been an interrupt or hangup */
@@ -316,8 +316,8 @@ void hangup (void)
 	signal (SIGINT, SIG_IGN);
 	signal (SIGQUIT, SIG_IGN);
 	Hup_caught = 0;
-	Crypting = NO;		/* force buffer to be clear text */
-	dowrit (1, Lastln, "se.hangup", NO, YES, NO);
+	Crypting = SE_NO;		/* force buffer to be clear text */
+	dowrit (1, Lastln, "se.hangup", SE_NO, SE_YES, SE_NO);
 	clrbuf ();
 	exit (1);
 }
@@ -332,7 +332,7 @@ void mswait (void)
 {
 	struct stat buf;
 	static char *mbox = NULL;
-	static int first = YES;
+	static int first = SE_YES;
 	static unsigned long mtime = 0L;
 
 	if (! Notify)
@@ -340,7 +340,7 @@ void mswait (void)
 
 	if (first) 
 	{
-		first = NO;
+		first = SE_NO;
 		if ((mbox = getenv ("MAIL")) != NULL && access (mbox, 4) == 0)
 		{
 			if (stat (mbox, &buf) >= 0)
@@ -367,7 +367,7 @@ void print_verbose_err_msg (void)
 	case EBACKWARD:
 		remark ("Line numbers in backward order");
 		break;
-	case ENOPAT:
+	case ESE_NOPAT:
 		remark ("No saved pattern -- sorry");
 		break;
 	case EBADPAT:
@@ -394,7 +394,7 @@ void print_verbose_err_msg (void)
 	case EINSIDEOUT:
 		remark ("Can't move a group into itself");
 		break;
-	case EKNOTFND:
+	case EKSE_NOTFND:
 		remark ("No line has that mark name");
 		break;
 	case ELINE1:
@@ -403,10 +403,10 @@ void print_verbose_err_msg (void)
 	case E2LONG:
 		remark ("Resultant line too long to handle");
 		break;
-	case ENOERR:
+	case ESE_NOSE_ERR:
 		remark ("No error to report");
 		break;
-	case ENOLIMBO:
+	case ESE_NOLIMBO:
 		remark ("No lines in limbo");
 		break;
 	case EODLSSGTR:
@@ -418,7 +418,7 @@ void print_verbose_err_msg (void)
 	case EOWHAT:
 		remark ("Can't recognize option");
 		break;
-	case EPNOTFND:
+	case EPSE_NOTFND:
 		remark ("No line contains that pattern");
 		break;
 	case ESTUPID:
@@ -439,22 +439,22 @@ void print_verbose_err_msg (void)
 	case ECANTINJECT:
 		remark ("No room for any more lines!");
 		break;
-	case ENOMATCH:
+	case ESE_NOMATCH:
 		remark ("No match for pattern");
 		break;
-	case ENOFN:
+	case ESE_NOFN:
 		remark ("No saved filename");
 		break;
 	case EBADLIST:
 		remark ("Bad syntax in character list");
 		break;
-	case ENOLIST:
+	case ESE_NOLIST:
 		remark ("No saved character list -- sorry");
 		break;
-	case ENONSENSE:
+	case ESE_NONSENSE:
 		remark ("Unreasonable value");
 		break;
-	case ENOHELP:
+	case ESE_NOHELP:
 		remark ("No help available");
 		break;
 	case EBADLNR:
@@ -466,29 +466,29 @@ void print_verbose_err_msg (void)
 	case EBADCOL:
 		remark ("Improper column number specification");
 		break;
-	case ENOLANG:
+	case ESE_NOLANG:
 		remark ("Unknown source language");
 		break;
 	case ETRUNC:
 		remark ("Lines were truncated");
 		break;
-	case ENOSHELL:
+	case ESE_NOSHELL:
 		remark ("Type control-q to rebuild screen");
 		break;
 	case ECANTFORK:
 		remark ("Can't fork --- get help!");
 		break;
-	case ENOSUB:
+	case ESE_NOSUB:
 		remark ("No saved replacement --- sorry");
 		break;
-	case ENOCMD:
+	case ESE_NOCMD:
 		remark ("No saved shell command --- sorry");
 		break;
 	default:
 		remark ("?");
 		break;
 	}
-	Errcode = ENOERR;
+	Errcode = ESE_NOSE_ERR;
 }
 
 /* usage --- print usage diagnostic and die */

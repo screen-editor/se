@@ -117,24 +117,24 @@ int setcaps (char *term)
 {
 	switch (tgetent (termbuf, term)) {
 	case -1:
-		error (NO, "se: couldn't open termcap file.");
+		error (SE_NO, "se: couldn't open termcap file.");
 
 	case 0:
-		error (NO, "se: no termcap entry for terminal.");
+		error (SE_NO, "se: no termcap entry for terminal.");
 
 	case 1:
 		addr_caps = caps;
 		getdescrip ();		/* get terminal description */
 		Nrows = tgetnum ("li");
 		Ncols = tgetnum ("co");
-		PC = pcstr ? pcstr[0] : EOS;
+		PC = pcstr ? pcstr[0] : SE_EOS;
 		break;
 
 	default:
-		error (YES, "in setcaps: can't happen.\n");
+		error (SE_YES, "in setcaps: can't happen.\n");
 	}
 
-	return (OK);
+	return (SE_OK);
 }
 
 
@@ -320,9 +320,9 @@ void setscreen ()
 			Screen_image[row][col] = ' ';
 
 	for (col = 0; col < Ncols; col++)	/* and clear out status line */
-		Msgalloc[col] = NOMSG;
+		Msgalloc[col] = SE_NOMSG;
 
-	Insert_mode = NO;
+	Insert_mode = SE_NO;
 }
 
 
@@ -374,8 +374,8 @@ void dellines (int row, int n)
 
 int hwinsdel (void)
 {
-	if (No_hardware == YES)
-		return (NO);
+	if (No_hardware == SE_YES)
+		return (SE_NO);
 
 	return (AL != NULL && DL != NULL);
 }
@@ -386,18 +386,18 @@ int hwinsdel (void)
 void clear_to_eol (int row, int col)
 {
 	int c, flag;
-	int hardware = NO;
+	int hardware = SE_NO;
 
 	hardware = (CE != NULL);
 
-	flag = NO;
+	flag = SE_NO;
 
 	for (c = col; c < Ncols; c++)
 		if (Screen_image[row][c] != ' ')
 		{
 			Screen_image[row][c] = ' ';
 			if (hardware)
-				flag = YES;
+				flag = SE_YES;
 			else
 			{
 				position_cursor (row, c);
@@ -405,11 +405,11 @@ void clear_to_eol (int row, int col)
 			}
 		}
 
-	if (flag == YES)
+	if (flag == SE_YES)
 	{
 		position_cursor (row, col);
 		tputs (CE, 1, outc);
-	} /* end if (flag == YES) */
+	} /* end if (flag == SE_YES) */
 }
 
 /* set_term -- initialize terminal parameters and actual capabilities */
@@ -418,24 +418,24 @@ int set_term (char *type)
 {
 	if (type == NULL)
 	{
-		error (NO, "se: terminal type not available");
+		error (SE_NO, "se: terminal type not available");
 	}
 
-	if (type[0] == EOS)
+	if (type[0] == SE_EOS)
 	{
-		error (NO, "in set_term: can't happen.");
+		error (SE_NO, "in set_term: can't happen.");
 	}
 
 	Ncols = Nrows = -1;
 
-	if (setcaps (type) == ERR)
+	if (setcaps (type) == SE_ERR)
 	{
-		error (NO, "se: could not find terminal in system database");
+		error (SE_NO, "se: could not find terminal in system database");
 	}
 
 	if (tgoto (CM, 0, 0) == NULL)	/* OOPS returned.. */
 	{
-		error (NO, "se: terminal does not have cursor motion.");
+		error (SE_NO, "se: terminal does not have cursor motion.");
 	}
 
 	/*
@@ -445,12 +445,12 @@ int set_term (char *type)
 	winsize (WINSIG);
 
 	if (Nrows == -1)
-		error (NO, "se: could not determine number of rows");
+		error (SE_NO, "se: could not determine number of rows");
 
 	if (Ncols == -1)
-		error (NO, "se: could not determine number of columns");
+		error (SE_NO, "se: could not determine number of columns");
 
-	return OK;
+	return SE_OK;
 }
 
 /* brighton --- turn on reverse video/standout mode */

@@ -36,7 +36,7 @@
 #define TAB             '\t'
 #define ANY		'.'
 #define BOL		'^'
-#define NOTINCCL	'^'
+#define SE_NOTINCCL	'^'
 #define START_TAG	'('
 #define STOP_TAG	')'
 #define ESCAPE		'\\'
@@ -54,15 +54,15 @@ int match (char lin[], char pat[])
 	int junk[9];
 	char *pc;
 
-	for (pc = lin; *pc != EOS; pc++)
+	for (pc = lin; *pc != SE_EOS; pc++)
 	{
 		if (amatch (lin, pc - lin, pat, junk, junk) >= 0)
 		{
-			return (YES);
+			return (SE_YES);
 		}
 	}
 
-	return (NO);
+	return (SE_NO);
 }
 
 
@@ -75,15 +75,15 @@ int amatch(char lin[], int from, char pat[], int tagbeg[], int tagend[])
 	int k = 0;
 
 	lastc = lin + from;     /* next unexamined input character */
-	for (ppat = pat; *ppat != EOS; ppat += patsiz (ppat))
+	for (ppat = pat; *ppat != SE_EOS; ppat += patsiz (ppat))
 	{
 		if (*ppat == CLOSURE)   /* a closure entry */
 		{
 			ppat++;
-			for (ch = lastc; *ch != EOS; )
+			for (ch = lastc; *ch != SE_EOS; )
 			{
 				/* match as many as possible */
-				if (omatch (lin, &ch, ppat) == NO)
+				if (omatch (lin, &ch, ppat) == SE_NO)
 				{
 					break;
 				}
@@ -112,7 +112,7 @@ int amatch(char lin[], int from, char pat[], int tagbeg[], int tagend[])
 		else if (*ppat == STOP_TAG)
 			tagend[(int) *(ppat + 1)] = lastc - lin;
 			/* non-closure */
-		else if (omatch (lin, &lastc, ppat) == NO)
+		else if (omatch (lin, &lastc, ppat) == SE_NO)
 			return (-1);
 		/* else
 			omatch succeeded */
@@ -129,8 +129,8 @@ int omatch (char lin[], char **adplin, char *ppat)
 	int bump, retval;
 
 	plin = *adplin;
-	retval = NO;
-	if (*plin == EOS)
+	retval = SE_NO;
+	if (*plin == SE_EOS)
 		return (retval);
 	bump = -1;
 	switch (*ppat) {
@@ -155,23 +155,23 @@ int omatch (char lin[], char **adplin, char *ppat)
 		break;
 
 	case CCL:
-		if (locate (*plin, ppat + 1) == YES)
+		if (locate (*plin, ppat + 1) == SE_YES)
 			bump = 1;
 		break;
 
 	case NCCL:
-		if (*plin != NEWLINE && locate (*plin, ppat + 1) == NO)
+		if (*plin != NEWLINE && locate (*plin, ppat + 1) == SE_NO)
 			bump = 1;
 		break;
 
 	default:
-		error (NO, "in omatch: can't happen.");
+		error (SE_NO, "in omatch: can't happen.");
 	}
 
 	if (bump >= 0)
 	{
 		*adplin += bump;
-		retval = YES;
+		retval = SE_YES;
 	}
 	return (retval);
 }
@@ -188,11 +188,11 @@ int locate (char c, char *ppat)
 	{
 		if (c == *pclas)
 		{
-			return (YES);
+			return (SE_YES);
 		}
 	}
 
-	return (NO);
+	return (SE_NO);
 }
 
 
@@ -220,8 +220,8 @@ int patsiz (char *ppat)
 		return (CLOSIZE);
 
 	default:
-		error (NO, "in patsiz: can't happen.");
-		return ERR; /* error() doesn't return -- will never get here */
+		error (SE_NO, "in patsiz: can't happen.");
+		return SE_ERR; /* error() doesn't return -- will never get here */
 	}
 }
 
@@ -236,7 +236,7 @@ int makpat (char arg[], int from, char delim, char pat[])
 	lastsub = patsub = 0;
 	tag_num = -1;
 	tag_nest = -1;
-	for (argsub = from; arg[argsub] != delim && arg[argsub] != EOS;
+	for (argsub = from; arg[argsub] != delim && arg[argsub] != SE_EOS;
 	    argsub++)
 	{
 		ls = patsub;
@@ -248,8 +248,8 @@ int makpat (char arg[], int from, char delim, char pat[])
 			addset (EOL, pat, &patsub, MAXPAT);
 		else if (arg[argsub] == CCL)
 		{
-			if (getccl (arg, &argsub, pat, &patsub) == ERR)
-				return (ERR);
+			if (getccl (arg, &argsub, pat, &patsub) == SE_ERR)
+				return (SE_ERR);
 		}
 		else if (arg[argsub] == CLOSURE && argsub > from)
 		{
@@ -283,18 +283,18 @@ int makpat (char arg[], int from, char delim, char pat[])
 
 			/* don't allow match of newline other than via $ */
 			if ((ch = esc(arg, &argsub)) == NEWLINE)
-				return (ERR);
+				return (SE_ERR);
 			addset (ch, pat, &patsub, MAXPAT);
 		}
 		lastsub = ls;
 	}
 
 	if (arg[argsub] != delim)               /* terminated early */
-		return (ERR);
-	else if (addset (EOS, pat, &patsub, MAXPAT) == NO)      /* no room */
-		return (ERR);
+		return (SE_ERR);
+	else if (addset (SE_EOS, pat, &patsub, MAXPAT) == SE_NO)      /* no room */
+		return (SE_ERR);
 	else if (tag_nest != -1)
-		return (ERR);
+		return (SE_ERR);
 	else
 		return (argsub);
 }
@@ -307,7 +307,7 @@ int getccl (char arg[], int *pasub, char pat[], int *pindex)
 	int start;
 
 	(*pasub)++;             /* skip over [ */
-	if (arg[*pasub] == NOTINCCL)
+	if (arg[*pasub] == SE_NOTINCCL)
 	{
 		addset (NCCL, pat, pindex, MAXPAT);
 		(*pasub)++;
@@ -323,9 +323,9 @@ int getccl (char arg[], int *pasub, char pat[], int *pindex)
 	pat[start] = *pindex - start - 1;
 
 	if (arg[*pasub] == CCLEND)
-		return (OK);
+		return (SE_OK);
 	else
-		return (ERR);
+		return (SE_ERR);
 }
 
 
@@ -353,7 +353,7 @@ int maksub (char arg[], int from, char delim, char sub[])
 	int argsub, index;
 
 	index = 0;
-	for (argsub = from; arg[argsub] != delim && arg[argsub] != EOS;
+	for (argsub = from; arg[argsub] != delim && arg[argsub] != SE_EOS;
 	    argsub++)
 	{
 		if (arg[argsub] == AND)
@@ -375,11 +375,11 @@ int maksub (char arg[], int from, char delim, char sub[])
 
 	if (arg[argsub] != delim)               /* missing delimeter */
 	{
-		return (ERR);
+		return (SE_ERR);
 	}
-	else if (addset (EOS, sub, &index, MAXPAT) == NO)       /* no room */
+	else if (addset (SE_EOS, sub, &index, MAXPAT) == SE_NO)       /* no room */
 	{
-		return (ERR);
+		return (SE_ERR);
 	}
 	else
 	{
@@ -395,7 +395,7 @@ void catsub (char lin[], int from[], int to[], char sub[], char _new[], int *k, 
 	int ri;
 	int i, j;
 
-	for (i = 0; sub[i] != EOS; i++)
+	for (i = 0; sub[i] != SE_EOS; i++)
 	{
 		if ((sub[i] & 0xff) == DITTO)
 		{
@@ -419,15 +419,15 @@ void filset (char delim, char array[], int *pasub, char set[], int *pindex, int 
 {
 	static char digits[] = "0123456789";
 	static char lowalf[] = "abcdefghijklmnopqrstuvwxyz";
-	static char upalf[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	static char upalf[] = "ABCDEFGHIJKLMSE_NOPQRSTUVWXYZ";
 
-	for ( ; array[*pasub] != delim && array[*pasub] != EOS; (*pasub)++)
+	for ( ; array[*pasub] != delim && array[*pasub] != SE_EOS; (*pasub)++)
 		if (array[*pasub] == ESCAPE)
 			addset (esc (array, pasub), set, pindex, maxset);
 		else if (array[*pasub] != DASH)
 			addset (array[*pasub], set, pindex, maxset);
 			/* literal DASH */
-		else if (*pindex <= 0 || array[*pasub + 1] == EOS ||
+		else if (*pindex <= 0 || array[*pasub + 1] == SE_EOS ||
 		    array[*pasub + 1] == delim)
 			addset (DASH, set, pindex, maxset);
 		/* else if (se_index (digits, set[*pindex - 1]) >= 0) */
@@ -467,11 +467,11 @@ int addset (char c, char set[], int *pindex, int maxsiz)
 {
 
 	if (*pindex >= maxsiz)
-		return (NO);
+		return (SE_NO);
 	else
 	{
 		set[(*pindex)++] = c;
-		return (YES);
+		return (SE_YES);
 	}
 }
 
@@ -483,7 +483,7 @@ char esc (char array[], int *pindex)
 
 	if (array[*pindex] != ESCAPE)
 		return (array[*pindex]);
-	else if (array[*pindex + 1] == EOS)     /* ESCAPE not special at end */
+	else if (array[*pindex + 1] == SE_EOS)     /* ESCAPE not special at end */
 		return (ESCAPE);
 	else
 	{
@@ -503,10 +503,10 @@ int start_tag(char *arg, int *argsub)
 	if (arg[*argsub] == ESCAPE && arg[*argsub + 1] == START_TAG)
 	{
 		(*argsub)++;
-		return (YES);
+		return (SE_YES);
 	}
 	else
-		return (NO);
+		return (SE_NO);
 }
 
 /* stop_tag --- determine if we've seen the end of a tagged pattern */
@@ -516,8 +516,8 @@ int stop_tag(char *arg, int *argsub)
 	if (arg[*argsub] == ESCAPE && arg[*argsub + 1] == STOP_TAG)
 	{
 		(*argsub)++;
-		return (YES);
+		return (SE_YES);
 	}
 	else
-		return (NO);
+		return (SE_NO);
 }

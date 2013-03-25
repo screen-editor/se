@@ -35,19 +35,19 @@
 #endif
 
 extern short ospeed;		/* from the termlib library */
-static int set_ospeed = NO;
+static int set_ospeed = SE_NO;
 
 static TTYINFO OldTtyInfo;	/* initial state of terminal */
 static TTYINFO NewTtyInfo;	/* modified state for editing */
 
-static int first = YES;		/* first time anything called */
+static int first = SE_YES;		/* first time anything called */
 
 
 void init(void)
 {
 	if (gttyinfo(1, &OldTtyInfo) == -1)	/* get current state */
 	{
-		error (NO, "couldn't get TTY info from system. get help!\n");
+		error (SE_NO, "couldn't get TTY info from system. get help!\n");
 	}
 
 	NewTtyInfo = OldTtyInfo;	/* copy it */
@@ -58,9 +58,9 @@ void init(void)
 
 void ttyedit(void)	/* set the terminal to correct modes for editing */
 {
-	if (first == YES)
+	if (first == SE_YES)
 	{
-		first = NO;
+		first = SE_NO;
 		init();
 	}
 
@@ -72,7 +72,7 @@ void ttynormal(void)	/* set the terminal to correct modes for normal use */
 {
 	if (first)
 	{
-		first = NO;
+		first = SE_NO;
 		init();
 	}
 
@@ -111,7 +111,7 @@ int getspeed(int fd)
 
 	if (first)		/* might as well set it here, too */
 	{
-		first = NO;
+		first = SE_NO;
 		init();
 	}
 
@@ -146,9 +146,9 @@ int gttyinfo(int fd, TTYINFO *buf)
 		return -1;
 	}
 #endif
-	if (set_ospeed == NO)
+	if (set_ospeed == SE_NO)
 	{
-		set_ospeed = YES;
+		set_ospeed = SE_YES;
 		ospeed = buf->c_cflag & 017;
 	}
 

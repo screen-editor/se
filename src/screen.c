@@ -46,27 +46,27 @@ int display_message (FILE *fp)
 		Toprow = 0;
 	}
 
-	eof = NO;
+	eof = SE_NO;
 	for (row = Toprow; row <= Botrow; row++)
 	{
 		if (fgets (lin, Ncols, fp) == NULL)
 		{
-			eof = YES;
+			eof = SE_YES;
 			break;
 		}
 		Toprow++;
 		Topln++;
-		lin[strlen (lin)] = EOS;		/* remove '\n' */
+		lin[strlen (lin)] = SE_EOS;		/* remove '\n' */
 		loadstr (lin, row, 0, Ncols);
 	}
 
-	if (eof == NO)
+	if (eof == SE_NO)
 	{
 		k = (Ncols - strlen (more)) / 2;
 		for (col = 0; col < k; col++)
 			load ('*', row, col);
 
-		for (k = 0; more[k] != EOS; k++, col++)
+		for (k = 0; more[k] != SE_EOS; k++, col++)
 			load (more[k], row, col);
 
 		for (; col < Ncols; col++)
@@ -92,10 +92,10 @@ int display_message (FILE *fp)
 
 	mesg ("Enter o- to restore display", HELP_MSG);
 
-	if (eof == YES)
+	if (eof == SE_YES)
 		return (EOF);
 
-	return (OK);
+	return (SE_OK);
 }
 
 static char smargin[] = "MARGIN";
@@ -140,21 +140,21 @@ void getcmd (char *lin, int col1, int *curpos, char *termchar)
 	if (cursor + 1 < Warncol)	/* erase the column display */
 		mesg ("", COL_MSG);
 
-	*termchar = EOS;	/* not yet terminated */
-	status = OK;
-	prev_status = ERR;
+	*termchar = SE_EOS;	/* not yet terminated */
+	status = SE_OK;
+	prev_status = SE_ERR;
 	first = col1;
 
-	while (*termchar == EOS)
+	while (*termchar == SE_EOS)
 	{
-		lin[nlpos] = EOS;	/* make sure the line has an EOS */
-		if (status == ERR)	/* last iteration generated an error */
+		lin[nlpos] = SE_EOS;	/* make sure the line has an SE_EOS */
+		if (status == SE_ERR)	/* last iteration generated an error */
 			twrite (1, "\007", 1);	/* Bell */
-		else if (prev_status == ERR)	/* last one OK but one before had error */
+		else if (prev_status == SE_ERR)	/* last one SE_OK but one before had error */
 			mesg ("", CHAR_MSG);
 
 		prev_status = status;
-		status = OK;
+		status = SE_OK;
 
 		if (first > cursor)     /* do horiz. scroll if needed */
 			first = cursor;
@@ -204,16 +204,16 @@ void getcmd (char *lin, int col1, int *curpos, char *termchar)
 				if ((c = cread()) == '\r')
 					c = '\n';
 			}
-			else if (Invert_case == YES && isalpha (c))
+			else if (Invert_case == SE_YES && isalpha (c))
 				c ^= 040;       /* toggle case (ASCII only) */
-			if (Insert_mode == YES)
+			if (Insert_mode == SE_YES)
 				insert (1, &nlpos, &status, cursor, lin);
 			else if (cursor >= MAXLINE - 2)
 			{
-				status = ERR;
+				status = SE_ERR;
 				mesg (smargin, CHAR_MSG);
 			}
-			if (status != ERR)
+			if (status != SE_ERR)
 			{
 				lin[cursor++] = c;
 				if (nlpos < cursor)
@@ -230,7 +230,7 @@ void getcmd (char *lin, int col1, int *curpos, char *termchar)
 
 		case TAB_LEFT:
 			tab_pos = scan_tab (TAB_LEFT, cursor, &status);
-			if (status != ERR)
+			if (status != SE_ERR)
 				cursor = tab_pos;
 			break;
 
@@ -239,21 +239,21 @@ void getcmd (char *lin, int col1, int *curpos, char *termchar)
 			break;
 
 		case SCAN_LEFT:
-			scan_pos = scan_char (c, YES, cursor, nlpos,
+			scan_pos = scan_char (c, SE_YES, cursor, nlpos,
 			    lin, &status);
-			if (status != ERR)
+			if (status != SE_ERR)
 				cursor = scan_pos;
 			break;
 
 		case G_LEFT:
 			set_cursor (cursor - 1, &status, &cursor, &nlpos, lin);
-			if (status != ERR)
+			if (status != SE_ERR)
 				gobble (1, cursor, &status, &nlpos, lin);
 			break;
 
 		case G_TAB_LEFT:
 			tab_pos = scan_tab (TAB_LEFT, cursor, &status);
-			if (status != ERR)
+			if (status != SE_ERR)
 			{
 				cursor = tab_pos;
 				gobble (prev_cursor - tab_pos, cursor,
@@ -267,9 +267,9 @@ void getcmd (char *lin, int col1, int *curpos, char *termchar)
 			break;
 
 		case G_SCAN_LEFT:
-			scan_pos = scan_char (c, NO, cursor, nlpos,
+			scan_pos = scan_char (c, SE_NO, cursor, nlpos,
 			    lin, &status);
-			if (status != ERR)
+			if (status != SE_ERR)
 			{
 				cursor = scan_pos;
 				gobble (prev_cursor - scan_pos, cursor,
@@ -284,7 +284,7 @@ void getcmd (char *lin, int col1, int *curpos, char *termchar)
 
 		case TAB_RIGHT:
 			tab_pos = scan_tab (TAB_RIGHT, cursor, &status);
-			if (status != ERR)
+			if (status != SE_ERR)
 				set_cursor (tab_pos, &status, &cursor,
 				    &nlpos, lin);
 			break;
@@ -295,9 +295,9 @@ void getcmd (char *lin, int col1, int *curpos, char *termchar)
 			break;
 
 		case SCAN_RIGHT:
-			scan_pos = scan_char (c, YES, cursor, nlpos,
+			scan_pos = scan_char (c, SE_YES, cursor, nlpos,
 			    lin, &status);
-			if (status != ERR)
+			if (status != SE_ERR)
 				cursor = scan_pos;
 			break;
 
@@ -308,7 +308,7 @@ void getcmd (char *lin, int col1, int *curpos, char *termchar)
 		case G_TAB_RIGHT:
 			tab_pos = scan_tab (TAB_RIGHT, cursor,
 			    &status);
-			if (status != ERR)
+			if (status != SE_ERR)
 				gobble (tab_pos - cursor, cursor, &status,
 				    &nlpos, lin);
 			break;
@@ -318,9 +318,9 @@ void getcmd (char *lin, int col1, int *curpos, char *termchar)
 			break;
 
 		case G_SCAN_RIGHT:
-			scan_pos = scan_char (c, NO, cursor, nlpos,
+			scan_pos = scan_char (c, SE_NO, cursor, nlpos,
 			    lin, &status);
-			if (status != ERR)
+			if (status != SE_ERR)
 				gobble (scan_pos - cursor, cursor, &status,
 				    &nlpos, lin);
 			break;
@@ -345,13 +345,13 @@ void getcmd (char *lin, int col1, int *curpos, char *termchar)
 	/* Insertion functions: */
 		case INSERT_BLANK:
 			insert (1, &nlpos, &status, cursor, lin);
-			if (status != ERR)
+			if (status != SE_ERR)
 				lin[cursor] = ' ';
 			break;
 
 		case INSERT_NEWLINE:
 			insert (1, &nlpos, &status, cursor, lin);
-			if (status != ERR)
+			if (status != SE_ERR)
 			{
 				lin[cursor] = '\n';
 				*termchar = CURSOR_UP;
@@ -362,10 +362,10 @@ void getcmd (char *lin, int col1, int *curpos, char *termchar)
 			while (lin[cursor] == ' ' || lin[cursor] == '\t')
 				cursor++;
 			tab_pos = scan_tab (TAB_RIGHT, cursor, &status);
-			if (status != ERR)
+			if (status != SE_ERR)
 				insert (tab_pos - cursor, &nlpos, &status,
 				    cursor, lin);
-			if (status != ERR)
+			if (status != SE_ERR)
 				for (; cursor < tab_pos; cursor++)
 					lin[cursor] = ' ';
 			cursor = prev_cursor;
@@ -373,16 +373,16 @@ void getcmd (char *lin, int col1, int *curpos, char *termchar)
 
 	/* Miscellanious control functions: */
 		case TOGGLE_INSERT_MODE:
-			Insert_mode = YES + NO - Insert_mode;
-			if (Insert_mode == NO)
+			Insert_mode = SE_YES + SE_NO - Insert_mode;
+			if (Insert_mode == SE_NO)
 				mesg ("", INS_MSG);
 			else
 				mesg ("INSERT", INS_MSG);
 			break;
 
 		case SHIFT_CASE:
-			Invert_case = YES + NO - Invert_case;
-			if (Invert_case == NO)
+			Invert_case = SE_YES + SE_NO - Invert_case;
+			if (Invert_case == SE_NO)
 				mesg ("", CASE_MSG);
 			else
 				mesg ("CASE", CASE_MSG);
@@ -397,14 +397,14 @@ void getcmd (char *lin, int col1, int *curpos, char *termchar)
 			break;
 
 		default:
-			status = ERR;
+			status = SE_ERR;
 			mesg ("WHA?", CHAR_MSG);
 			break;
 		} /* end switch */
-	} /* while (termchar == EOS) */
+	} /* while (termchar == SE_EOS) */
 
 	lin[nlpos] = '\n';
-	lin[nlpos + 1] = EOS;
+	lin[nlpos + 1] = SE_EOS;
 
 	load ('|', Cmdrow, BARCOL);
 	if (nlpos <= col1)
@@ -433,11 +433,11 @@ int cread (void)
 	if (Peekc)
 	{
 		c = Peekc;
-		Peekc = EOS;
+		Peekc = SE_EOS;
 	}
 	else
 	{
-		Reading = YES;
+		Reading = SE_YES;
 		if (read (0, &c, 1) == -1)
 		{
 			if (Hup_caught)
@@ -447,11 +447,11 @@ int cread (void)
 			else	/* must be a SIGINT at present */
 			{
 				Int_caught = 0;
-				Errcode = ENOERR;
+				Errcode = ESE_NOSE_ERR;
 				c = '\177';
 			}
 		}
-		Reading = NO;
+		Reading = SE_NO;
 	}
 
 	return c;
@@ -467,7 +467,7 @@ int scan_char (char chr, int wrap, int cursor, int nlpos, char *lin, int *status
 	int inc, scan_pos;
 
 	c = cread ();
-	if (Invert_case == YES && isalpha (c))
+	if (Invert_case == SE_YES && isalpha (c))
 		c ^= 040;       /* toggle case */
 	if (c == chr)
 		c = Last_char_scanned;
@@ -478,17 +478,17 @@ int scan_char (char chr, int wrap, int cursor, int nlpos, char *lin, int *status
 	else
 		inc = 1;
 
-	/* NOTE:  modify this code AT YOUR OWN RISK! */
+	/* SE_NOTE:  modify this code AT YOUR OWN RISK! */
 	scan_pos = cursor;
 	do
 	{
 		if (scan_pos < 0)
-			if (wrap == NO)
+			if (wrap == SE_NO)
 				break;
 			else
 				scan_pos = nlpos;
 		else if (scan_pos > nlpos)
-			if (wrap == NO)
+			if (wrap == SE_NO)
 				break;
 			else
 				scan_pos = 0;
@@ -500,8 +500,8 @@ int scan_char (char chr, int wrap, int cursor, int nlpos, char *lin, int *status
 
 	if (scan_pos < 0 || scan_pos >= nlpos || lin[scan_pos] != c)
 	{
-		*status = ERR;
-		mesg ("NOCHAR", CHAR_MSG);
+		*status = SE_ERR;
+		mesg ("SE_NOCHAR", CHAR_MSG);
 	}
 
 	return (scan_pos);
@@ -526,7 +526,7 @@ int scan_tab (char chr, int cursor, int *status)
 
 	for (; -1 < tab_pos && tab_pos < MAXLINE; tab_pos += inc)
 	{
-		if (Tabstops[tab_pos] == YES)
+		if (Tabstops[tab_pos] == SE_YES)
 		{
 			break;
 		}
@@ -534,7 +534,7 @@ int scan_tab (char chr, int cursor, int *status)
 
 	if (tab_pos < 0 || tab_pos >= MAXLINE - 1)
 	{
-		*status = ERR;
+		*status = SE_ERR;
 		mesg (smargin, CHAR_MSG);
 	}
 
@@ -549,7 +549,7 @@ void gobble (int len, int cursor, int *status, int *nlpos, char *lin)
 {
 	if (cursor + len > *nlpos)
 	{
-		*status = ERR;
+		*status = SE_ERR;
 		mesg (smargin, CHAR_MSG);
 	}
 	else if (len > 0)
@@ -569,7 +569,7 @@ void insert (int len, int *nlpos, int *status, int cursor, char *lin)
 
 	if (*nlpos + len >= MAXLINE - 1)
 	{
-		*status = ERR;
+		*status = SE_ERR;
 		mesg (smargin, CHAR_MSG);
 	}
 	else
@@ -588,7 +588,7 @@ void set_cursor (int pos, int *status, int *cursor, int *nlpos, char *lin)
 {
 	if (pos < 0 || pos >= MAXLINE - 1)
 	{
-		*status = ERR;
+		*status = SE_ERR;
 		mesg (smargin, CHAR_MSG);
 	}
 	else
@@ -608,7 +608,7 @@ void litnnum (char *lit, int num, int type)
 {
 	char msg[MAXLINE];
 
-	memset(msg, EOS, MAXLINE);
+	memset(msg, SE_EOS, MAXLINE);
 	snprintf (msg, MAXLINE-1, "%s%d", lit, num);
 	mesg (msg, type);
 }
@@ -643,7 +643,7 @@ void loadstr (char *str, int row, int stcol, int endcol)
 	if (row >= 0 && row < Nrows && stcol >= 0)
 	{
 		c = stcol;
-		for (p = 0; str[p] != EOS; p++)
+		for (p = 0; str[p] != SE_EOS; p++)
 		{
 			if (c >= Ncols)
 			{
@@ -707,10 +707,10 @@ void mesg (char *s, int t)
 		{
 			break;
 		}
-		Msgalloc[last] = NOMSG;
+		Msgalloc[last] = SE_NOMSG;
 	}
 
-	for (; first > 0 && Msgalloc[first - 1] == NOMSG; first--)
+	for (; first > 0 && Msgalloc[first - 1] == SE_NOMSG; first--)
 	{
 		;
 	}
@@ -725,9 +725,9 @@ void mesg (char *s, int t)
 			for (col = 0; col < Ncols - 1; col = c)
 			{
 				while (col < Ncols - 1
-				    && Msgalloc[col] != NOMSG)
+				    && Msgalloc[col] != SE_NOMSG)
 					col++;
-				for (c = col; Msgalloc[c] == NOMSG; c++)
+				for (c = col; Msgalloc[c] == SE_NOMSG; c++)
 					if (c >= Ncols - 1)
 						break;
 				if (c - col >= need)
@@ -738,7 +738,7 @@ void mesg (char *s, int t)
 		{
 			col = 0;
 			for (c = 0; c < Ncols; c++)
-				if (Msgalloc[c] != NOMSG)
+				if (Msgalloc[c] != SE_NOMSG)
 				{
 					load (Screen_image[Nrows - 1][c],
 					    Nrows - 1, col);
@@ -746,7 +746,7 @@ void mesg (char *s, int t)
 					col++;
 				}
 			for (c = col; c < Ncols; c++)
-				Msgalloc[c] = NOMSG;
+				Msgalloc[c] = SE_NOMSG;
 		}
 
 		load (' ', Nrows - 1, col);
@@ -764,7 +764,7 @@ void mesg (char *s, int t)
 	}
 
 	for (col = 0; col < Ncols; col++)
-		if (Msgalloc[col] == NOMSG)
+		if (Msgalloc[col] == SE_NOMSG)
 			load ('.', Nrows - 1, col);
 	tflush ();
 }
@@ -807,7 +807,7 @@ void saynum (int n)
 {
 	char s[MAXLINE];
 
-	memset(s, EOS, MAXLINE);
+	memset(s, SE_EOS, MAXLINE);
 	snprintf (s, MAXLINE-1, "%d", n);
 	remark (s);
 }
@@ -821,8 +821,8 @@ void updscreen (void)
 	int i;
 	LINEDESC *k;
 
-	memset(abs_lineno, EOS, 10);
-	memset(rel_lineno, EOS, 10);
+	memset(abs_lineno, SE_EOS, 10);
+	memset(rel_lineno, SE_EOS, 10);
 
 	fixscreen ();
 
@@ -845,10 +845,10 @@ void updscreen (void)
 				loadstr ("1", row, 0, NAMECOL - 1);
 			else if (line == Lastln)
 				loadstr ("$", row, 0, NAMECOL - 1);
-			else if (Absnos == NO && row <= 25)
+			else if (Absnos == SE_NO && row <= 25)
 			{
 				rel_lineno[0] = Rel_a + row;
-				rel_lineno[1] = EOS;
+				rel_lineno[1] = SE_EOS;
 				loadstr (rel_lineno, row, 0, NAMECOL - 1);
 			}
 			else
@@ -910,7 +910,7 @@ void watch (void)
 	struct tm *now;
 	char face[10];
 
-	memset(face, EOS, 10);
+	memset(face, SE_EOS, 10);
 
 	time (&clock);
 	now = localtime (&clock);

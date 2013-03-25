@@ -19,7 +19,7 @@
 
 typedef	struct ldesc {		/* line	descriptor */
 	unsigned Seekaddr;	/* scratch file seek address / 8 */
-	unsigned Lineleng : 16;	/* line length	including NL  EOS */
+	unsigned Lineleng : 16;	/* line length	including NL  SE_EOS */
 	unsigned Globmark : 1;	/* mark for global commands */
 	unsigned Markname : 7;	/* mark name associated with line */
 } LINEDESC;
@@ -35,12 +35,12 @@ typedef	struct ldesc {		/* line	descriptor */
 /* Arbitrary definitions */
 #define BACKWARD	-1
 #define FORWARD		0
-#define NOSTATUS	1
-#define NOMORE		0
+#define SE_NOSTATUS	1
+#define SE_NOMORE		0
 #define NEWLINE		'\n'
 #define TAB		'\t'
-#define RETERR	1
-#define RETOK	0
+#define RETSE_ERR	1
+#define RETSE_OK	0
 
 /* Array dimensions and	other limit values */
 #define MAXBUF		8192
@@ -57,7 +57,7 @@ typedef	struct ldesc {		/* line	descriptor */
 #define KEYSIZE		11
 
 /* Message classes for status line at bottom of	screen */
-#define NOMSG		0
+#define SE_NOMSG		0
 #define REMARK_MSG	1
 #define CHAR_MSG	2
 #define CASE_MSG	3
@@ -108,7 +108,7 @@ typedef	struct ldesc {		/* line	descriptor */
 #define UCMOVECOM	'M'
 #define NAMECOM		'n'
 #define UCNAMECOM	'N'
-#define NOTINCCL	'^'
+#define SE_NOTINCCL	'^'
 #define OPTCOM		'o'
 #define UCOPTCOM	'O'
 #define PAGECOM		':'
@@ -143,7 +143,7 @@ typedef	struct ldesc {		/* line	descriptor */
 
 /* Error message numbers.  Arbitrary so	long as	they are different. */
 #define EBACKWARD	1
-#define ENOPAT		2
+#define ESE_NOPAT		2
 #define EBADPAT		3
 #define EBADSTR		4
 #define EBADSUB		5
@@ -152,37 +152,37 @@ typedef	struct ldesc {		/* line	descriptor */
 #define EFILEN		8
 #define EBADTABS	9
 #define EINSIDEOUT	10
-#define EKNOTFND	11
+#define EKSE_NOTFND	11
 #define ELINE1		12
 #define E2LONG		13
-#define ENOERR		14
-#define ENOLIMBO	15
+#define ESE_NOSE_ERR		14
+#define ESE_NOLIMBO	15
 #define EODLSSGTR	16
 #define EORANGE		17
 #define EOWHAT		18
-#define EPNOTFND	19
+#define EPSE_NOTFND	19
 #define ESTUPID		20
 #define EWHATZAT	21
 #define EBREAK		22
 #define ELINE2		23
 #define ECANTWRITE	24
 #define ECANTINJECT	25
-#define ENOMATCH	26
-#define ENOFN		27
+#define ESE_NOMATCH	26
+#define ESE_NOFN		27
 #define EBADLIST	28
-#define ENOLIST		29
-#define ENONSENSE	30
-#define ENOHELP		31
+#define ESE_NOLIST		29
+#define ESE_NONSENSE	30
+#define ESE_NOHELP		31
 #define EBADLNR		32
 #define EFEXISTS	33
 #define EBADCOL		34
-#define ENOLANG		35
+#define ESE_NOLANG		35
 #define ETRUNC		36
-#define ENOSHELL	37
+#define ESE_NOSHELL	37
 #define ECANTFORK	38
 #define EHANGUP		39
-#define ENOSUB		40
-#define ENOCMD		41
+#define ESE_NOSUB		40
+#define ESE_NOCMD		41
 
 /* Screen design positions */
 #define NAMECOL		5	/* column to put mark name in */

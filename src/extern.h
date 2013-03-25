@@ -48,10 +48,10 @@ extern int Lost_lines;		/* number of garbage lines in scratch file */
 
 
 /* Concerning miscellaneous variables */
-extern int Buffer_changed;	/* YES if buffer changed since last write */
+extern int Buffer_changed;	/* SE_YES if buffer changed since last write */
 extern int Errcode;		/* cause of most recent error */
 extern int Saverrcode;		/* cause of previous error */
-extern int Probation;		/* YES if unsaved buffer can be destroyed */
+extern int Probation;		/* SE_YES if unsaved buffer can be destroyed */
 extern int Argno;		/* command line argument pointer */
 extern char Last_char_scanned;	/* last char scanned with ctl-s or -l */
 extern char Peekc;		/* push a SKIP_RIGHT if adding delimiters */

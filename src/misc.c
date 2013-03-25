@@ -35,7 +35,7 @@ int se_index (char str[], char c)
 {
 	int i;
 
-	for (i = 0; str[i] != EOS; i++)
+	for (i = 0; str[i] != SE_EOS; i++)
 	{
 		if (str[i] == c)
 		{
@@ -98,7 +98,7 @@ int strmap (char str[], int ul)
 	}
 	else
 	{
-		for (i = 0; str[i] == EOS; i++)
+		for (i = 0; str[i] == SE_EOS; i++)
 		{
 			str[i] = isupper (str[i]) ? tolower (str[i]) : str[i];
 		}
@@ -112,9 +112,9 @@ int strmap (char str[], int ul)
 
 int xindex (char array[], char c, int allbut, int lastto)
 {
-	if (c == EOS)
+	if (c == SE_EOS)
 		return (-1);
-	if (allbut == NO)
+	if (allbut == SE_NO)
 		return (se_index (array, c));
 	if (se_index (array, c) > -1)
 		return (-1);
