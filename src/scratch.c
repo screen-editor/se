@@ -199,7 +199,6 @@ int inject (char lin[])
 {
 	int i;
 	int maklin ();
-	LINEDESC *k1, *k2;
 	LINEDESC *k3;
 	LINEDESC *getind ();
 
@@ -373,7 +372,7 @@ void mkbuf (void)
 
 LINEDESC *sp_inject (char lin[], int len, LINEDESC *line)
 {
-	LINEDESC *k, *ret;
+	LINEDESC *ret;
 	LINEDESC *ptr;
 
 	ret = alloc (&ptr);

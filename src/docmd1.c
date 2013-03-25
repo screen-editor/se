@@ -299,9 +299,12 @@ int docmd (char lin[], int i, int glob, int *status)
 	case UCENTER:
 		i++;
 		if (Nlines != 0)
+		{
 			Errcode = EBADLNR;
+		}
 		else if (ckupd (lin, &i, ENTER, status) == OK
 		    && ckchar ('x', 'X', lin, &i, &tflag, status) == OK)
+		{
 			if (getfn (lin, i - 1, file, MAXLINE) == OK)
 			{
 				expanded = expand_env (file);
@@ -317,13 +320,18 @@ int docmd (char lin[], int i, int glob, int *status)
 				Buffer_changed = NO;
 			}
 			else
+			{
 				*status = ERR;
+			}
+		}
 		break;
 
 	case PRINTFIL:
 	case UCPRINTFIL:
 		if (Nlines != 0)
+		{
 			Errcode = EBADLNR;
+		}
 		else if (getfn (lin, i, file, MAXLINE) == OK)
 		{
 			expanded = expand_env (file);
@@ -422,21 +430,33 @@ int docmd (char lin[], int i, int glob, int *status)
 	case OPTCOM:
 	case UCOPTCOM:
 		if (Nlines == 0)
+		{
 			*status = doopt (lin, &i);
+		}
 		else
+		{
 			Errcode = EBADLNR;
+		}
 		break;
 
 	case QUIT:
 	case UCQUIT:
 		i++;
 		if (Nlines != 0)
+		{
 			Errcode = EBADLNR;
+		}
 		else if (ckupd (lin, &i, QUIT, status) == OK)
+		{
 			if (lin[i] == '\n')
+			{
 				*status = EOF;
+			}
 			else
+			{
 				*status = ERR;
+			}
+		}
 		break;
 
 	case HELP:
@@ -488,7 +508,6 @@ int docmd (char lin[], int i, int glob, int *status)
 void dohelp (char lin[], int *i, int *status)
 {
 	char filename[MAXLINE];
-	char swt_filename[MAXLINE];
 	static char helpdir[] = HELP_DIR;	/* help scripts */
 	int j;
 	FILE *fp;
@@ -628,21 +647,29 @@ int doopt (char lin[], int *i)
 	case 'W':
 		++(*i);
 		if (lin[*i] == '\n')
+		{
 			ret = OK;
+		}
 		else
 		{
 			temp = ctoi (lin, i);
 			if (lin[*i] == '\n')
+			{
 				if (temp > 0 && temp < MAXLINE - 3)
 				{
 					ret = OK;
 					Warncol = temp;
 				}
 				else
+				{
 					Errcode = ENONSENSE;
+				}
+			}
 		}
 		if (ret == OK)
+		{
 			saynum (Warncol);
+		}
 		break;
 
 	case '-':	/* fix window in place on screen, or erase it */
@@ -659,6 +686,7 @@ int doopt (char lin[], int *i)
 			ret = OK;
 		}
 		else if (stat != ERR && lin[*i] == '\n')
+		{
 			if (Toprow + (line - Topln + 1) < Cmdrow)
 			{
 				Toprow += line - Topln + 1;
@@ -672,7 +700,10 @@ int doopt (char lin[], int *i)
 				ret = OK;
 			}
 			else
+			{
 				Errcode = EORANGE;
+			}
+		}
 		break;
 
 	case 'a':	/* toggle absolute line numbering */
@@ -716,7 +747,9 @@ int doopt (char lin[], int *i)
 			ret = OK;
 		}
 		else if (lin[*i + 2] != '\n')
+		{
 			Errcode = EODLSSGTR;
+		}
 		else if (lin[*i + 1] == '>')
 		{
 			ret = OK;
@@ -728,7 +761,9 @@ int doopt (char lin[], int *i)
 			Ddir = BACKWARD;
 		}
 		else
+		{
 			Errcode = EODLSSGTR;
+		}
 		break;
 
 	case 'v':	/* set or display overlay column */
@@ -737,9 +772,13 @@ int doopt (char lin[], int *i)
 		if (lin[*i] == '\n')
 		{
 			if (Overlay_col == 0)
+			{
 				remark ("$");
+			}
 			else
+			{
 				saynum (Overlay_col);
+			}
 			ret = OK;
 		}
 		else
@@ -758,7 +797,9 @@ int doopt (char lin[], int *i)
 					ret = OK;
 				}
 				else
+				{
 					Errcode = ENONSENSE;
+				}
 			}
 		}
 		break;
@@ -776,7 +817,9 @@ int doopt (char lin[], int *i)
 		else if (lin[*i + 2] == '\n')
 		{
 			if (lin[*i + 1] < ' ' || lin[*i + 1] >= DEL)
+			{
 				Errcode = ENONSENSE;
+			}
 			else 
 			{
 				ret = OK;
@@ -817,6 +860,7 @@ int doopt (char lin[], int *i)
 				(*i)++;
 				temp = ctoi (lin, i);
 				if (lin[*i] == '\n')
+				{
 					if (temp > 0 && temp < MAXLINE)
 					{
 						First_affected = Topln;
@@ -824,7 +868,10 @@ int doopt (char lin[], int *i)
 						ret = OK;
 					}
 					else
+					{
 						Errcode = ENONSENSE;
+					}
+				}
 			}
 		}
 		break;
@@ -832,7 +879,9 @@ int doopt (char lin[], int *i)
 	case 'f':	/* fortran (ugh, yick, gross) options */
 	case 'F':
 		if (lin[*i + 1] == '\n')
+		{
 			ret = dosopt ("f");
+		}
 		break;
 
 	case 's':	/* set source options */
@@ -854,19 +903,29 @@ int doopt (char lin[], int *i)
 		{
 			temp = ctoi (lin, i);
 			if (lin[*i] == '\n')
+			{
 				if (temp > 0 && temp < MAXLINE - 3)
 				{
 					ret = OK;
 					Indent = temp;
 				}
 				else
+				{
 					Errcode = ENONSENSE;
+				}
+			}
 		}
 		if (ret == OK)
+		{
 			if (Indent > 0)
+			{
 				saynum (Indent);
+			}
 			else
+			{
 				remark ("auto");
+			}
+		}
 		break;
 
 	case 'm':	/* toggle mail notification */
@@ -897,13 +956,17 @@ int doopt (char lin[], int *i)
 			ret = OK;
 			Crypting = ! Crypting;
 			if (Crypting )
+			{
 				do {
 					getkey ();
 					if (Key[0] == EOS)
 						remark ("Empty keys are not allowed.\n");
 				} while (Key[0] == EOS);
+			}
 			else
+			{
 				Key[0] = EOS;
+			}
 		}
 		else
 		{
@@ -1031,13 +1094,20 @@ int doread (int line, char *file, int tflag)
 			{
 				len = 0;
 				for (i = 0; lin1[i] != EOS && len < MAXLINE - 1; i++)
+				{
 					if (lin1[i] != '\t')
+					{
 						lin2[len++] = lin1[i];
+					}
 					else
-						do
+					{
+						do {
 							lin2[len++] = ' ';
-						while (len % 8 != 0 
+						} while (len % 8 != 0 
 						    && len < MAXLINE - 1);
+					}
+				}
+
 				lin2[len] = EOS;
 				if (len >= MAXLINE)
 				{
@@ -1075,19 +1145,19 @@ int dosopt (char lin[])
 		char *txt;
 		int val;
 	} ltxt[] = {
-		"",     1,
-		"as",   2,
-		"c",    3,
-		"d",    1,
-		"data", 1,
-		"f",    4,
-		"h",    3,
-		"n",    1,
-		"nr",   1,
-		"nroff",1,
-		"p",	3,
-		"r",    3,
-		"s",    2,
+		{"",     1},
+		{"as",   2},
+		{"c",    3},
+		{"d",    1},
+		{"data", 1},
+		{"f",    4},
+		{"h",    3},
+		{"n",    1},
+		{"nr",   1},
+		{"nroff",1},
+		{"p",    3},
+		{"r",    3},
+		{"s",    2},
 	};
 
 	i = 0;
@@ -1235,7 +1305,6 @@ int dotlit (char sub[], int allbut)
 
 int doundo (int dflg, int *status)
 {
-	LINEDESC *l1, *l2, *k1, *k2;
 	int oldcnt;
 
 	*status = ERR;

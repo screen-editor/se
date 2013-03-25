@@ -307,12 +307,20 @@ int getone (char lin[], int *i, int *num, int *status)
 				(*i)++;
 			}
 			if (getnum (lin, i, &pnum, status) == OK)
+			{
 				if (porm == '-')
+				{
 					*num -= pnum;
+				}
 				else
+				{
 					*num += pnum;
+				}
+			}
 			if (*status == EOF && porm != EOS)	/* trailing + or - */
+			{
 				*status = ERR;
+			}
 		} while (*status == OK);
 	}
 
@@ -928,17 +936,27 @@ int getstr (char lin[], int *i, char dst[], int maxdst)
 	for (k = j + 1; lin[k] != delim; k++)	/* find end */
 	{
 		if (lin[k] == '\n' || lin[k] == EOS)
+		{
 			if (delim == ' ')
+			{
 				break;
+			}
 			else
+			{
 				return (ERR);
+			}
+		}
 		esc (lin, &k);
 	}
 	if (k - j > maxdst)
+	{
 		return (ERR);
+	}
 
 	for (d = 0, j++; j < k; d++, j++)
+	{
 		dst[d] = esc (lin, &j);
+	}
 	dst[d] = EOS;
 
 	*i = j;
@@ -1274,7 +1292,11 @@ void serc (void)
 	FILE *fp;
 	int status = ENOERR;
 	int len, cursav, i;
-	char *serc_files[] = {file, "./.serc", NULL};
+	char *serc_files[3];
+
+	serc_files[0] = "./.serc";
+	serc_files[1] = file;
+	serc_files[2] = NULL;
 
 	homeserc = expand_env ("$HOME/.serc");
 
@@ -1362,14 +1384,7 @@ void log_usage (void)
 
 char *sysname (void)
 {
-	int i, j, k;
-	char c;
-	static char buf[MAXLINE] = "";
-	FILE *fp;
-	static char unknown[] = "unknown";
-
 	static struct utsname whoarewe;
-
 	uname (& whoarewe);
 	return (whoarewe.nodename);
 }

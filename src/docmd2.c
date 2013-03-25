@@ -48,10 +48,11 @@ int append (int line, char str[])
 			len = max (0, Indent - 1);
 		else /* do auto indent */
 		{
-			LINEDESC *k;
-			k = se_gettxt (line);
+			se_gettxt (line);
 			for (len = 0; Txt[len] == ' '; len++)
-				;
+			{
+				/* nop */;
+			}
 		}
 		dpos = len;     /* position for terminating '.' */
 
@@ -150,7 +151,7 @@ int copy (int line3)
 {
 	int i;
 	int ret;
-	LINEDESC *ptr3, *after3, *k;
+	LINEDESC *k;
 
 	ret = ERR;
 
@@ -189,8 +190,6 @@ int copy (int line3)
 
 int se_delete (int from, int to, int *status)
 {
-	LINEDESC *k1, *k2, *j1, *j2, *l1;
-
 	if (from <= 0)          /* can't delete line 0 */
 	{
 		*status = ERR;
@@ -278,8 +277,6 @@ int join (char sub[])
 
 int move (int line3)
 {
-	LINEDESC *k0, *k1, *k2, *k3, *k4, *k5;
-
 	if (Line1 <= 0)
 	{
 		Errcode = EORANGE;
@@ -410,7 +407,7 @@ int subst (char sub[], int gflag, int glob)
 {
 	char new[MAXLINE], kname;
 	int line, m, k, lastm;
-	int j, junk, status, subbed, ret;
+	int j, status, subbed, ret;
 	int tagbeg[10], tagend[10];
 	LINEDESC *inx;
 
@@ -465,7 +462,7 @@ int subst (char sub[], int gflag, int glob)
 			}
 			if (m == -1 || m == k)  /* no match or null match */
 			{
-				junk = addset (Txt[k], new, &j, MAXLINE);
+				addset (Txt[k], new, &j, MAXLINE);
 				k++;
 			}
 			else

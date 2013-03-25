@@ -85,21 +85,21 @@ void getdescrip (void)
 	static struct _table {
 		char *name;
 		char **ptr_to_cap;
-		} table[] = {
-			"vs",	& VS,
-			"ve",	& VE,
-			"ti",	& TI,
-			"te",	& TE,
-			"cm",	& CM,
-			"ce",	& CE,
-			"dl",	& DL,
-			"al",	& AL,
-			"cl",	& CL,
-			"so",	& STANDOUT,
-			"se",	& SE,
-			"pc",	& pcstr,
-			NULL,	NULL
-			};
+	} table[] = {
+		{"vs",	& VS},
+		{"ve",	& VE},
+		{"ti",	& TI},
+		{"te",	& TE},
+		{"cm",	& CM},
+		{"ce",	& CE},
+		{"dl",	& DL},
+		{"al",	& AL},
+		{"cl",	& CL},
+		{"so",	& STANDOUT},
+		{"se",	& SE},
+		{"pc",	& pcstr},
+		{NULL,	NULL}
+	};
 
 	AM = tgetflag ("am");		/* only boolean se needs */
 
@@ -331,7 +331,6 @@ void setscreen ()
 void inslines (int row, int n)
 {
 	int i;
-	int delay;
 
 	position_cursor (row, 0);
 
@@ -354,7 +353,6 @@ void inslines (int row, int n)
 void dellines (int row, int n)
 {
 	int i;
-	int delay;
 
 	position_cursor (row, 0);
 
@@ -418,8 +416,6 @@ void clear_to_eol (int row, int col)
 
 int set_term (char *type)
 {
-	char *ret;
-
 	if (type == NULL)
 	{
 		error (NO, "se: terminal type not available");

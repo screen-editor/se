@@ -969,7 +969,7 @@ void adjust_window (int from, int to)
 
 void svdel (int ln, int n)
 {
-	int i, j, lb, ub;
+	int i, lb, ub;
 
 	if (ln + n <= Sctop)
 	{

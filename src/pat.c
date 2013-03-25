@@ -29,7 +29,7 @@
 #define CLOSIZE         1
 #define CLOSURE         '*'
 #define DASH            '-'
-#define DITTO           0200
+#define DITTO           (char)0200
 #define EOL             '$'
 #define NCCL            'n'
 #define NEWLINE         '\n'
@@ -72,40 +72,52 @@ int amatch(char lin[], int from, char pat[], int tagbeg[], int tagend[])
 {
 	char *ch, *lastc;
 	char *ppat;
-	int k;
+	int k = 0;
 
 	lastc = lin + from;     /* next unexamined input character */
 	for (ppat = pat; *ppat != EOS; ppat += patsiz (ppat))
+	{
 		if (*ppat == CLOSURE)   /* a closure entry */
 		{
 			ppat++;
 			for (ch = lastc; *ch != EOS; )
+			{
 				/* match as many as possible */
 				if (omatch (lin, &ch, ppat) == NO)
+				{
 					break;
+				}
+			}
+
 			/*
 			 * ch now points to character that made us fail
 			 * try to match rest of pattern against rest of input
 			 * shrink the closure by 1 after each failure
 			 */
 			for (ppat += patsiz (ppat); ch >= lastc; ch--)
+			{
 				/* successful match of rest of pattern */
 				if ((k = amatch (lin, ch - lin, ppat, tagbeg,
 				    tagend)) >= 0)
+				{
 					break;
+				}
+			}
 			lastc = lin + k;        /* if k < 0, failure */
 						/* if k >= 0, success */
 			break;
 		}
 		else if (*ppat == START_TAG)
-			tagbeg[*(ppat + 1)] = lastc - lin;
+			tagbeg[(int) *(ppat + 1)] = lastc - lin;
 		else if (*ppat == STOP_TAG)
-			tagend[*(ppat + 1)] = lastc - lin;
+			tagend[(int) *(ppat + 1)] = lastc - lin;
 			/* non-closure */
 		else if (omatch (lin, &lastc, ppat) == NO)
 			return (-1);
 		/* else
 			omatch succeeded */
+	}
+
 	return (lastc - lin);
 }
 
@@ -219,7 +231,7 @@ int patsiz (char *ppat)
 int makpat (char arg[], int from, char delim, char pat[])
 {
 	char ch;
-	int argsub, junk, lastsub, ls, patsub, tag_nest, tag_num, tag_stack[9];
+	int argsub, lastsub, ls, patsub, tag_nest, tag_num, tag_stack[9];
 
 	lastsub = patsub = 0;
 	tag_num = -1;
@@ -229,11 +241,11 @@ int makpat (char arg[], int from, char delim, char pat[])
 	{
 		ls = patsub;
 		if (arg[argsub] == ANY)
-			junk = addset (ANY, pat, &patsub, MAXPAT);
+			addset (ANY, pat, &patsub, MAXPAT);
 		else if (arg[argsub] == BOL && argsub == from)
-			junk = addset (BOL, pat, &patsub, MAXPAT);
+			addset (BOL, pat, &patsub, MAXPAT);
 		else if (arg[argsub] == EOL && arg[argsub + 1] == delim)
-			junk = addset (EOL, pat, &patsub, MAXPAT);
+			addset (EOL, pat, &patsub, MAXPAT);
 		else if (arg[argsub] == CCL)
 		{
 			if (getccl (arg, &argsub, pat, &patsub) == ERR)
@@ -256,23 +268,23 @@ int makpat (char arg[], int from, char delim, char pat[])
 			tag_num++;
 			tag_nest++;
 			tag_stack[tag_nest] = tag_num;
-			junk = addset (START_TAG, pat, &patsub, MAXPAT);
-			junk = addset (tag_num, pat, &patsub, MAXPAT);
+			addset (START_TAG, pat, &patsub, MAXPAT);
+			addset (tag_num, pat, &patsub, MAXPAT);
 		}
 		else if (stop_tag(arg, &argsub) && tag_nest > -1)
 		{
-			junk = addset (STOP_TAG, pat, &patsub, MAXPAT);
-			junk = addset (tag_stack[tag_nest], pat, &patsub, MAXPAT);
+			addset (STOP_TAG, pat, &patsub, MAXPAT);
+			addset (tag_stack[tag_nest], pat, &patsub, MAXPAT);
 			tag_nest--;
 		}
 		else
 		{
-			junk = addset (CHAR, pat, &patsub, MAXPAT);
+			addset (CHAR, pat, &patsub, MAXPAT);
 
 			/* don't allow match of newline other than via $ */
 			if ((ch = esc(arg, &argsub)) == NEWLINE)
 				return (ERR);
-			junk = addset (ch, pat, &patsub, MAXPAT);
+			addset (ch, pat, &patsub, MAXPAT);
 		}
 		lastsub = ls;
 	}
@@ -292,19 +304,21 @@ int makpat (char arg[], int from, char delim, char pat[])
 
 int getccl (char arg[], int *pasub, char pat[], int *pindex)
 {
-	int junk, start;
+	int start;
 
 	(*pasub)++;             /* skip over [ */
 	if (arg[*pasub] == NOTINCCL)
 	{
-		junk = addset (NCCL, pat, pindex, MAXPAT);
+		addset (NCCL, pat, pindex, MAXPAT);
 		(*pasub)++;
 	}
 	else
-		junk = addset (CCL, pat, pindex, MAXPAT);
+	{
+		addset (CCL, pat, pindex, MAXPAT);
+	}
 
 	start = *pindex;
-	junk = addset (0, pat, pindex, MAXPAT); /* leave room for count */
+	addset (0, pat, pindex, MAXPAT); /* leave room for count */
 	filset (CCLEND, arg, pasub, pat, pindex, MAXPAT);
 	pat[start] = *pindex - start - 1;
 
@@ -319,16 +333,16 @@ int getccl (char arg[], int *pasub, char pat[], int *pindex)
 
 void stclos (char pat[], int *ppatsub, int *plastsub)
 {
-	int i, j, junk;
+	int i, j;
 
 	for (i = *ppatsub - 1; i >= *plastsub; i--)     /* make a hole */
 	{
 		j = i + CLOSIZE;
-		junk = addset (pat[i], pat, &j, MAXPAT);
+		addset (pat[i], pat, &j, MAXPAT);
 	}
 	*ppatsub += CLOSIZE;
 	/* put closure in it */
-	junk = addset (CLOSURE, pat, plastsub, MAXPAT);
+	addset (CLOSURE, pat, plastsub, MAXPAT);
 }
 
 
@@ -336,30 +350,41 @@ void stclos (char pat[], int *ppatsub, int *plastsub)
 
 int maksub (char arg[], int from, char delim, char sub[])
 {
-	int argsub, index, junk;
+	int argsub, index;
 
 	index = 0;
 	for (argsub = from; arg[argsub] != delim && arg[argsub] != EOS;
 	    argsub++)
+	{
 		if (arg[argsub] == AND)
 		{
-			junk = addset (DITTO, sub, &index, MAXPAT);
-			junk = addset (0, sub, &index, MAXPAT);
+			addset (DITTO, sub, &index, MAXPAT);
+			addset (0, sub, &index, MAXPAT);
 		}
 		else if (arg[argsub] == ESCAPE && isdigit (arg[argsub + 1]))
 		{
 			argsub++;
-			junk = addset (DITTO, sub, &index, MAXPAT);
-			junk = addset (arg[argsub] - '0', sub, &index, MAXPAT);
+			addset (DITTO, sub, &index, MAXPAT);
+			addset (arg[argsub] - '0', sub, &index, MAXPAT);
 		}
 		else
-			junk = addset (esc (arg, &argsub), sub, &index, MAXPAT);
+		{
+			addset (esc (arg, &argsub), sub, &index, MAXPAT);
+		}
+	}
+
 	if (arg[argsub] != delim)               /* missing delimeter */
+	{
 		return (ERR);
+	}
 	else if (addset (EOS, sub, &index, MAXPAT) == NO)       /* no room */
+	{
 		return (ERR);
+	}
 	else
+	{
 		return (argsub);
+	}
 }
 
 
@@ -367,18 +392,24 @@ int maksub (char arg[], int from, char delim, char sub[])
 
 void catsub (char lin[], int from[], int to[], char sub[], char _new[], int *k, int maxnew)
 {
-	int junk, ri;
+	int ri;
 	int i, j;
 
 	for (i = 0; sub[i] != EOS; i++)
+	{
 		if ((sub[i] & 0xff) == DITTO)
 		{
 			ri = sub[++i];
 			for (j = from[ri]; j < to[ri]; j++)
-				junk = addset (lin[j], _new, k, maxnew);
+			{
+				addset (lin[j], _new, k, maxnew);
+			}
 		}
 		else
-			junk = addset (sub[i], _new, k, maxnew);
+		{
+			addset (sub[i], _new, k, maxnew);
+		}
+	}
 }
 
 
@@ -386,20 +417,19 @@ void catsub (char lin[], int from[], int to[], char sub[], char _new[], int *k, 
 
 void filset (char delim, char array[], int *pasub, char set[], int *pindex, int maxset)
 {
-	int junk;
 	static char digits[] = "0123456789";
 	static char lowalf[] = "abcdefghijklmnopqrstuvwxyz";
 	static char upalf[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 	for ( ; array[*pasub] != delim && array[*pasub] != EOS; (*pasub)++)
 		if (array[*pasub] == ESCAPE)
-			junk = addset (esc (array, pasub), set, pindex, maxset);
+			addset (esc (array, pasub), set, pindex, maxset);
 		else if (array[*pasub] != DASH)
-			junk = addset (array[*pasub], set, pindex, maxset);
+			addset (array[*pasub], set, pindex, maxset);
 			/* literal DASH */
 		else if (*pindex <= 0 || array[*pasub + 1] == EOS ||
 		    array[*pasub + 1] == delim)
-			junk = addset (DASH, set, pindex, maxset);
+			addset (DASH, set, pindex, maxset);
 		/* else if (se_index (digits, set[*pindex - 1]) >= 0) */
 		else if (isdigit(set[*pindex - 1]))
 			dodash (digits, array, pasub, set, pindex, maxset);
@@ -410,7 +440,7 @@ void filset (char delim, char array[], int *pasub, char set[], int *pindex, int 
 		else if (isupper(set[*pindex - 1]))
 			dodash (upalf, array, pasub, set, pindex, maxset);
 		else
-			junk = addset (DASH, set, pindex, maxset);
+			addset (DASH, set, pindex, maxset);
 }
 
 
@@ -421,13 +451,13 @@ void filset (char delim, char array[], int *pasub, char set[], int *pindex, int 
 
 void dodash (char valid[], char array[], int *pasub, char set[], int *pindex, int maxset)
 {
-	int junk, k, limit;
+	int k, limit;
 
 	(*pasub)++;
 	(*pindex)--;
 	limit = se_index (valid, esc (array, pasub));
 	for (k = se_index (valid, set[*pindex]); k <= limit; k++)
-		junk = addset (valid[k], set, pindex, maxset);
+		addset (valid[k], set, pindex, maxset);
 }
 
 

@@ -59,6 +59,13 @@ dnl
 AC_CHECK_LIB(bsd, getpass)
 
 dnl
+dnl Enable some extra warnings when using gcc.
+dnl
+if test "x$GCC" = "xyes" ; then
+	CFLAGS="$CFLAGS -Wall -pedantic"
+fi
+
+dnl
 dnl generate some files
 dnl
 
