@@ -21,8 +21,11 @@ void inslines(int row, int n);
 void dellines(int row, int n);
 int hwinsdel(void);
 void clear_to_eol(int row, int col);
-int set_term(char *type);
+int se_set_term(char *type);
 void brighton(void);
 void brightoff(void);
+
+void ttynormal (void);
+void ttyedit (void);
 
 #endif

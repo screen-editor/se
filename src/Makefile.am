@@ -7,7 +7,6 @@ bin_PROGRAMS = se scriptse
 
 se_SOURCES = \
 	ascii.h				\
-	changetty.c changetty.h		\
 	constdefs.h			\
 	docmd1.c docmd1.h		\
 	docmd2.c docmd2.h		\
@@ -21,7 +20,7 @@ se_SOURCES = \
 	se.h				\
 	term.c term.h
 
-se_LDADD = $(LIBTERMCAP)
+se_LDADD = $(LIBNCURSES)
 
 scriptse_SOURCES = \
 	scriptse.c

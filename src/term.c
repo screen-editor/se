@@ -17,18 +17,7 @@
 #include <signal.h>
 #include <sys/ioctl.h>
 
-#ifdef HAVE_TERMCAP_H
-#include <termcap.h>
-#endif
-
-#ifdef HAVE_TERMIOS_H
-#include <termios.h>
-#else
-/* fallback to termio */
-#ifdef HAVE_TERMIO_H
-#include <termio.h>
-#endif
-#endif
+#include <ncurses.h>
 
 #include "se.h"
 #include "extern.h"
@@ -142,10 +131,23 @@ int setcaps (char *term)
 
 void t_init (void)
 {
-	if (VS)
-		tputs (VS, 1, outc);
-	if (TI)
-		tputs (TI, 1, outc);	/* terminal initializations */
+	/* terminal initializations */
+	initscr ();
+}
+
+/* ttynormal -- set the terminal to correct modes for normal use */
+
+void ttynormal (void)
+{
+	raw ();
+	cbreak ();
+}
+
+/* ttyedit -- set the terminal to correct modes for editing */
+
+void ttyedit (void)
+{
+	nocbreak ();
 }
 
 /* t_exit -- put out strings to turn off whatever modes we had turned on */
@@ -153,11 +155,7 @@ void t_init (void)
 void t_exit (void)
 {
 	/* terminal exiting strings */
-	if (TE)
-		tputs (TE, 1, outc);
-	if (VE)
-		tputs (VE, 1, outc);
-	tflush ();	/* force it out */
+	endwin ();
 }
 
 /* winsize --- get the size of the window from the windowing system */
@@ -412,9 +410,9 @@ void clear_to_eol (int row, int col)
 	} /* end if (flag == SE_YES) */
 }
 
-/* set_term -- initialize terminal parameters and actual capabilities */
+/* se_set_term -- initialize terminal parameters and actual capabilities */
 
-int set_term (char *type)
+int se_set_term (char *type)
 {
 	if (type == NULL)
 	{

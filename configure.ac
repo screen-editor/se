@@ -13,7 +13,9 @@ dnl
 dnl Look for a working C compiler
 dnl
 
+AC_ISC_POSIX
 AC_PROG_CC
+AM_PROG_CC_STDC
 
 dnl
 dnl Give the user the option of enabling usage logging.
@@ -29,28 +31,18 @@ if test "x$enable_usage_logging" = "xyes" ; then
 fi
 
 dnl
-dnl Try to find a terminal library
+dnl ncurses
 dnl
 
-for tgetflag_library in ncurses termlib termcap curses
-do
-	if test "$LIBTERMCAP" = ""; then
-		AC_CHECK_LIB($tgetflag_library, tgetflag, LIBTERMCAP=-l$tgetflag_library)
-	fi
-done
-
-if test "$LIBTERMCAP" = ""; then
-	AC_MSG_ERROR([We looked for a library containing tgetflag(), but none was found. Please install one of the following libraries: termcap, curses, ncurses, or terminfo])
-fi
-
-AC_SUBST(LIBTERMCAP)
+AC_CHECK_LIB(ncurses, initscr, LIBNCURSES="-lncurses", AC_MSG_ERROR([Please install the ncurses library.]))
+AC_SUBST(LIBNCURSES)
 
 dnl
 dnl check for system dependent header files and functions
 dnl
 
-AC_CHECK_HEADERS([termio.h termios.h termcap.h])
-AC_CHECK_FUNCS([tcgetattr tcsetattr])
+AC_HEADER_STDC
+AC_CHECK_HEADERS([curses.h])
 
 dnl
 dnl Haiku needs -lbsd for getpass(3)

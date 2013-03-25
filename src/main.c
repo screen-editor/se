@@ -15,7 +15,6 @@
 #include <sys/stat.h>
 
 #include "se.h"
-#include "changetty.h"
 #include "docmd1.h"
 #include "edit.h"
 #include "main.h"
@@ -177,10 +176,10 @@ int main (int argc, char *argv[])
 
 	edit (argc, argv);
 
-	t_exit ();
-
 	/* reset the terminal mode */
 	ttynormal ();
+
+	t_exit ();
 
 	return 0;
 }
@@ -212,7 +211,7 @@ void initialize (int argc, char *argv[])
 
 	Argno = 1;
 
-	if (set_term (getenv ("TERM")) == SE_ERR)
+	if (se_set_term (getenv ("TERM")) == SE_ERR)
 		usage ();
 
 	/* Initialize the scratch file: */
