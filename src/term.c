@@ -32,107 +32,35 @@ int outc (int i)
 {
 	char c;
 	c = (char) i;
-	twrite (1, &c, 1);
+	addch (c);
+	refresh ();
 	return i;
 }
 
-/*
- * code for using BSD termlib -- getting capabilities, and writing them out.
- */
-
-/* capabilities from termcap */
-
-static int AM;		/* automatic margins, i.e. wraps at column 80 */
-
-static char *VS;	/* visual start -- e.g. clear status line */
-static char *VE;	/* visual end -- e.g. restore status line */
-static char *TI;	/* terminal init -- whatever needed for screen ops */
-static char *TE;	/* terminal ops end */
-static char *CM;	/* cursor motion, used by tgoto() */
-static char *CE;	/* clear to end of line */
-static char *DL;	/* hardware delete line */
-static char *AL;	/* hardware add (insert) line */
-static char *CL;	/* clear screen */
-static char *STANDOUT;	/* standout on  (SO conflicts w/ASCII character name) */
-static char *SE;	/* standout end */
-
-extern char PC;		/* Pad character, usually '\0' */
-
-static char *pcstr;
-
-static char caps[128];		/* space for decoded capability strings */
-static char *addr_caps;		/* address of caps for relocation */
-
-#define TERMBUFSIZ	1024+1
-static char termbuf[TERMBUFSIZ];
-
-/* getdescrip --- get descriptions out of termcap entry */
-
-void getdescrip (void)
-{
-	int i;
-	static struct _table {
-		char *name;
-		char **ptr_to_cap;
-	} table[] = {
-		{"vs",	& VS},
-		{"ve",	& VE},
-		{"ti",	& TI},
-		{"te",	& TE},
-		{"cm",	& CM},
-		{"ce",	& CE},
-		{"dl",	& DL},
-		{"al",	& AL},
-		{"cl",	& CL},
-		{"so",	& STANDOUT},
-		{"se",	& SE},
-		{"pc",	& pcstr},
-		{NULL,	NULL}
-	};
-
-	AM = tgetflag ("am");		/* only boolean se needs */
-
-	/* get string values */
-
-	for (i = 0; table[i].name != NULL; i++)
-	{
-		*(table[i].ptr_to_cap) = tgetstr (table[i].name, & addr_caps);
-	}
-}
-
-/* setcaps -- get the capabilities from termcap file into termbuf */
-
-int setcaps (char *term)
-{
-	switch (tgetent (termbuf, term)) {
-	case -1:
-		error (SE_NO, "se: couldn't open termcap file.");
-
-	case 0:
-		error (SE_NO, "se: no termcap entry for terminal.");
-
-	case 1:
-		addr_caps = caps;
-		getdescrip ();		/* get terminal description */
-		Nrows = tgetnum ("li");
-		Ncols = tgetnum ("co");
-		PC = pcstr ? pcstr[0] : SE_EOS;
-		break;
-
-	default:
-		error (SE_YES, "in setcaps: can't happen.\n");
-	}
-
-	return (SE_OK);
-}
-
+static int t_initialized = 0;
 
 /* t_init -- put out terminal initialization string */
 
 void t_init (void)
 {
-	/* terminal initializations */
-	initscr ();
+	if (!t_initialized)
+	{
+		/* terminal initializations */
+		initscr ();
+		t_initialized = 1;
+	}
+}
+
+/* t_exit -- put out strings to turn off whatever modes we had turned on */
+
+void t_exit (void)
+{
+	if (t_initialized)
+	{
+		/* terminal exiting strings */
+		endwin ();
+		t_initialized = 0;
+	}
 }
 
 /* ttynormal -- set the terminal to correct modes for normal use */
@@ -148,14 +76,6 @@ void ttynormal (void)
 void ttyedit (void)
 {
 	nocbreak ();
-}
-
-/* t_exit -- put out strings to turn off whatever modes we had turned on */
-
-void t_exit (void)
-{
-	/* terminal exiting strings */
-	endwin ();
 }
 
 /* winsize --- get the size of the window from the windowing system */
@@ -215,7 +135,7 @@ void winsize (int sig)
 	updscreen ();	/* reload from buffer */
 	loadstr (savestatus, Nrows - 1, 0, Ncols);
 	remark ("window size change");
-	tflush ();
+	refresh ();
 }
 
 
@@ -232,14 +152,14 @@ void send (char chr)
 
 	if (Curcol == Ncols - 1)
 	{
-		if (AM)		/* terminal wraps when hits last column */
-		{
-			Curcol = 0;
-			Currow++;
-		}
+		/* terminal wraps when hits last column */
+		Curcol = 0;
+		Currow++;
 	}
 	else		/* cursor not at extreme right */
+	{
 		Curcol++;
+	}
 }
 
 /* clrscreen --- clear entire screen */
@@ -250,7 +170,8 @@ void clrscreen (void)
 	/* clearing screen homes cursor to upper left corner */
 	/* on all terminals */
 
-	tputs (CL, 1, outc);
+	erase ();
+	refresh ();
 }
 
 
@@ -266,19 +187,24 @@ void position_cursor (int row, int col)
 		{
 			/* short motion in current line */
 			if (Curcol < col)
+			{
 				for (; Curcol != col; Curcol++)
-					twrite (1, &Screen_image[Currow][Curcol], 1);
+				{
+					outc(Screen_image[Currow][Curcol]);
+				}
+			}
 			else
+			{
 				for (; Curcol != col; Curcol--)
-					twrite (1, "\b", 1);
+				{
+					outc('\b');
+				}
+			}
 		}
 		else
 		{
-#if defined (USG) && defined(S5R2)
-			tputs (tparm (cursor_address, row, col), 1, outc);
-#else
-			tputs (tgoto (CM, col, row), 1, outc);
-#endif
+			move (row, col);
+			refresh ();
 			Currow = row;
 			Curcol = col;
 		}
@@ -376,6 +302,7 @@ void clear_to_eol (int row, int col)
 	flag = SE_NO;
 
 	for (c = col; c < Ncols; c++)
+	{
 		if (Screen_image[row][c] != ' ')
 		{
 			Screen_image[row][c] = ' ';
@@ -387,11 +314,13 @@ void clear_to_eol (int row, int col)
 				send (' ');
 			}
 		}
+	}
 
 	if (flag == SE_YES)
 	{
 		position_cursor (row, col);
-		tputs (CE, 1, outc);
+		clrtoeol ();
+		refresh ();
 	} /* end if (flag == SE_YES) */
 }
 
@@ -404,17 +333,9 @@ int se_set_term (char *type)
 		error (SE_NO, "se: terminal type not available");
 	}
 
-	if (type[0] == SE_EOS)
-	{
-		error (SE_NO, "in set_term: can't happen.");
-	}
+	t_init ();
 
 	Ncols = Nrows = -1;
-
-	if (setcaps (type) == SE_ERR)
-	{
-		error (SE_NO, "se: could not find terminal in system database");
-	}
 
 	move (0, 0);
 	refresh ();
