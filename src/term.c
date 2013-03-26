@@ -32,8 +32,7 @@ int outc (int i)
 {
 	char c;
 	c = (char) i;
-	addch (c);
-	refresh ();
+	echochar (c);
 	return i;
 }
 
@@ -293,7 +292,7 @@ void dellines (int row, int n)
 
 int hwinsdel (void)
 {
-	return SE_NO;
+	return SE_YES;
 }
 
 
