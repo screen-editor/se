@@ -12,7 +12,7 @@
 #include <signal.h>
 
 /* some standard definitions used throughout the screen editor */
-#include "constdefs.h"
+#include "constdef.h"
 #include "ascii.h"	/* definitions of ascii characters */
 
 /* new data types */

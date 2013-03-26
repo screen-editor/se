@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#include "constdefs.h"
+#include "constdef.h"
 #include "pat.h"
 #include "main.h"
 #include "misc.h"
