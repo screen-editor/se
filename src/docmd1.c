@@ -10,7 +10,10 @@
 
 #include <string.h>
 #include <stdlib.h>
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 #include "se.h"
 #include "edit.h"
@@ -1403,7 +1406,11 @@ int dowrit (int from, int to, char *file, int aflag, int fflag, int tflag)
 				crypt_close (fd);
 			else
 				fclose (fd);
+
+#ifdef HAVE_SYNC
 			sync ();	/* just in case the system crashes */
+#endif
+
 			saynum (line - from);
 			if (from == 1 && line - 1 == Lastln)
 				Buffer_changed = SE_NO;

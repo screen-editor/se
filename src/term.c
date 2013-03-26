@@ -17,7 +17,7 @@
 #include <signal.h>
 #include <sys/ioctl.h>
 
-#include <ncurses.h>
+#include CURSES_LOC
 
 #include "se.h"
 #include "extern.h"

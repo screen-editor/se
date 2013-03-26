@@ -31,18 +31,22 @@ if test "x$enable_usage_logging" = "xyes" ; then
 fi
 
 dnl
-dnl ncurses
+dnl curses library and header detection.
 dnl
 
-AC_CHECK_LIB(ncurses, initscr, LIBNCURSES="-lncurses", AC_MSG_ERROR([Please install the ncurses library.]))
-AC_SUBST(LIBNCURSES)
+AC_SEARCH_LIBS(initscr, [ncursesw ncurses curses pdcurses], [], AC_MSG_ERROR([curses library not found.]))
+
+AC_CHECK_HEADERS([ncursesw/ncurses.h ncursesw.h ncursesw/curses.h ncurses/ncurses.h ncurses.h ncurses/curses.h curses.h curses/curses.h pdcurses/pdcurses.h pdcurses.h pdcurses/curses.h], [CURSES_LOC="<$ac_header>";found_curses_headers=yes; break;])
+AS_IF([test "x$CURSES_LOC" = "x"], [AC_MSG_ERROR([curses headers not found])])
+AC_SUBST(CURSES_LOC)
 
 dnl
 dnl check for system dependent header files and functions
 dnl
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS([curses.h])
+AC_CHECK_HEADERS([sys/wait.h unistd.h])
+AC_CHECK_FUNCS([fork getpass pclose popen sync])
 
 dnl
 dnl Haiku needs -lbsd for getpass(3)

@@ -1,7 +1,7 @@
 # This file is in the public domain.
 
 AM_CPPFLAGS = -DHELP_DIR='"$(datadir)/@PACKAGE@/help"' \
-	-DSHELL='"$(SHELL)"'
+	-DSHELL='"$(SHELL)"' -DCURSES_LOC='@CURSES_LOC@'
 
 bin_PROGRAMS = se scriptse
 
@@ -20,7 +20,7 @@ se_SOURCES = \
 	se.h				\
 	term.c term.h
 
-se_LDADD = $(LIBNCURSES)
+#se_LDADD = @MY_CURSES_LIB@
 
 scriptse_SOURCES = \
 	scriptse.c
