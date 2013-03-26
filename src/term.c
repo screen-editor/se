@@ -90,6 +90,13 @@ void winsize (int sig)
 
 	signal (SIGWINCH, winsize);
 
+	if (!first)
+	{
+		struct winsize size;
+		ioctl(0, TIOCGWINSZ, &size);
+		resizeterm(size.ws_row, size.ws_col);
+	}
+
 	cols = COLS;
 	rows = LINES;
 
