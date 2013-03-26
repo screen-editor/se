@@ -334,8 +334,8 @@ void inslines (int row, int n)
 
 	for (i = 0; i < n; i++)
 	{
-		tputs (AL, n, outc);
-		tflush ();
+		insertln ();
+		refresh ();
 	}
 
 	for (i = Nrows - 1; i - n >= Currow; i--)
@@ -356,8 +356,8 @@ void dellines (int row, int n)
 
 	for (i = 0; i < n; i++)
 	{
-		tputs (DL, n, outc);
-		tflush ();
+		deleteln ();
+		refresh ();
 	}
 
 	for (i = Currow; i + n < Nrows; i++)
@@ -372,10 +372,7 @@ void dellines (int row, int n)
 
 int hwinsdel (void)
 {
-	if (No_hardware == SE_YES)
-		return (SE_NO);
-
-	return (AL != NULL && DL != NULL);
+	return SE_NO;
 }
 
 
@@ -431,10 +428,8 @@ int se_set_term (char *type)
 		error (SE_NO, "se: could not find terminal in system database");
 	}
 
-	if (tgoto (CM, 0, 0) == NULL)	/* OOPS returned.. */
-	{
-		error (SE_NO, "se: terminal does not have cursor motion.");
-	}
+	move (0, 0);
+	refresh ();
 
 	/*
 	 * first, get it from the library. then check the
@@ -455,14 +450,12 @@ int se_set_term (char *type)
 
 void brighton (void)
 {
-	if (STANDOUT)
-		tputs (STANDOUT, 1, outc);
+	attron (A_REVERSE);
 }
 
 /* brightoff --- turn off reverse video/standout mode */
 
 void brightoff (void)
 {
-	if (SE)
-		tputs (SE, 1, outc);
+	attroff (A_REVERSE);
 }
