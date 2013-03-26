@@ -55,3 +55,7 @@ Other Improvements:
 	- add a test suite.
 
 	- internationalization
+
+	- continue to clean up the code
+
+		* use lint, splint, rates, ... static analysis tools
