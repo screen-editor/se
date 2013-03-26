@@ -1,17 +1,57 @@
-This file lists potential improvements for future versions of se.
+This file lists *potential* improvements for future versions of se.
 
 Documentation:
 
 	- tutorial (like vimtutor or `C-h t` in emacs)
+
 	- texinfo manual
 
 Port to the following operating systems:
 
-	- FreeDOS 
-		(this is a high cost, low reward target, but it might be
-		an interesting platform to support).
+	- ReactOS / Mingw32
+
+		should be possible for the next release. This
+		port mainly involves cutting out some of the
+		signal stuff on this platform.
+
+	- FreeDOS
+
+		just setting up a build environment is tricky.
+		This is a high cost (in terms of effort), low
+		reward target, but it might be an interesting
+		platform to support.
+
+	- Others?
+
+		Feel free to suggest other operating systems.
+		Let me know, tcort@se-editor.org
+
+Work on Old Bugs:
+
+	- better tab handling
+
+		* it's hard to get it so that tabs are displayed as
+		tabs on the screen and saved to a file as \t characters.
+
+		* a lot of toggling can happen based on how the file is
+		opened (cmdline vs in editor), the file name, the .serc,
+		the command line arguments, etc. This makes it hard to
+		get consistent results. Some options should be set/unset
+		rather than toggled.
+
+	- off by 1 error with the help system.
+
+		To Reproduce:
+		# start se
+		help
+		o-
+		a
+		# apd> opens at line 2 not 1
 
 Other Improvements:
 
 	- Better usage() output with useful explainations.
-	- add a test suite (should be easy since we have scriptse already).
+
+	- add a test suite.
+
+	- internationalization
