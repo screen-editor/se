@@ -501,7 +501,7 @@ int scan_char (char chr, int wrap, int cursor, int nlpos, char *lin, int *status
 	if (scan_pos < 0 || scan_pos >= nlpos || lin[scan_pos] != c)
 	{
 		*status = SE_ERR;
-		mesg ("SE_NOCHAR", CHAR_MSG);
+		mesg ("NOCHAR", CHAR_MSG);
 	}
 
 	return (scan_pos);
