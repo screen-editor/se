@@ -65,6 +65,8 @@ dnl
 dnl generate some files
 dnl
 
-AC_CONFIG_HEADERS([config.h])
+dnl short filename for DOS
+AC_CONFIG_HEADERS([config.h:config.in])
+
 AC_CONFIG_FILES([Makefile src/Makefile help/Makefile man/Makefile])
 AC_OUTPUT
