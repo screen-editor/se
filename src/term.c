@@ -161,15 +161,6 @@ void t_exit (void)
 /* winsize --- get the size of the window from the windowing system */
 /*		also arrange to catch the windowing signal */
 
-/* 4.3 BSD and/or Sun 3.x */
-#define WINSIG		SIGWINCH
-#define WINIOCTL	TIOCGWINSZ
-#define WINSTRUCT	winsize
-#define COLS w.ws_col
-#define ROWS w.ws_row
-
-static struct WINSTRUCT w;
-
 void winsize (int sig)
 {
 	static int first = 1;
@@ -177,39 +168,34 @@ void winsize (int sig)
 	int row, oldstatus = Nrows - 1;
 	int cols, rows;
 
-	signal (WINSIG, winsize);
+	signal (SIGWINCH, winsize);
 
-	if (ioctl (0, WINIOCTL, (char *) & w) != -1)
+	cols = COLS;
+	rows = LINES;
+
+	if (first)
 	{
-		cols = COLS;
-		rows = ROWS;
-
-		if (first)
+		first = 0;
+		if (cols && rows)
 		{
-			first = 0;
-			if (cols && rows)
-			{
-				Ncols = cols;
-				Nrows = rows;
-			}
-			return;		/* don't redraw screen */
+			Ncols = cols;
+			Nrows = rows;
 		}
-		else if (Ncols == cols && Nrows == rows)
-		{
-			/* only position changed */
-			return;
-		}
-		else
-		{
-			if (cols && rows)
-			{
-				Ncols = cols;
-				Nrows = rows;
-			}
-		}
+		return;		/* don't redraw screen */
+	}
+	else if (Ncols == cols && Nrows == rows)
+	{
+		/* only position changed */
+		return;
 	}
 	else
-		return;
+	{
+		if (cols && rows)
+		{
+			Ncols = cols;
+			Nrows = rows;
+		}
+	}
 
 	move_ (Screen_image[oldstatus], savestatus, MAXCOLS);
 	clrscreen ();
@@ -219,8 +205,10 @@ void winsize (int sig)
 	Sclen = -1;
 
 	for (row = 0; row < Nrows; row++)
+	{
 		move_ (Blanks, Screen_image[row], MAXCOLS);
 		/* clear screen */
+	}
 
 	First_affected = Topln;
 	adjust_window (Curln, Curln);
@@ -383,7 +371,7 @@ void clear_to_eol (int row, int col)
 	int c, flag;
 	int hardware = SE_NO;
 
-	hardware = (CE != NULL);
+	hardware = SE_YES;
 
 	flag = SE_NO;
 
@@ -435,7 +423,7 @@ int se_set_term (char *type)
 	 * first, get it from the library. then check the
 	 * windowing system, if there is one.
 	 */
-	winsize (WINSIG);
+	winsize (SIGWINCH);
 
 	if (Nrows == -1)
 		error (SE_NO, "se: could not determine number of rows");
