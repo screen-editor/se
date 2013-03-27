@@ -17,7 +17,11 @@
 #include <signal.h>
 #include <sys/ioctl.h>
 
+#ifdef CURSES_LOC
 #include CURSES_LOC
+#else
+#include <curses.h>
+#endif
 
 #include "se.h"
 #include "extern.h"
