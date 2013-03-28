@@ -1,4 +1,23 @@
-This file lists *potential* improvements for future versions of se.
+This section lists tasks that I'm actively working on. These will
+likely make it into the next version:
+
+	- encryption without the crypt(1) program
+
+		* the crypt(1) program isn't so popular these
+		days, but most systems have the encrypt(3) functions,
+		so use those to do encryption instead.
+
+	- Port to mingw32
+
+		* Possible Pain points
+
+			+ Signals
+			+ Environment Variable Expansion
+			+ File permissions
+
+
+
+This section lists *potential* improvements for future versions of se.
 
 Documentation:
 
@@ -9,12 +28,6 @@ Documentation:
 	- Y2K statement
 
 Port to the following operating systems:
-
-	- ReactOS / Mingw32
-
-		should be possible for the next release. This
-		port mainly involves cutting out some of the
-		signal stuff on this platform.
 
 	- FreeDOS
 
@@ -32,12 +45,10 @@ Other Improvements:
 
 	- Better usage() output with useful explainations.
 
-	- Use crypt.3 functions instead of crypt.1
-
 	- add a test suite.
 
 	- internationalization.
 
 	- continue to clean up the code
 
-		* use lint, splint, rates, ... static analysis tools
+		* use lint, splint, rats, ... static analysis tools
