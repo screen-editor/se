@@ -32,9 +32,7 @@ Other Improvements:
 
 	- Better usage() output with useful explainations.
 
-	- make crypt optional --with-crypt=/path/to/crypt
-
-		* gnupg instead of crypt?
+	- Use crypt.3 functions instead of crypt.1
 
 	- add a test suite.
 

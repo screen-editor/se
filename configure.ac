@@ -41,11 +41,19 @@ AS_IF([test "x$CURSES_LOC" = "x"], [AC_MSG_ERROR([curses headers not found])])
 AC_SUBST(CURSES_LOC)
 
 dnl
+dnl crypt library and header detection
+dnl
+
+AC_SEARCH_LIBS(crypt, [crypt c])
+AC_CHECK_FUNCS([crypt])
+AC_CHECK_HEADERS([unistd.h])
+
+dnl
 dnl check for system dependent header files and functions
 dnl
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS([sys/wait.h unistd.h])
+AC_CHECK_HEADERS([sys/wait.h])
 AC_CHECK_FUNCS([fork getpass pclose popen sync])
 
 dnl

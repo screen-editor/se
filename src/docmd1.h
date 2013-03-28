@@ -7,6 +7,8 @@
 #ifndef __DOCMD1_H
 #define __DOCMD1_H
 
+#include "config.h"
+
 #include <stdio.h>
 
 int docmd(char lin[], int i, int glob, int *status);
@@ -20,8 +22,11 @@ int dotlit(char sub[], int allbut);
 int doundo(int dflg, int *status);
 int dowrit(int from, int to, char *file, int aflag, int fflag, int tflag);
 char *expand_env(char *file);
-FILE *crypt_open(char *file, char *mode);
-void crypt_close(FILE *fp);
-void getkey(void);
+
+#ifdef HAVE_CRYPT
+FILE *crypt_open (char *file, char *mode);
+void crypt_close (FILE *fp);
+void getkey (void);
+#endif
 
 #endif

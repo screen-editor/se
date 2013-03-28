@@ -20,7 +20,5 @@ se_SOURCES = \
 	se.h				\
 	term.c term.h
 
-#se_LDADD = @MY_CURSES_LIB@
-
 scriptse_SOURCES = \
 	scriptse.c

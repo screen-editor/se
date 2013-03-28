@@ -12,8 +12,15 @@
 #include <stdlib.h>
 
 #ifdef HAVE_UNISTD_H
+
+#ifdef HAVE_CRYPT
+/* to get encrypt(3) */
+#define _XOPEN_SOURCE
+#endif /* HAVE_CRYPT */
+
 #include <unistd.h>
-#endif
+
+#endif /* HAVE_UNISTD_H */
 
 #include "se.h"
 #include "edit.h"
@@ -952,17 +959,25 @@ int doopt (char lin[], int *i)
 
 	case 'y':	/* encrypt files */
 	case 'Y':
+
+#ifdef HAVE_CRYPT
+
 		if (lin[*i + 1] == '\n')
 		{
+
 		crypt_toggle:
 			ret = SE_OK;
 			Crypting = ! Crypting;
-			if (Crypting )
+
+			if (Crypting)
 			{
 				do {
 					getkey ();
 					if (Key[0] == SE_EOS)
+					{
 						remark ("Empty keys are not allowed.\n");
+					}
+
 				} while (Key[0] == SE_EOS);
 			}
 			else
@@ -970,27 +985,45 @@ int doopt (char lin[], int *i)
 				Key[0] = SE_EOS;
 			}
 		}
-		else
+		else			/* the key was supplied after oy */
 		{
 			int j;
 
 			ret = SE_OK;
+
 			(*i)++;		/* *i was the 'y' */
+
 			while (isspace (lin[*i]) && lin[*i] != '\n')
+			{
 				(*i)++;
+			}
+
 			if (lin[*i] != '\n' && lin[*i] != SE_EOS)
 			{
 				for (j = 0; lin[*i] != '\n' && lin[*i] != SE_EOS;
 				    j++, (*i)++)
+				{
 					Key[j] = lin[*i];
+				}
+
 				Key[j] = SE_EOS;
 				Crypting = SE_YES;
 			}
 			else
+			{
 				goto crypt_toggle;
+			}
 		}
+
 		mesg (Crypting ? "ENCRYPT" : "", CRYPT_MSG);
 		break;
+
+#else /* !HAVE_CRYPT */
+
+		remark ("encryption not supported");
+		break;
+
+#endif /* !HAVE_CRYPT */
 
 	default:
 		Errcode = EOWHAT;
@@ -1066,10 +1099,18 @@ int doread (int line, char *file, int tflag)
 		mesg (Savfil, FILE_MSG);
 	}
 
+#ifdef HAVE_CRYPT
+
 	if (Crypting)
 		fd = crypt_open (file, "r");
 	else
 		fd = fopen (file, "r");
+
+#else /* !HAVE_CRYPT */
+
+	fd = fopen (file, "r");
+
+#endif /* !HAVE_CRYPT */
 
 	if (fd == NULL)
 	{
@@ -1124,10 +1165,20 @@ int doread (int line, char *file, int tflag)
 				break;
 			}
 		}
+
+#ifdef HAVE_CRYPT
+
 		if (Crypting)
 			crypt_close (fd);
 		else
 			fclose (fd);
+
+#else /* !HAVE_CRYPT */
+
+		fclose (fd);
+
+#endif /* !HAVE_CRYPT */
+
 		saynum (count);
 		Curln = line + count;
 		svins (line, count);
@@ -1357,18 +1408,38 @@ int dowrit (int from, int to, char *file, int aflag, int fflag, int tflag)
 
 		if (aflag == SE_YES)
 		{
+
+#ifdef HAVE_CRYPT
+
 			if (Crypting)
 				fd = crypt_open (file, "a");
 			else
 				fd = fopen (file, "a");
+
+#else /* !HAVE_CRYPT */
+
+			fd = fopen (file, "a");
+
+#endif /* !HAVE_CRYPT */
+
 		}
 		else if (strcmp (file, Savfil) == 0 || fflag == SE_YES
 		    || Probation == WRITECOM || access (file, 0) == -1)
 		{
+
+#ifdef HAVE_CRYPT
+
 			if (Crypting)
 				fd = crypt_open (file, "w");
 			else
 				fd = fopen (file, "w");
+
+#else /* !HAVE_CRYPT */
+
+			fd = fopen (file, "w");
+
+#endif /* !HAVE_CRYPT */
+
 		}
 		else
 		{
@@ -1402,14 +1473,27 @@ int dowrit (int from, int to, char *file, int aflag, int fflag, int tflag)
 				}
 				k = NEXTLINE(k);
 			}
+
+#ifdef HAVE_CRYPT
+
 			if (Crypting)
 				crypt_close (fd);
 			else
 				fclose (fd);
 
+#else /* !HAVE_CRYPT */
+
+			fclose (fd);
+
+#endif /* !HAVE_CRYPT */
+
+
+
 #ifdef HAVE_SYNC
+
 			sync ();	/* just in case the system crashes */
-#endif
+
+#endif /* HAVE_SYNC */
 
 			saynum (line - from);
 			if (from == 1 && line - 1 == Lastln)
@@ -1477,6 +1561,8 @@ char *expand_env (char *file)
 
 	return (buf);
 }
+
+#ifdef HAVE_CRYPT
 
 /* crypt_open -- run files through crypt */
 
@@ -1556,3 +1642,5 @@ void getkey (void)
 
 	restore_screen ();
 }
+
+#endif /* HAVE_CRYPT */

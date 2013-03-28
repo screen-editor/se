@@ -70,15 +70,14 @@ void t_exit (void)
 
 void ttynormal (void)
 {
-	raw ();
-	cbreak ();
+	nocbreak ();
 }
 
 /* ttyedit -- set the terminal to correct modes for editing */
 
 void ttyedit (void)
 {
-	nocbreak ();
+	cbreak ();
 }
 
 /* winsize --- get the size of the window from the windowing system */

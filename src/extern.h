@@ -10,6 +10,8 @@
 #ifndef __EXTERN_H
 #define __EXTERN_H
 
+#include "config.h"
+
 /* Concerning line numbers: */
 extern int Line1;		/* first line number on command */
 extern int Line2;		/* second line number on command */
@@ -101,9 +103,10 @@ extern int Int_caught;		/* caught a SIGINT from user */
 extern int Hup_caught;		/* caught a SIGHUP when phone line dropped */
 extern int Catching_stops;	/* catching or ignoring SIGTSTP's? */
 
-
+#ifdef HAVE_CRYPT
 /* Concerning file encryption: */
 extern int Crypting;		/* doing file encryption? */
 extern char Key[KEYSIZE];	/* encryption key */
+#endif /* HAVE_CRYPT */
 
 #endif

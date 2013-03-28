@@ -116,9 +116,11 @@ int Int_caught = 0;	/* caught a SIGINT from user */
 int Hup_caught = 0;	/* caught a SIGHUP when phone line dropped */
 int Catching_stops;	/* catching or ignoring SIGTSTP's? */
 
+#ifdef HAVE_CRYPT
 /* Concerning file encryption: */
 int Crypting = SE_NO;	/* doing file encryption? */
 char Key[KEYSIZE] = "";	/* saved encryption key */
+#endif /* HAVE_CRYPT */
 
 extern char *getenv ();
 
@@ -315,7 +317,11 @@ void hangup (void)
 	signal (SIGINT, SIG_IGN);
 	signal (SIGQUIT, SIG_IGN);
 	Hup_caught = 0;
+
+#ifdef HAVE_CRYPT
 	Crypting = SE_NO;		/* force buffer to be clear text */
+#endif /* HAVE_CRYPT */
+
 	dowrit (1, Lastln, "se.hangup", SE_NO, SE_YES, SE_NO);
 	clrbuf ();
 	exit (1);

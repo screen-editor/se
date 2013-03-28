@@ -7,6 +7,8 @@
 #ifndef __SE_H
 #define __SE_H
 
+#include "config.h"
+
 #include <stdio.h>
 #include <ctype.h>
 #include <signal.h>
@@ -54,7 +56,10 @@ typedef	struct ldesc {		/* line	descriptor */
 #define GARB_FACTOR	2
 #define GARB_THRESHOLD	1000
 #define BUFENT		1
+
+#ifdef HAVE_CRYPT
 #define KEYSIZE		11
+#endif /* HAVE_CRYPT */
 
 /* Message classes for status line at bottom of	screen */
 #define SE_NOMSG		0
