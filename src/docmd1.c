@@ -429,8 +429,6 @@ int docmd (char lin[], int i, int glob, int *status)
 	case UCLOCATECMD:
 		if (lin[i+1] == '\n')
 		{
-			char *sysname ();
-
 			remark (sysname ());
 			*status = SE_OK;
 		}

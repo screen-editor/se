@@ -262,7 +262,6 @@ int maklin (char lin[], int i, LINEDESC **newind)
 }
 
 
-
 /* makscr --- create a new scratch file */
 
 void makscr (int *fd, char str[], size_t strsize)
@@ -276,7 +275,12 @@ void makscr (int *fd, char str[], size_t strsize)
 	expanded = expand_env ("$HOME/.scratch-XXXXXX");
 	memset (str, SE_EOS, strsize);
 	snprintf (str, strsize - 1, "%s", expanded);
+
+#ifdef HAVE_MKSTEMP
 	*fd = mkstemp (str);
+#else /* !HAVE_MKSTEMP */
+	*fd = open(str, O_RDWR | O_CREAT | O_EXCL, 0600);
+#endif /* !HAVE_MKSTEMP */
 
 	if (*fd == -1)
 	{

@@ -15,13 +15,16 @@
 
 #include <stdlib.h>
 #include <signal.h>
+
+#ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
+#endif /* HAVE_SYS_IOCTL_H */
 
 #ifdef CURSES_LOC
 #include CURSES_LOC
-#else
+#else /* !CURSES_LOC */
 #include <curses.h>
-#endif
+#endif /* !CURSES_LOC */
 
 #include "se.h"
 #include "extern.h"
@@ -90,6 +93,10 @@ void winsize (int sig)
 	int row, oldstatus = Nrows - 1;
 	int cols, rows;
 
+#ifdef SIGWINCH
+
+	/* handle window resizing */
+
 	signal (SIGWINCH, winsize);
 
 	if (!first)
@@ -98,6 +105,8 @@ void winsize (int sig)
 		ioctl(0, TIOCGWINSZ, &size);
 		resizeterm(size.ws_row, size.ws_col);
 	}
+
+#endif /* SIGWINCH */
 
 	cols = COLS;
 	rows = LINES;
@@ -353,7 +362,7 @@ int se_set_term (char *type)
 	 * first, get it from the library. then check the
 	 * windowing system, if there is one.
 	 */
-	winsize (SIGWINCH);
+	winsize (0);
 
 	if (Nrows == -1)
 		error (SE_NO, "se: could not determine number of rows");

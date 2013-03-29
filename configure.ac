@@ -53,8 +53,16 @@ dnl check for system dependent header files and functions
 dnl
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS([sys/wait.h])
-AC_CHECK_FUNCS([fork getpass pclose popen sync])
+AC_CHECK_HEADERS([sys/ioctl.h sys/utsname.h sys/wait.h])
+AC_CHECK_FUNCS([fork getpass mkstemp pclose popen sync uname])
+
+dnl
+dnl Discover gethostname on mingw32
+dnl
+
+AC_CHECK_HEADERS([Winsock2.h])
+AC_CHECK_LIB(Ws2_32, gethostname)
+AC_CHECK_FUNCS([gethostname])
 
 dnl
 dnl Haiku needs -lbsd for getpass(3)

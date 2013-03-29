@@ -7,16 +7,6 @@ likely make it into the next version:
 		days, but most systems have the encrypt(3) functions,
 		so use those to do encryption instead.
 
-	- Port to mingw32
-
-		* Possible Pain points
-
-			+ Signals
-			+ Environment Variable Expansion
-			+ File permissions
-
-
-
 This section lists *potential* improvements for future versions of se.
 
 Documentation:
@@ -35,6 +25,14 @@ Port to the following operating systems:
 		This is a high cost (in terms of effort), low
 		reward target, but it might be an interesting
 		platform to support.
+
+	- More complete mingw32 port
+
+		* Reimplement
+
+			+ doshell ()
+			+ serc_safe ()
+			+ winsize ()
 
 	- Others?
 

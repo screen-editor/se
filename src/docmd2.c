@@ -12,7 +12,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
+
+#ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
+#endif
 
 #include "se.h"
 #include "docmd1.h"
@@ -661,6 +664,7 @@ void dfltsopt (char name[])
 
 int doshell (char lin[], int *pi)
 {
+#ifdef HAVE_FORK
 	int rc;
 	int forkstatus, childstatus;
 	void (*save_quit)(int);
@@ -858,6 +862,12 @@ int doshell (char lin[], int *pi)
 	{
 		remark ("Not implemented yet");
 	}
+#else /* !HAVE_FORK */
+
+	remark ("Not implemented yet");
+
+#endif /* !HAVE_FORK */
+
 
 	return SE_OK;
 }

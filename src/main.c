@@ -127,8 +127,13 @@ extern char *getenv ();
 
 int main (int argc, char *argv[])
 {
+#ifdef SIGINT
 	void (*old_int) (int);
+#endif /* SIGINT */
+
+#ifdef SIGQUIT
 	void (*old_quit) (int);
+#endif /* SIGQUIT */
 
 	/* catch quit and hangup signals */
 	/*
@@ -137,12 +142,27 @@ int main (int argc, char *argv[])
 	 * the terminal.  Now we just ignore them if sent from elsewhere.
 	 */
 
+#ifdef SIGHUP
 	signal (SIGHUP, hup_hdlr);
+#endif /* SIGHUP */
 
+#ifdef SIGINT
 	old_int = signal (SIGINT, int_hdlr);
-	old_quit = signal (SIGQUIT, SIG_IGN);
+#endif /* SIGINT */
 
-	if (old_int == SIG_IGN || old_quit == SIG_IGN)
+#ifdef SIGQUIT
+	old_quit = signal (SIGQUIT, SIG_IGN);
+#endif /* SIGQUIT */
+
+	if (
+#ifdef SIGINT
+		old_int == SIG_IGN ||
+#endif /* SIGINT */
+#ifdef SIGQUIT
+		old_quit == SIG_IGN ||
+#endif /* SIGQUIT */
+		0
+	)
 	{
 		/* fired off into the background, refuse to run */
 		if (isatty (fileno (stdin)))
@@ -182,11 +202,21 @@ void error (int coredump, char *msg)
 
 	ttynormal ();
 	fprintf (stderr, "%s\n", msg);
+
+#ifdef SIGQUIT
+
 	signal (SIGQUIT, SIG_DFL);	/* restore normal quit handling */
+
 	if (coredump)
 		kill (getpid (), SIGQUIT);	/* dump memory */
 	else
 		exit (1);
+
+#else /* !SIGQUIT */
+
+	exit (1);
+
+#endif /* !SIGQUIT */
 }
 
 /* initialize --- set up global data areas, get terminal type */
@@ -249,6 +279,7 @@ void int_hdlr (int sig)
 
 void hup_hdlr (int sig)
 {
+#ifdef SIGHUP
 	if (sig == SIGHUP)
 	{
 
@@ -262,6 +293,7 @@ void hup_hdlr (int sig)
 			hangup ();
 		}
 	}
+#endif /* SIGHUP */
 }
 
 /* hangup --- dump contents of edit buffer if SIGHUP occurs */
@@ -273,9 +305,18 @@ void hangup (void)
 	close (1);
 	close (2);
 
+#ifdef SIGHUP
 	signal (SIGHUP, SIG_IGN);
+#endif /* SIGHUP */
+
+#ifdef SIGINT
 	signal (SIGINT, SIG_IGN);
+#endif /* SIGINT */
+
+#ifdef SIGQUIT
 	signal (SIGQUIT, SIG_IGN);
+#endif /* SIGQUIT */
+
 	Hup_caught = 0;
 
 #ifdef HAVE_CRYPT

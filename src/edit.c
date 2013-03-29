@@ -9,15 +9,22 @@
 #include "config.h"
 
 #include <string.h>
-#include <sys/utsname.h>	/* stuff to find out who we are */
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
 
+#ifdef HAVE_SYS_UTSNAME_H
+#include <sys/utsname.h>	/* stuff to find out who we are */
+#endif /* HAVE_SYS_UTSNAME_H */
+
+#ifdef HAVE_WINSOCK2_H
+#include <Winsock2.h>
+#endif /* HAVE_WINSOCK2_H */
+
 #ifdef LOG_USAGE
 #include <syslog.h>
-#endif
+#endif /* LOG_USAGE */
 
 #include "se.h"
 #include "docmd1.h"
@@ -1249,6 +1256,9 @@ int settab (char str[])
 
 int serc_safe (char *path)
 {
+
+#ifdef HAVE_STAT
+
 	int rc;
 	uid_t our_euid;
 	struct stat sbuf;
@@ -1274,6 +1284,13 @@ int serc_safe (char *path)
 	}
 
 	return SE_YES;
+
+#else
+
+	return SE_NO;
+
+#endif
+
 }
 
 
@@ -1384,7 +1401,32 @@ void log_usage (void)
 
 char *sysname (void)
 {
+
+#ifdef HAVE_UNAME
+
 	static struct utsname whoarewe;
 	uname (& whoarewe);
 	return (whoarewe.nodename);
+
+#else /* !HAVE_UNAME */
+
+#ifdef HAVE_GETHOSTNAME
+	WSADATA wsaData;
+	static char hostname[MAXLINE];
+
+	memset(hostname, SE_EOS, MAXLINE);
+
+	WSAStartup(MAKEWORD(2, 2), &wsaData);
+	gethostname(hostname, MAXLINE-1);
+	WSACleanup();
+
+	return hostname;
+#else /* !HAVE_GETHOSTNAME */
+
+	return "localhost";
+
+#endif /* !HAVE_GETHOSTNAME */
+
+
+#endif /* !HAVE_UNAME */
 }
