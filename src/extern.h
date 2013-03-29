@@ -101,7 +101,7 @@ extern char *Tobp;		/* pointer to last used part of Tobuf */
 /* Concerning interrupts: */
 extern int Int_caught;		/* caught a SIGINT from user */
 extern int Hup_caught;		/* caught a SIGHUP when phone line dropped */
-extern int Catching_stops;	/* catching or ignoring SIGTSTP's? */
+
 
 #ifdef HAVE_CRYPT
 /* Concerning file encryption: */

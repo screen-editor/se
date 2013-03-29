@@ -611,23 +611,6 @@ int doopt (char lin[], int *i)
 		}
 		break;
 
-
-	case 'z':	/* suspend the editor process */
-	case 'Z':
-		if (lin[*i + 1] == '\n')
-		{
-			ret = SE_OK;
-
-			if (Catching_stops)
-			{
-				if (Buffer_changed == SE_YES)
-					fprintf (stderr, "WARNING: buffer not saved\r\n");
-				kill (getpid(), SIGTSTP);
-				/* stop_hdlr() will do all the work for us */
-			}
-		}
-		break;
-
 	case 't':	/* set or display tab stops for expanding tabs */
 	case 'T':
 		++(*i);

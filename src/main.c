@@ -114,7 +114,6 @@ char *Tobp = Tobuf - 1;	/* pointer to last used part of Tobuf */
 /* Concerning interrupts: */
 int Int_caught = 0;	/* caught a SIGINT from user */
 int Hup_caught = 0;	/* caught a SIGHUP when phone line dropped */
-int Catching_stops;	/* catching or ignoring SIGTSTP's? */
 
 #ifdef HAVE_CRYPT
 /* Concerning file encryption: */
@@ -128,10 +127,8 @@ extern char *getenv ();
 
 int main (int argc, char *argv[])
 {
-	char *basename ();
-	void (*old_int)(int);
-	void (*old_quit)(int);
-	void (*old_stop)(int);
+	void (*old_int) (int);
+	void (*old_quit) (int);
 
 	/* catch quit and hangup signals */
 	/*
@@ -156,19 +153,6 @@ int main (int argc, char *argv[])
 		}
 		/* else
 			assume input is a script */
-	}
-
-	old_stop = signal (SIGTSTP, stop_hdlr);
-
-	if (old_stop == SIG_IGN)	/* running bourne shell */
-	{
-		signal (SIGTSTP, SIG_IGN);	/* restore it */
-		Catching_stops = SE_NO;
-	}
-	else
-	{
-		Catching_stops = SE_YES;
-		/* running C-shell or BRL sh, catch Control-Z's */
 	}
 
 	/* set terminal to no echo, no output processing, break enabled */
@@ -277,30 +261,6 @@ void hup_hdlr (int sig)
 		{
 			hangup ();
 		}
-	}
-}
-
-/* stop_hdlr --- handle the berkeley stop/suspend signal */
-
-void stop_hdlr (int sig)
-{
-	if (sig == SIGSTOP)
-	{
-
-		clrscreen ();
-		tflush ();
-		ttynormal ();
-
-		/* this handler remains in effect, use uncatchable signal */
-		kill (getpid(), SIGSTOP);
-
-		/*
-		 * user does a "fg"
-		 */
-		signal (SIGTSTP, stop_hdlr);	/* reset stop catching */
-
-		ttyedit ();
-		restore_screen ();
 	}
 }
 

@@ -13,7 +13,6 @@ void initialize(int argc, char *argv[]);
 int intrpt(void);
 void int_hdlr(int sig);
 void hup_hdlr(int sig);
-void stop_hdlr(int sig);
 void hangup(void);
 void mswait(void);
 void print_verbose_err_msg(void);
