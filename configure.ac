@@ -8,6 +8,7 @@ dnl
 
 AC_INIT([se], [3.0.1], [tcort@se-editor.org])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_SILENT_RULES([yes])
 
 dnl
 dnl Look for a working C compiler
