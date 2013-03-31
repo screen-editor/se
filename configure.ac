@@ -44,7 +44,10 @@ dnl
 dnl check for crypt(1) program
 dnl
 
-AC_CHECK_PROG(USE_CRYPT, crypt, AC_DEFINE([HAVE_CRYPT_PROG], [1], [crypt(1) is available]))
+AC_CHECK_PROG(CRYPT_PROG, crypt, yes)
+if test x"${CRYPT_PROG}" != x"" ; then
+	AC_DEFINE([HAVE_CRYPT_PROG], [1], [crypt(1) is available])
+fi
 AC_CHECK_HEADERS([unistd.h])
 AC_CHECK_LIB(bsd, getpass)
 
