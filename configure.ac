@@ -75,11 +75,23 @@ if test "x$GCC" = "xyes" ; then
 fi
 
 dnl
+dnl check for diff(1)
+dnl
+
+AC_ARG_VAR([DIFF],[the 'diff' program to use for test output comparison])
+AC_PATH_PROG([DIFF],[diff],[])
+if test "x$DIFF" = "x"; then
+	AC_MSG_NOTICE([==> diff command not found!])
+	AC_MSG_NOTICE([==> Set DIFF variable if present in non-standard path!])
+	AC_MSG_NOTICE([diff is mandatory to run the tests])
+fi
+
+dnl
 dnl generate some files
 dnl
 
 dnl short filename for DOS
 AC_CONFIG_HEADERS([config.h:config.in])
 
-AC_CONFIG_FILES([Makefile src/Makefile help/Makefile man/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile help/Makefile man/Makefile tests/Makefile])
 AC_OUTPUT

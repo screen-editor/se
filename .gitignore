@@ -1,6 +1,7 @@
 Makefile
 Makefile.in
 *.o
+*.out
 .deps
 config.*
 configure

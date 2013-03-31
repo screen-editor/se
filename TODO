@@ -34,8 +34,6 @@ Other Improvements:
 
 	- Better usage() output with useful explainations.
 
-	- add a test suite.
-
 	- internationalization.
 
 	- continue to clean up the code
