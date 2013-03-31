@@ -23,7 +23,7 @@ int doundo(int dflg, int *status);
 int dowrit(int from, int to, char *file, int aflag, int fflag, int tflag);
 char *expand_env(char *file);
 
-#ifdef HAVE_CRYPT
+#ifdef HAVE_CRYPT_PROG
 FILE *crypt_open (char *file, char *mode);
 void crypt_close (FILE *fp);
 void getkey (void);

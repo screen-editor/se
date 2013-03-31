@@ -57,9 +57,9 @@ typedef	struct ldesc {		/* line	descriptor */
 #define GARB_THRESHOLD	1000
 #define BUFENT		1
 
-#ifdef HAVE_CRYPT
+#ifdef HAVE_CRYPT_PROG
 #define KEYSIZE		11
-#endif /* HAVE_CRYPT */
+#endif /* HAVE_CRYPT_PROG */
 
 /* Message classes for status line at bottom of	screen */
 #define SE_NOMSG		0

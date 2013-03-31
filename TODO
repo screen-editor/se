@@ -1,12 +1,3 @@
-This section lists tasks that I'm actively working on. These will
-likely make it into the next version:
-
-	- encryption without the crypt(1) program
-
-		* the crypt(1) program isn't so popular these
-		days, but most systems have the encrypt(3) functions,
-		so use those to do encryption instead.
-
 This section lists *potential* improvements for future versions of se.
 
 Documentation:

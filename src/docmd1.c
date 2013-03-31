@@ -12,14 +12,7 @@
 #include <stdlib.h>
 
 #ifdef HAVE_UNISTD_H
-
-#ifdef HAVE_CRYPT
-/* to get encrypt(3) */
-#define _XOPEN_SOURCE
-#endif /* HAVE_CRYPT */
-
 #include <unistd.h>
-
 #endif /* HAVE_UNISTD_H */
 
 #include "se.h"
@@ -941,7 +934,7 @@ int doopt (char lin[], int *i)
 	case 'y':	/* encrypt files */
 	case 'Y':
 
-#ifdef HAVE_CRYPT
+#ifdef HAVE_CRYPT_PROG
 
 		if (lin[*i + 1] == '\n')
 		{
@@ -999,12 +992,13 @@ int doopt (char lin[], int *i)
 		mesg (Crypting ? "ENCRYPT" : "", CRYPT_MSG);
 		break;
 
-#else /* !HAVE_CRYPT */
+#else /* !HAVE_CRYPT_PROG */
 
+		ret = SE_OK;
 		remark ("encryption not supported");
 		break;
 
-#endif /* !HAVE_CRYPT */
+#endif /* !HAVE_CRYPT_PROG */
 
 	default:
 		Errcode = EOWHAT;
@@ -1080,18 +1074,18 @@ int doread (int line, char *file, int tflag)
 		mesg (Savfil, FILE_MSG);
 	}
 
-#ifdef HAVE_CRYPT
+#ifdef HAVE_CRYPT_PROG
 
 	if (Crypting)
 		fd = crypt_open (file, "r");
 	else
 		fd = fopen (file, "r");
 
-#else /* !HAVE_CRYPT */
+#else /* !HAVE_CRYPT_PROG */
 
 	fd = fopen (file, "r");
 
-#endif /* !HAVE_CRYPT */
+#endif /* !HAVE_CRYPT_PROG */
 
 	if (fd == NULL)
 	{
@@ -1147,18 +1141,18 @@ int doread (int line, char *file, int tflag)
 			}
 		}
 
-#ifdef HAVE_CRYPT
+#ifdef HAVE_CRYPT_PROG
 
 		if (Crypting)
 			crypt_close (fd);
 		else
 			fclose (fd);
 
-#else /* !HAVE_CRYPT */
+#else /* !HAVE_CRYPT_PROG */
 
 		fclose (fd);
 
-#endif /* !HAVE_CRYPT */
+#endif /* !HAVE_CRYPT_PROG */
 
 		saynum (count);
 		Curln = line + count;
@@ -1390,36 +1384,36 @@ int dowrit (int from, int to, char *file, int aflag, int fflag, int tflag)
 		if (aflag == SE_YES)
 		{
 
-#ifdef HAVE_CRYPT
+#ifdef HAVE_CRYPT_PROG
 
 			if (Crypting)
 				fd = crypt_open (file, "a");
 			else
 				fd = fopen (file, "a");
 
-#else /* !HAVE_CRYPT */
+#else /* !HAVE_CRYPT_PROG */
 
 			fd = fopen (file, "a");
 
-#endif /* !HAVE_CRYPT */
+#endif /* !HAVE_CRYPT_PROG */
 
 		}
 		else if (strcmp (file, Savfil) == 0 || fflag == SE_YES
 		    || Probation == WRITECOM || access (file, 0) == -1)
 		{
 
-#ifdef HAVE_CRYPT
+#ifdef HAVE_CRYPT_PROG
 
 			if (Crypting)
 				fd = crypt_open (file, "w");
 			else
 				fd = fopen (file, "w");
 
-#else /* !HAVE_CRYPT */
+#else /* !HAVE_CRYPT_PROG */
 
 			fd = fopen (file, "w");
 
-#endif /* !HAVE_CRYPT */
+#endif /* !HAVE_CRYPT_PROG */
 
 		}
 		else
@@ -1455,18 +1449,18 @@ int dowrit (int from, int to, char *file, int aflag, int fflag, int tflag)
 				k = NEXTLINE(k);
 			}
 
-#ifdef HAVE_CRYPT
+#ifdef HAVE_CRYPT_PROG
 
 			if (Crypting)
 				crypt_close (fd);
 			else
 				fclose (fd);
 
-#else /* !HAVE_CRYPT */
+#else /* !HAVE_CRYPT_PROG */
 
 			fclose (fd);
 
-#endif /* !HAVE_CRYPT */
+#endif /* !HAVE_CRYPT_PROG */
 
 
 
@@ -1543,7 +1537,7 @@ char *expand_env (char *file)
 	return (buf);
 }
 
-#ifdef HAVE_CRYPT
+#ifdef HAVE_CRYPT_PROG
 
 /* crypt_open -- run files through crypt */
 
@@ -1624,4 +1618,4 @@ void getkey (void)
 	restore_screen ();
 }
 
-#endif /* HAVE_CRYPT */
+#endif /* HAVE_CRYPT_PROG */

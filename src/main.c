@@ -115,11 +115,11 @@ char *Tobp = Tobuf - 1;	/* pointer to last used part of Tobuf */
 int Int_caught = 0;	/* caught a SIGINT from user */
 int Hup_caught = 0;	/* caught a SIGHUP when phone line dropped */
 
-#ifdef HAVE_CRYPT
+#ifdef HAVE_CRYPT_PROG
 /* Concerning file encryption: */
 int Crypting = SE_NO;	/* doing file encryption? */
 char Key[KEYSIZE] = "";	/* saved encryption key */
-#endif /* HAVE_CRYPT */
+#endif /* HAVE_CRYPT_PROG */
 
 extern char *getenv ();
 
@@ -319,9 +319,9 @@ void hangup (void)
 
 	Hup_caught = 0;
 
-#ifdef HAVE_CRYPT
+#ifdef HAVE_CRYPT_PROG
 	Crypting = SE_NO;		/* force buffer to be clear text */
-#endif /* HAVE_CRYPT */
+#endif /* HAVE_CRYPT_PROG */
 
 	dowrit (1, Lastln, "se.hangup", SE_NO, SE_YES, SE_NO);
 	clrbuf ();

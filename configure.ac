@@ -41,19 +41,19 @@ AS_IF([test "x$CURSES_LOC" = "x"], [AC_MSG_ERROR([curses headers not found])])
 AC_SUBST(CURSES_LOC)
 
 dnl
-dnl crypt library and header detection
+dnl check for crypt(1) program
 dnl
 
-AC_SEARCH_LIBS(crypt, [crypt c])
-AC_CHECK_FUNCS([crypt])
+AC_CHECK_PROG(USE_CRYPT, crypt, AC_DEFINE([HAVE_CRYPT_PROG], [1], [crypt(1) is available]))
 AC_CHECK_HEADERS([unistd.h])
+AC_CHECK_LIB(bsd, getpass)
 
 dnl
 dnl check for system dependent header files and functions
 dnl
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS([sys/ioctl.h sys/utsname.h sys/wait.h])
+AC_CHECK_HEADERS([sys/ioctl.h sys/utsname.h sys/wait.h unistd.h])
 AC_CHECK_FUNCS([fork getpass mkstemp pclose popen sync uname])
 
 dnl
@@ -63,12 +63,6 @@ dnl
 AC_CHECK_HEADERS([Winsock2.h])
 AC_CHECK_LIB(Ws2_32, gethostname)
 AC_CHECK_FUNCS([gethostname])
-
-dnl
-dnl Haiku needs -lbsd for getpass(3)
-dnl
-
-AC_CHECK_LIB(bsd, getpass)
 
 dnl
 dnl Enable some extra warnings when using gcc.
