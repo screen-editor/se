@@ -16,7 +16,6 @@ dnl
 
 AC_ISC_POSIX
 AC_PROG_CC
-AM_PROG_CC_STDC
 
 dnl
 dnl Give the user the option of enabling usage logging.
