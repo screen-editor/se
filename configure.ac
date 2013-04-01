@@ -56,8 +56,8 @@ dnl check for system dependent header files and functions
 dnl
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS([sys/ioctl.h sys/utsname.h sys/wait.h unistd.h])
-AC_CHECK_FUNCS([fork getpass mkstemp pclose popen sync uname])
+AC_CHECK_HEADERS([sys/ioctl.h sys/utsname.h sys/wait.h termio.h termios.h termcap.h unistd.h])
+AC_CHECK_FUNCS([fork getpass mkstemp pclose popen sync tcgetattr tcsetattr uname])
 
 dnl
 dnl Discover gethostname on mingw32

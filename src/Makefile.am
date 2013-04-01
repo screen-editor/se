@@ -7,6 +7,7 @@ bin_PROGRAMS = se scriptse
 
 se_SOURCES = \
 	ascii.h				\
+	changetty.c changetty.h		\
 	constdef.h			\
 	docmd1.c docmd1.h		\
 	docmd2.c docmd2.h		\

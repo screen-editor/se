@@ -25,7 +25,4 @@ int se_set_term(char *type);
 void brighton(void);
 void brightoff(void);
 
-void ttynormal (void);
-void ttyedit (void);
-
 #endif

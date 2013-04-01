@@ -15,6 +15,7 @@
 #include <sys/stat.h>
 
 #include "se.h"
+#include "changetty.h"
 #include "docmd1.h"
 #include "edit.h"
 #include "main.h"

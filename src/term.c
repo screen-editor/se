@@ -15,18 +15,24 @@
 
 #include <stdlib.h>
 #include <signal.h>
-
-#ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
-#endif /* HAVE_SYS_IOCTL_H */
 
-#ifdef CURSES_LOC
-#include CURSES_LOC
-#else /* !CURSES_LOC */
-#include <curses.h>
-#endif /* !CURSES_LOC */
+#ifdef HAVE_TERMCAP_H
+#include <termcap.h>
+#endif
+
+#ifdef HAVE_TERMIOS_H
+#include <termios.h>
+#else
+/* fallback to termio */
+#ifdef HAVE_TERMIO_H
+#include <termio.h>
+#endif
+#endif
 
 #include "se.h"
+#include "constdef.h"
+#include "changetty.h"
 #include "extern.h"
 #include "main.h"
 #include "misc.h"
@@ -39,52 +45,134 @@ int outc (int i)
 {
 	char c;
 	c = (char) i;
-	echochar (c);
+	twrite (1, &c, 1);
 	return i;
 }
 
-static int t_initialized = 0;
+/*
+ * code for using BSD termlib -- getting capabilities, and writing them out.
+ */
+
+/* capabilities from termcap */
+
+static int AM;		/* automatic margins, i.e. wraps at column 80 */
+
+static char *VS;	/* visual start -- e.g. clear status line */
+static char *VE;	/* visual end -- e.g. restore status line */
+static char *TI;	/* terminal init -- whatever needed for screen ops */
+static char *TE;	/* terminal ops end */
+static char *CM;	/* cursor motion, used by tgoto() */
+static char *CE;	/* clear to end of line */
+static char *DL;	/* hardware delete line */
+static char *AL;	/* hardware add (insert) line */
+static char *CL;	/* clear screen */
+static char *STANDOUT;	/* standout on  (SO conflicts w/ASCII character name) */
+static char *SE;	/* standout end */
+
+extern char PC;		/* Pad character, usually '\0' */
+
+static char *pcstr;
+
+static char caps[128];		/* space for decoded capability strings */
+static char *addr_caps;		/* address of caps for relocation */
+
+#define TERMBUFSIZ	1024+1
+static char termbuf[TERMBUFSIZ];
+
+/* getdescrip --- get descriptions out of termcap entry */
+
+void getdescrip (void)
+{
+	int i;
+	static struct _table {
+		char *name;
+		char **ptr_to_cap;
+	} table[] = {
+		{"vs",	& VS},
+		{"ve",	& VE},
+		{"ti",	& TI},
+		{"te",	& TE},
+		{"cm",	& CM},
+		{"ce",	& CE},
+		{"dl",	& DL},
+		{"al",	& AL},
+		{"cl",	& CL},
+		{"so",	& STANDOUT},
+		{"se",	& SE},
+		{"pc",	& pcstr},
+		{NULL,	NULL}
+	};
+
+	AM = tgetflag ("am");		/* only boolean se needs */
+
+	/* get string values */
+
+	for (i = 0; table[i].name != NULL; i++)
+	{
+		*(table[i].ptr_to_cap) = tgetstr (table[i].name, & addr_caps);
+	}
+}
+
+/* setcaps -- get the capabilities from termcap file into termbuf */
+
+int setcaps (char *term)
+{
+	switch (tgetent (termbuf, term)) {
+	case -1:
+		error (SE_NO, "se: couldn't open termcap file.");
+
+	case 0:
+		error (SE_NO, "se: no termcap entry for terminal.");
+
+	case 1:
+		addr_caps = caps;
+		getdescrip ();		/* get terminal description */
+		Nrows = tgetnum ("li");
+		Ncols = tgetnum ("co");
+		PC = pcstr ? pcstr[0] : SE_EOS;
+		break;
+
+	default:
+		error (SE_YES, "in setcaps: can't happen.\n");
+	}
+
+	return (SE_OK);
+}
+
 
 /* t_init -- put out terminal initialization string */
 
 void t_init (void)
 {
-	if (!t_initialized)
-	{
-		/* terminal initializations */
-		initscr ();
-		t_initialized = 1;
-	}
+	if (VS)
+		tputs (VS, 1, outc);
+	if (TI)
+		tputs (TI, 1, outc);	/* terminal initializations */
 }
 
 /* t_exit -- put out strings to turn off whatever modes we had turned on */
 
 void t_exit (void)
 {
-	if (t_initialized)
-	{
-		/* terminal exiting strings */
-		endwin ();
-		t_initialized = 0;
-	}
-}
-
-/* ttynormal -- set the terminal to correct modes for normal use */
-
-void ttynormal (void)
-{
-	nocbreak ();
-}
-
-/* ttyedit -- set the terminal to correct modes for editing */
-
-void ttyedit (void)
-{
-	cbreak ();
+	/* terminal exiting strings */
+	if (TE)
+		tputs (TE, 1, outc);
+	if (VE)
+		tputs (VE, 1, outc);
+	tflush ();	/* force it out */
 }
 
 /* winsize --- get the size of the window from the windowing system */
 /*		also arrange to catch the windowing signal */
+
+/* 4.3 BSD and/or Sun 3.x */
+#define WINSIG		SIGWINCH
+#define WINIOCTL	TIOCGWINSZ
+#define WINSTRUCT	winsize
+#define COLS w.ws_col
+#define ROWS w.ws_row
+
+static struct WINSTRUCT w;
 
 void winsize (int sig)
 {
@@ -93,47 +181,39 @@ void winsize (int sig)
 	int row, oldstatus = Nrows - 1;
 	int cols, rows;
 
-#ifdef SIGWINCH
+	signal (WINSIG, winsize);
 
-	/* handle window resizing */
-
-	signal (SIGWINCH, winsize);
-
-	if (!first)
+	if (ioctl (0, WINIOCTL, (char *) & w) != -1)
 	{
-		struct winsize size;
-		ioctl(0, TIOCGWINSZ, &size);
-		resizeterm(size.ws_row, size.ws_col);
-	}
+		cols = COLS;
+		rows = ROWS;
 
-#endif /* SIGWINCH */
-
-	cols = COLS;
-	rows = LINES;
-
-	if (first)
-	{
-		first = 0;
-		if (cols && rows)
+		if (first)
 		{
-			Ncols = cols;
-			Nrows = rows;
+			first = 0;
+			if (cols && rows)
+			{
+				Ncols = cols;
+				Nrows = rows;
+			}
+			return;		/* don't redraw screen */
 		}
-		return;		/* don't redraw screen */
-	}
-	else if (Ncols == cols && Nrows == rows)
-	{
-		/* only position changed */
-		return;
+		else if (Ncols == cols && Nrows == rows)
+		{
+			/* only position changed */
+			return;
+		}
+		else
+		{
+			if (cols && rows)
+			{
+				Ncols = cols;
+				Nrows = rows;
+			}
+		}
 	}
 	else
-	{
-		if (cols && rows)
-		{
-			Ncols = cols;
-			Nrows = rows;
-		}
-	}
+		return;
 
 	move_ (Screen_image[oldstatus], savestatus, MAXCOLS);
 	clrscreen ();
@@ -143,17 +223,15 @@ void winsize (int sig)
 	Sclen = -1;
 
 	for (row = 0; row < Nrows; row++)
-	{
 		move_ (Blanks, Screen_image[row], MAXCOLS);
 		/* clear screen */
-	}
 
 	First_affected = Topln;
 	adjust_window (Curln, Curln);
 	updscreen ();	/* reload from buffer */
 	loadstr (savestatus, Nrows - 1, 0, Ncols);
 	remark ("window size change");
-	refresh ();
+	tflush ();
 }
 
 
@@ -170,14 +248,14 @@ void send (char chr)
 
 	if (Curcol == Ncols - 1)
 	{
-		/* terminal wraps when hits last column */
-		Curcol = 0;
-		Currow++;
+		if (AM)		/* terminal wraps when hits last column */
+		{
+			Curcol = 0;
+			Currow++;
+		}
 	}
 	else		/* cursor not at extreme right */
-	{
 		Curcol++;
-	}
 }
 
 /* clrscreen --- clear entire screen */
@@ -188,8 +266,7 @@ void clrscreen (void)
 	/* clearing screen homes cursor to upper left corner */
 	/* on all terminals */
 
-	erase ();
-	refresh ();
+	tputs (CL, 1, outc);
 }
 
 
@@ -205,24 +282,19 @@ void position_cursor (int row, int col)
 		{
 			/* short motion in current line */
 			if (Curcol < col)
-			{
 				for (; Curcol != col; Curcol++)
-				{
-					outc(Screen_image[Currow][Curcol]);
-				}
-			}
+					twrite (1, &Screen_image[Currow][Curcol], 1);
 			else
-			{
 				for (; Curcol != col; Curcol--)
-				{
-					outc('\b');
-				}
-			}
+					twrite (1, "\b", 1);
 		}
 		else
 		{
-			move (row, col);
-			refresh ();
+#if defined (USG) && defined(S5R2)
+			tputs (tparm (cursor_address, row, col), 1, outc);
+#else
+			tputs (tgoto (CM, col, row), 1, outc);
+#endif
 			Currow = row;
 			Curcol = col;
 		}
@@ -266,8 +338,8 @@ void inslines (int row, int n)
 
 	for (i = 0; i < n; i++)
 	{
-		insertln ();
-		refresh ();
+		tputs (AL, n, outc);
+		tflush ();
 	}
 
 	for (i = Nrows - 1; i - n >= Currow; i--)
@@ -288,8 +360,8 @@ void dellines (int row, int n)
 
 	for (i = 0; i < n; i++)
 	{
-		deleteln ();
-		refresh ();
+		tputs (DL, n, outc);
+		tflush ();
 	}
 
 	for (i = Currow; i + n < Nrows; i++)
@@ -304,7 +376,10 @@ void dellines (int row, int n)
 
 int hwinsdel (void)
 {
-	return SE_YES;
+	if (No_hardware == SE_YES)
+		return (SE_NO);
+
+	return (AL != NULL && DL != NULL);
 }
 
 
@@ -315,12 +390,11 @@ void clear_to_eol (int row, int col)
 	int c, flag;
 	int hardware = SE_NO;
 
-	hardware = SE_YES;
+	hardware = (CE != NULL);
 
 	flag = SE_NO;
 
 	for (c = col; c < Ncols; c++)
-	{
 		if (Screen_image[row][c] != ' ')
 		{
 			Screen_image[row][c] = ' ';
@@ -332,13 +406,11 @@ void clear_to_eol (int row, int col)
 				send (' ');
 			}
 		}
-	}
 
 	if (flag == SE_YES)
 	{
 		position_cursor (row, col);
-		clrtoeol ();
-		refresh ();
+		tputs (CE, 1, outc);
 	} /* end if (flag == SE_YES) */
 }
 
@@ -351,18 +423,28 @@ int se_set_term (char *type)
 		error (SE_NO, "se: terminal type not available");
 	}
 
-	t_init ();
+	if (type[0] == SE_EOS)
+	{
+		error (SE_NO, "in se_set_term: can't happen.");
+	}
 
 	Ncols = Nrows = -1;
 
-	move (0, 0);
-	refresh ();
+	if (setcaps (type) == SE_ERR)
+	{
+		error (SE_NO, "se: could not find terminal in system database");
+	}
+
+	if (tgoto (CM, 0, 0) == NULL)	/* OOPS returned.. */
+	{
+		error (SE_NO, "se: terminal does not have cursor motion.");
+	}
 
 	/*
 	 * first, get it from the library. then check the
 	 * windowing system, if there is one.
 	 */
-	winsize (0);
+	winsize (WINSIG);
 
 	if (Nrows == -1)
 		error (SE_NO, "se: could not determine number of rows");
@@ -377,12 +459,14 @@ int se_set_term (char *type)
 
 void brighton (void)
 {
-	attron (A_REVERSE);
+	if (STANDOUT)
+		tputs (STANDOUT, 1, outc);
 }
 
 /* brightoff --- turn off reverse video/standout mode */
 
 void brightoff (void)
 {
-	attroff (A_REVERSE);
+	if (SE)
+		tputs (SE, 1, outc);
 }

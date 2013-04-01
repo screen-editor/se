@@ -18,6 +18,7 @@
 #endif
 
 #include "se.h"
+#include "changetty.h"
 #include "docmd1.h"
 #include "docmd2.h"
 #include "edit.h"
