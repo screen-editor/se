@@ -17,14 +17,6 @@ Port to the following operating systems:
 		reward target, but it might be an interesting
 		platform to support.
 
-	- More complete mingw32 port
-
-		* Reimplement
-
-			+ doshell ()
-			+ serc_safe ()
-			+ winsize ()
-
 	- Others?
 
 		Feel free to suggest other operating systems.
