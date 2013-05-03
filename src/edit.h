@@ -31,7 +31,7 @@ int optpat(char lin[], int *i);
 int ptscan(int way, int *num);
 int settab(char str[]);
 void serc(void);
-int serc_safe (char *path);
+FILE *serc_safe_open (char *path);
 char *sysname(void);
 void log_usage(void);
 
