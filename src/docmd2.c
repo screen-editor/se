@@ -677,6 +677,8 @@ int doshell (char lin[], int *pi)
 	static char sav_com[MAXLINE] = "";
 	int expanded = SE_NO;
 
+	memset(new_command, '\0', sizeof(char) * MAXLINE);
+
 	if (Nlines == 0)        /* use normal 'ed' behavior */
 	{
 		tflush ();	/* flush out the terminal output */
@@ -763,7 +765,7 @@ int doshell (char lin[], int *pi)
 				new_command[j++] = lin[i];
 		}
 
-		if (new_command[j-1] == '\n')
+		if (j > 0 && new_command[j-1] == '\n')
 			j--;
 		new_command[j] = SE_EOS;
 
