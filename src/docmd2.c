@@ -823,8 +823,8 @@ int doshell (char lin[], int *pi)
 		save_quit = signal (SIGQUIT, SIG_IGN);
 		while (wait (&childstatus) != forkstatus)
 			;
-		save_int = signal (SIGINT, save_int);       /* catch interupts */
-		save_quit = signal (SIGQUIT, save_quit);
+		signal (SIGINT, save_int);       /* catch interupts */
+		signal (SIGQUIT, save_quit);
 
 		rc = write (1, "\n\n", 2);    /* clear out some message space */
 		if (rc == -1)
