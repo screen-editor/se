@@ -667,7 +667,7 @@ int doshell (char lin[], int *pi)
 {
 #ifdef HAVE_FORK
 	int rc;
-	int forkstatus, childstatus;
+	int forkstatus, childstatus = 0;
 	void (*save_quit)(int);
 	void (*save_int)(int);
 	int i, auto_redraw;
