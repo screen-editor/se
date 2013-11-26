@@ -793,6 +793,12 @@ int doshell (char lin[], int *pi)
 			signal (SIGINT, SIG_DFL);
 			signal (SIGQUIT, SIG_DFL);
 
+			if (name == NULL) {
+				remark ("NULL command name.");
+				Errcode = ESTUPID;
+				return SE_ERR;
+			}
+
 			if (strcmp (name, "sh") != 0)	/* not /bin/sh */
 			{
 				signal (SIGTSTP, SIG_DFL);
