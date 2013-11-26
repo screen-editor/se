@@ -24,10 +24,12 @@ Port to the following operating systems:
 
 Other Improvements:
 
-	- Better usage() output with useful explainations.
+	- Better usage() output with useful explanations.
 
 	- internationalization.
 
+	- develop more test scripts and maybe some unit tests.
+
 	- continue to clean up the code
 
-		* use lint, splint, rats, ... static analysis tools
+		* use lint, splint, rats, and other static analysis tools
