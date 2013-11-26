@@ -1055,6 +1055,8 @@ void fixscreen (void)
 	int wline[MAXROWS];	/* new screen contents; Scline contains old */
 	int p;
 
+	memset(wline, 0, sizeof(int) * MAXROWS);
+
 	/* if the screen width was changed, give up before it's too late */
 	if (Botrow - Toprow + 1 != Sclen || ! hwinsdel())
 	{
