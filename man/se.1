@@ -86,7 +86,9 @@ obeying the options given there, and begins
 reading your file (if you specified one).
 The
 .B .serc
-file is only evaluated if the euid of se matches the owner for the file
+file is only evaluated if the euid of
+.I se
+matches the owner for the file
 and no other users have permission to write to the file.
 The screen it draws
 looks something like this.
@@ -352,7 +354,9 @@ using a special shell file in your bin (for
 .IR sh (1)).
 The
 .B .serc
-file is only evaluated if the euid of se matches the owner for the file
+file is only evaluated if the euid of
+.I se
+matches the owner for the file
 and no other users have permission to write to the file.
 .PP
 Command line options are processed
@@ -1338,7 +1342,9 @@ well. This was finished in early 1985.
 In early 2013, Thomas Cort continued maintenance of se, modernizing
 the code base and build system to support current POSIX operating systems.
 Thomas' primary motivation is to preserve this bit of computing history.
-His goals are to squash any remaining bugs and make se as portable as
+His goals are to squash any remaining bugs and make
+.I se
+as portable as
 possible. No major new features will be added. He can be reached at
 tcort@se-editor.org
 
