@@ -1,0 +1,19 @@
+Installation Instructions
+
+The project uses GNU autoconf and GNU automake to generate
+scripts which will configure the build system. If there is
+not a 'configure' script present, run these commands to
+generate one based on the settings in configure.ac:
+
+	$ autoconf
+	$ automake
+
+You can use the configure script to configure the build.
+Run `./configure --help` for a complete list of options.
+Then run `make` to build the software and `make install`
+to install it. Here's a summary of the commands:
+
+	$ ./configure
+	$ make
+	# make install
+
