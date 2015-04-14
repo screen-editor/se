@@ -50,7 +50,7 @@ typedef	struct ldesc {		/* line	descriptor */
 #define MAXCHARS	10
 #define MAXROWS		200
 #define MINROWS		16
-#define MAXCOLS		200
+#define MAXCOLS		512
 #define MAXLINE		512
 #define MAXPAT		512
 #define GARB_FACTOR	2
