@@ -1,12 +1,15 @@
 # This file is in the public domain.
 
-TESTS_ENVIRONMENT = SE=$(top_builddir)/src/se \
-			SCRIPTSE=$(top_builddir)/src/scriptse \
-			TESTSDIR=$(top_srcdir)/tests \
-			DIFF=$(DIFF) \
-			$(SHELL) $(top_srcdir)/tests/driver.sh
+TESTS_ENVIRONMENT = \
+	SE=$(top_builddir)/src/se \
+	SCRIPTSE=$(top_builddir)/src/scriptse \
+	TESTSDIR=$(top_srcdir)/tests \
+	DIFF=$(DIFF) \
+	TEST_RUNNER=$(top_srcdir)/tests/test-runner.sh
 
-TESTS = hello_world
+TESTS = \
+	hello_world.sh
+
 EXPECTED = hello_world.exp
 CLEANFILES = hello_world.out
 

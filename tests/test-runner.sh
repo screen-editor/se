@@ -3,7 +3,7 @@
 # This file is in the public domain.
 #
 
-TESTFILE=$(basename $@)
+TESTFILE=$(basename ${1})
 
-${SCRIPTSE} < ${TESTSDIR}/${TESTFILE} | ${SE}
+${SCRIPTSE} < ${TESTSDIR}/${TESTFILE} | ${SE} > /dev/tty
 ${DIFF} ${TESTSDIR}/${TESTFILE}.exp ${TESTFILE}.out

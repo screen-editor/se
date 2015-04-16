@@ -15,3 +15,7 @@ depcomp
 aclocal.m4
 se.exe
 scriptse.exe
+compile
+test-driver
+*.log
+*.trs
