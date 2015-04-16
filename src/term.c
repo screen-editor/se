@@ -76,7 +76,7 @@ static char *pcstr;
 static char caps[128];		/* space for decoded capability strings */
 static char *addr_caps;		/* address of caps for relocation */
 
-#define TERMBUFSIZ	1024+1
+#define TERMBUFSIZ	2048
 static char termbuf[TERMBUFSIZ];
 
 /* getdescrip --- get descriptions out of termcap entry */
