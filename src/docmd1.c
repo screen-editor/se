@@ -16,6 +16,7 @@
 #endif /* HAVE_UNISTD_H */
 
 #include "se.h"
+#include "changetty.h"
 #include "edit.h"
 #include "extern.h"
 #include "docmd1.h"
