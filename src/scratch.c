@@ -266,6 +266,7 @@ int maklin (char lin[], int i, LINEDESC **newind)
 
 void makscr (int *fd, char str[], size_t strsize)
 {
+	mode_t oldmask;
 	char *expanded;
 
 	/* old scratch files were in /tmp, some systems use /usr/tmp.
@@ -277,7 +278,9 @@ void makscr (int *fd, char str[], size_t strsize)
 	snprintf (str, strsize >= 1 ? strsize - 1 : 0, "%s", expanded);
 
 #ifdef HAVE_MKSTEMP
+	oldmask = umask (S_IXUSR | S_IRWXG | S_IRWXO);
 	*fd = mkstemp (str);
+	umask (oldmask);
 #else /* !HAVE_MKSTEMP */
 	*fd = open(str, O_RDWR | O_CREAT | O_EXCL, 0600);
 #endif /* !HAVE_MKSTEMP */
