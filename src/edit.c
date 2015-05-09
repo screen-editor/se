@@ -99,7 +99,7 @@ void edit (int argc, char *argv[])
 
 	/* main command loop */
 	do {
-		intrpt ();	/* discard pending breaks (interrupts) */
+		(void) intrpt ();	/* discard pending breaks (interrupts) */
 		if (Lost_lines > GARB_THRESHOLD
 		    && (Lastln + Limcnt) / Lost_lines <= GARB_FACTOR)
 			garbage_collect ();
