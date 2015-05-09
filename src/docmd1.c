@@ -1432,8 +1432,10 @@ int dowrit (int from, int to, char *file, int aflag, int fflag, int tflag)
 			k = getind (from);
 			for (line = from; line <= to; line++)
 			{
-				if (intrpt ())
+				if (intrpt ()) {
+					fclose (fd);
 					return (SE_ERR);
+				}
 				gtxt (k);
 				if (Compress == SE_NO && tflag == SE_NO)
 					fputs (Txt, fd);
