@@ -13,7 +13,7 @@ int setcaps(char *term);
 void t_init(void);
 void t_exit(void);
 void winsize(int sig);
-void send(char chr);
+void send_(char chr);
 void clrscreen(void);
 void position_cursor(int row, int col);
 void setscreen(void);

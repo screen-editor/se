@@ -237,9 +237,9 @@ void winsize (int sig)
 
 /* terminal handling functions used throughout the editor */
 
-/* send --- send a printable character, predict cursor position */
+/* send_ --- send a printable character, predict cursor position */
 
-void send (char chr)
+void send_ (char chr)
 {
 	if (Currow == Nrows - 1 && Curcol == Ncols - 1)
 		return;         /* anything in corner causes scroll... */
@@ -403,7 +403,7 @@ void clear_to_eol (int row, int col)
 			else
 			{
 				position_cursor (row, c);
-				send (' ');
+				send_ (' ');
 			}
 		}
 

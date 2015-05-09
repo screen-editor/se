@@ -628,7 +628,7 @@ void load (char chr, int row, int col)
 	{
 		position_cursor (row, col);
 		Screen_image[row][col] = ch;
-		send (ch);
+		send_ (ch);
 	}
 }
 
@@ -661,7 +661,7 @@ void loadstr (char *str, int row, int stcol, int endcol)
 			{
 				Screen_image[row][c] = ch;
 				position_cursor (row, c);
-				send (ch);
+				send_ (ch);
 			}
 			c++;
 		}
@@ -679,7 +679,7 @@ void loadstr (char *str, int row, int stcol, int endcol)
 				{
 					Screen_image[row][c] = ' ';
 					position_cursor (row, c);
-					send (' ');
+					send_ (' ');
 				}
 			}
 		}
@@ -793,7 +793,7 @@ void restore_screen (void)
 			if (Screen_image[row][col] != ' ')
 			{
 				position_cursor (row, col);
-				send (Screen_image[row][col]);
+				send_ (Screen_image[row][col]);
 			}
 		}
 	}
