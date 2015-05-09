@@ -719,7 +719,7 @@ int getrhs (char lin[], int *i, char sub[], size_t subsize, int *gflag)
 		}
 	 */
 		memset (sub, SE_EOS, subsize);
-		strncpy (sub, Subs, subsize-1);
+		strncpy (sub, Subs, subsize >= 1 ? subsize-1 : 0);
 		*i += 2;
 		if (lin[*i] == '\n')
 		{
@@ -1038,7 +1038,7 @@ int makset (char array[], int *k, char set[], size_t size)
 					   || array[*k + 2] == '\n'))
 	{
 		memset (set, SE_EOS, size);
-		strncpy (set, Tset, size-1);
+		strncpy (set, Tset, size >= 1 ? size-1 : 0);
 		*k += 2;
 		if (array[*k] == '\n')
 		{

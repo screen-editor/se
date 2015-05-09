@@ -274,7 +274,7 @@ void makscr (int *fd, char str[], size_t strsize)
 	 */
 	expanded = expand_env ("$HOME/.scratch-XXXXXX");
 	memset (str, SE_EOS, strsize);
-	snprintf (str, strsize - 1, "%s", expanded);
+	snprintf (str, strsize >= 1 ? strsize - 1 : 0, "%s", expanded);
 
 #ifdef HAVE_MKSTEMP
 	*fd = mkstemp (str);
