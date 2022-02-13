@@ -6,7 +6,7 @@ dnl
 dnl Initialize autoconf and automake
 dnl
 
-AC_INIT([se], [3.0.1], [tcort@se-editor.org])
+AC_INIT([se],[3.0.1],[tcort@se-editor.org])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AM_SILENT_RULES([yes])
 
@@ -14,7 +14,7 @@ dnl
 dnl Look for a working C compiler
 dnl
 
-AC_ISC_POSIX
+AC_SEARCH_LIBS([strerror],[cposix])
 AC_PROG_CC
 
 dnl
@@ -55,7 +55,6 @@ dnl
 dnl check for system dependent header files and functions
 dnl
 
-AC_HEADER_STDC
 AC_CHECK_HEADERS([sys/ioctl.h sys/utsname.h sys/wait.h termio.h termios.h termcap.h unistd.h])
 AC_CHECK_FUNCS([fork getpass mkstemp pclose popen sync tcgetattr tcsetattr uname])
 
@@ -95,3 +94,5 @@ AC_CONFIG_HEADERS([config.h:config.in])
 
 AC_CONFIG_FILES([Makefile src/Makefile help/Makefile man/Makefile tests/Makefile])
 AC_OUTPUT
+m4_unquote(
+  _m4_defn([_m4_wrap_text])_m4_popdef([_m4_wrap_text]))
