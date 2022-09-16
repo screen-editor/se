@@ -1,4 +1,11 @@
-Installation Instructions
+If you are building for a Posix system, just do this:
+
+	$ cd src
+	$ make
+	# make install
+
+If you are building for some other system, you can try to
+use the following instructions, but you may have trouble.
 
 The project uses GNU autoconf and GNU automake to generate
 scripts which will configure the build system. If there is
