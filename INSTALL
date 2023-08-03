@@ -5,8 +5,7 @@ scripts which will configure the build system. If there is
 not a 'configure' script present, run these commands to
 generate one based on the settings in configure.ac:
 
-	$ autoconf
-	$ automake
+	$ make -f Makefile.am reconf
 
 You can use the configure script to configure the build.
 Run `./configure --help` for a complete list of options.

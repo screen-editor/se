@@ -14,8 +14,8 @@ dnl
 dnl Look for a working C compiler
 dnl
 
-AC_SEARCH_LIBS([strerror],[cposix])
 AC_PROG_CC
+AC_SEARCH_LIBS([strerror],[cposix])
 
 dnl
 dnl Give the user the option of enabling usage logging.
