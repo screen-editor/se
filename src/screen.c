@@ -554,7 +554,8 @@ void gobble (int len, int cursor, int *status, int *nlpos, char *lin)
 	}
 	else if (len > 0)
 	{
-		strcpy (&lin[cursor], &lin[cursor + len]);
+		/* strcpy & strncpy for overlap regions is underfined, use memmove. */
+		(void) memmove(&lin[cursor], &lin[cursor + len], (size_t)(*nlpos + 1 - cursor - len));
 		*nlpos -= len;
 	}
 }
