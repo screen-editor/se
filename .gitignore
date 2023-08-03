@@ -19,3 +19,5 @@ compile
 test-driver
 *.log
 *.trs
+# TextPad workspace
+*.tws
