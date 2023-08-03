@@ -155,7 +155,7 @@ void garbage_collect (void)
 
 	Scr = new_fd;
 	memset (Scrname, '\0', MAXLINE);
-	snprintf (Scrname, MAXLINE-1, "%s", new_name);
+	snprintf (Scrname, sizeof (Scrname), "%s", new_name);
 	Scrend = new_scrend;
 	Lost_lines = 0;
 

@@ -181,7 +181,11 @@ int tflush (void)
 	int rc;
 
 	rc = write (1, Tobuf, (int)(Tobp - Tobuf + 1));
+/* Reset Tobp before the start of the buffer; make sure to pre-increment. */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
 	Tobp = Tobuf - 1;
+#pragma GCC diagnostic pop
 
 	return rc;
 }
