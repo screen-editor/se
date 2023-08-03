@@ -51,6 +51,7 @@ int docmd (char lin[], int i, int glob, int *status)
 	switch (lin[i]) {
 	case APPENDCOM:
 	case UCAPPENDCOM:
+append_after_line:
 		if (lin[i + 1] == '\n' || lin[i + 1] == ':')
 		{
 			defalt (Curln, Curln);
@@ -130,7 +131,11 @@ int docmd (char lin[], int i, int glob, int *status)
 	case INSERT:
 	case UCINSERT:
 		defalt (Curln, Curln);
-		if (Line1 <= 0)
+		if (Line1 == 0 && Lastln == 0)
+		{
+			goto append_after_line;
+		}
+		else if (Line1 <= 0)
 		{
 			Errcode = EORANGE;
 		}
@@ -804,7 +809,7 @@ int doopt (char lin[], int *i)
 			{
 				Errcode = ESE_NONSENSE;
 			}
-			else 
+			else
 			{
 				ret = SE_OK;
 				if (Unprintable != lin[*i + 1])
@@ -839,7 +844,7 @@ int doopt (char lin[], int *i)
 				saynum (Firstcol + 1);
 				ret = SE_OK;
 			}
-			else 
+			else
 			{
 				(*i)++;
 				temp = ctoi (lin, i);
@@ -1122,7 +1127,7 @@ int doread (int line, char *file, int tflag)
 					{
 						do {
 							lin2[len++] = ' ';
-						} while (len % 8 != 0 
+						} while (len % 8 != 0
 						    && len < MAXLINE - 1);
 					}
 				}
