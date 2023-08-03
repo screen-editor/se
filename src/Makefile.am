@@ -1,5 +1,6 @@
 # This file is in the public domain.
 
+AM_CFLAGS = -Wno-char-subscripts
 AM_CPPFLAGS = -DHELP_DIR='"$(datadir)/@PACKAGE@/help"' \
 	-DSHELL='"$(SHELL)"' -DCURSES_LOC='@CURSES_LOC@'
 

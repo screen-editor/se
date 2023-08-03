@@ -69,8 +69,6 @@ static char *CL;	/* clear screen */
 static char *STANDOUT;	/* standout on  (SO conflicts w/ASCII character name) */
 static char *SE;	/* standout end */
 
-extern char PC;		/* Pad character, usually '\0' */
-
 static char *pcstr;
 
 static char caps[128];		/* space for decoded capability strings */
@@ -129,7 +127,6 @@ int setcaps (char *term)
 		getdescrip ();		/* get terminal description */
 		Nrows = tgetnum ("li");
 		Ncols = tgetnum ("co");
-		PC = pcstr ? pcstr[0] : SE_EOS;
 		break;
 
 	default:

@@ -395,7 +395,7 @@ void overlay (int *status)
 				vcol = 0;
 				break;
 			}
-		} while (term == CURSOR_UP || 
+		} while (term == CURSOR_UP ||
 		    term == CURSOR_DOWN ||
 		    term == CURSOR_SAME);
 	}
@@ -769,8 +769,8 @@ int doshell (char lin[], int *pi)
 			j--;
 		new_command[j] = SE_EOS;
 
-		memset (sav_com, SE_EOS, MAXLINE);
-		strncpy (sav_com, new_command, MAXLINE-1);	/* save it */
+		memset (sav_com, SE_EOS, sizeof (sav_com));
+		strncpy (sav_com, new_command, sizeof (sav_com));	/* save it */
 
 		ttynormal ();
 		t_exit ();

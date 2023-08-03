@@ -397,7 +397,7 @@ void catsub (char lin[], int from[], int to[], char sub[], char _new[], int *k, 
 
 	for (i = 0; sub[i] != SE_EOS; i++)
 	{
-		if ((sub[i] & 0xff) == DITTO)
+		if (((unsigned char)sub[i] & 0xff) == DITTO)
 		{
 			ri = sub[++i];
 			for (j = from[ri]; j < to[ri]; j++)
