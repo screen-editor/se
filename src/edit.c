@@ -2,8 +2,6 @@
 ** edit.c
 **
 ** editor main routine, plus other routines used a lot.
-**
-** This file is in the public domain.
 */
 
 #include "config.h"

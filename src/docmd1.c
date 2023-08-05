@@ -2,8 +2,6 @@
 ** docmd1.c
 **
 ** main command processor.  routines for individual commands
-**
-** This file is in the public domain.
 */
 
 #include "config.h"

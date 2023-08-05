@@ -1,7 +1,5 @@
 /*
 ** term.h
-**
-** This file is in the public domain.
 */
 
 #ifndef __TERM_H

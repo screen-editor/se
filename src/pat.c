@@ -6,8 +6,6 @@
 ** routines declared static are not necessary for the rest
 ** of the editor, therefore make them static in the name
 ** of modularity.
-**
-** This file is in the public domain.
 */
 
 #include "config.h"

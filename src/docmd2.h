@@ -1,7 +1,5 @@
 /*
 ** docmd2.h
-**
-** This file is in the public domain.
 */
 
 #ifndef __DOCMD2_H

@@ -7,8 +7,6 @@
 ** the terminfo package, so we assume that if it is Release 1, someone will
 ** have ported the BSD termlib library.  If it is Release 2, then the new
 ** terminfo package is there, and we wil use it.
-**
-** This file is in the public domain.
 */
 
 #include "config.h"

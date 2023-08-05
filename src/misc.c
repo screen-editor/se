@@ -2,8 +2,6 @@
 ** misc.c
 **
 ** lots of miscellanious routines for the screen editor.
-**
-** This file is in the public domain.
 */
 
 #include "config.h"

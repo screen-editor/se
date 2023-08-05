@@ -2,8 +2,6 @@
 ** constdef.h
 **
 ** Standard macro definitions for se screen editor
-**
-** This file is in the public domain.
 */
 
 #ifndef __CONSTDEF_H

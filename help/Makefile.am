@@ -1,5 +1,3 @@
-# This file is in the public domain.
-
 helpdir = $(datadir)/@PACKAGE@/help
 
 help_DATA = a abt ah arg2 args b bang bug c cc ccmisc chardel charins colon \

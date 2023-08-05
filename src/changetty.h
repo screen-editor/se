@@ -1,7 +1,5 @@
 /*
 ** changetty.h
-**
-** This file is in the public domain.
 */
 
 #ifndef __CHANGETTY_H

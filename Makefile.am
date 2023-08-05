@@ -1,5 +1,3 @@
-# This file is in the public domain.
-
 SUBDIRS = help src man tests
 
 sampledir = $(datadir)/@PACKAGE@

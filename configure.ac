@@ -1,8 +1,4 @@
 dnl
-dnl This file is in the public domain.
-dnl
-
-dnl
 dnl Initialize autoconf and automake
 dnl
 

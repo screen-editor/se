@@ -1,7 +1,5 @@
 /*
 ** main.h
-**
-** This file is in the public domain.
 */
 
 #ifndef __MAIN_H

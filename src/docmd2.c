@@ -2,8 +2,6 @@
 ** docmd2.c
 **
 ** routines to actually execute commands
-**
-** This file is in the public domain.
 */
 
 #include "config.h"

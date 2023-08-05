@@ -2,7 +2,6 @@
 ** ascii.h
 **
 ** definitions of ASCII mnemonics and synonyms.
-** This file is in the public domain.
 */
 
 #ifndef	__ASCII_H

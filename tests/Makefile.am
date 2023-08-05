@@ -1,5 +1,3 @@
-# This file is in the public domain.
-
 TESTS_ENVIRONMENT = \
 	SE=$(top_builddir)/src/se \
 	SCRIPTSE=$(top_builddir)/src/scriptse \

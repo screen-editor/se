@@ -1,7 +1,5 @@
 /*
 ** scratch.h
-**
-** This file is in the public domain.
 */
 
 #ifndef __SCRATCH_H

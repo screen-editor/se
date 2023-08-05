@@ -3,8 +3,6 @@
 **
 ** main program and lots of other routines
 ** for the se screen editor.
-**
-** This file is in the public domain.
 */
 
 #include "config.h"

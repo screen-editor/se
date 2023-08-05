@@ -14,8 +14,6 @@
 ** If we are using System V, then the Release 2 version does not
 ** need ospeed.  If not release 2, we assume Release 1 that someone
 ** have moved the BSD termlib to.
-**
-** This file is in the public domain.
 */
 
 #include "config.h"
