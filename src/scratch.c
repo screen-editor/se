@@ -196,9 +196,7 @@ int gtxt (LINEDESC *ptr)
 int inject (char lin[])
 {
 	int i;
-	int maklin ();
 	LINEDESC *k3;
-	LINEDESC *getind ();
 
 	for (i = 0; lin [i] != SE_EOS; )
 	{

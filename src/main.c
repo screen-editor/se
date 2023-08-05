@@ -120,7 +120,7 @@ int Crypting = SE_NO;	/* doing file encryption? */
 char Key[KEYSIZE] = "";	/* saved encryption key */
 #endif /* HAVE_CRYPT_PROG */
 
-extern char *getenv ();
+extern char *getenv (const char *name);
 
 /* main --- main program for screen editor */
 

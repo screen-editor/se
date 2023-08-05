@@ -1171,7 +1171,6 @@ int ptscan (int way, int *num)
 int settab (char str[])
 {
 	int i, j, n, maxstop, last, inc, ret;
-	int ctoi ();
 
 	for (i = 0; i < MAXLINE; i++)   /* clear all tab stops */
 		Tabstops[i] = SE_NO;

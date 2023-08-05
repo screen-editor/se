@@ -299,7 +299,7 @@ void position_cursor (int row, int col)
 
 /* setscreen --- initialize screen and associated descriptive variables */
 
-void setscreen ()
+void setscreen (void)
 {
 	int row, col;
 
